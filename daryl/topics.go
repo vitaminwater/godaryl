@@ -1,5 +1,10 @@
 package daryl
 
+type topicMessage struct {
+	topic string
+	msg   interface{}
+}
+
 const (
 	// From RPC
 	USER_MESSAGE_TOPIC       = "USER_MESSAGE_TOPIC"

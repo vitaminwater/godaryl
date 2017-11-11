@@ -10,14 +10,22 @@ type darylLog struct {
 
 func darylLogProcess(dl *darylLog) {
 	for msg := range dl.c {
-		log.Info("################")
-		log.Info(msg)
+		tm := msg.(topicMessage)
+		log.Info(tm.topic, " : ", tm.msg)
 	}
 }
 
 func newDarylLog(s *darylServer) *darylLog {
 	dl := &darylLog{}
-	dl.c = s.pubsub.Sub(USER_MESSAGE_TOPIC)
+	dl.c = s.pubsub.Sub(
+		USER_MESSAGE_TOPIC,
+		ADD_HABIT_TOPIC,
+		START_WORK_SESSION_TOPIC,
+		LINK_LOG_TOPIC,
+		NOTE_LOG_TOPIC,
+		TODO_LOG_TOPIC,
+		UNPROCESSED_LOG_TOPIC,
+	)
 	go darylLogProcess(dl)
 	return dl
 }

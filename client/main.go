@@ -8,7 +8,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-const Identifier = "lol4"
+const Identifier = "lol1"
 
 func startDaryl(client farm.FarmClient) {
 	log.Info("startDaryl")
@@ -32,7 +32,7 @@ func hasDaryl(client farm.FarmClient) {
 
 func userMessage(client daryl.DarylClient) {
 	log.Info("userMessage")
-	request := &daryl.UserMessageRequest{Identifier: Identifier, Text: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout."}
+	request := &daryl.UserMessageRequest{Identifier: Identifier, Text: "http://lol.com/pouet It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout."}
 	response, err := client.UserMessage(context.Background(), request)
 	if err != nil {
 		log.Fatalf("fail to stuff: %v", err)
