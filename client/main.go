@@ -8,7 +8,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-const Identifier = "lol1"
+const Identifier = "lol3"
 
 func startDaryl(client farm.FarmClient) {
 	log.Info("startDaryl")
@@ -42,7 +42,17 @@ func userMessage(client daryl.DarylClient) {
 
 func addHabit(client daryl.DarylClient) {
 	log.Info("addHabit")
-	request := &daryl.AddHabitRequest{Identifier: Identifier}
+	request := &daryl.AddHabitRequest{
+		Identifier: Identifier,
+		Habit: &daryl.Habit{
+			Title:       "Habit de ouf !",
+			AvgDuration: 30,
+			Deadline:    "2002-10-02T15:00:00Z",
+			During:      30,
+			Every:       2,
+			EveryUnit:   "hours",
+		},
+	}
 	response, err := client.AddHabit(context.Background(), request)
 	if err != nil {
 		log.Fatalf("fail to stuff: %v", err)
@@ -52,7 +62,7 @@ func addHabit(client daryl.DarylClient) {
 
 func startWorkSession(client daryl.DarylClient) {
 	log.Info("startWorkSession")
-	request := &daryl.StartWorkSessionRequest{Identifier: "lol"}
+	request := &daryl.StartWorkSessionRequest{Identifier: Identifier}
 	response, err := client.StartWorkSession(context.Background(), request)
 	if err != nil {
 		log.Fatalf("fail to stuff: %v", err)
@@ -73,6 +83,7 @@ func main() {
 	startDaryl(farm)
 	hasDaryl(farm)
 	userMessage(daryl)
+	addHabit(daryl)
 	addHabit(daryl)
 	startWorkSession(daryl)
 }

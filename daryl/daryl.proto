@@ -22,8 +22,19 @@ message UserMessageResponse {
 
 // AddHabit
 
+message Habit {
+  string title = 1;
+  uint32 avgDuration = 2;
+  string deadline = 3;
+  uint32 during = 4;
+  uint32 every = 5;
+  string everyUnit = 6;
+}
+
 message AddHabitRequest {
   string identifier = 1;
+
+  Habit habit = 2;
 }
 
 message AddHabitResponse {

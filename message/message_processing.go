@@ -1,22 +1,24 @@
-package daryl
+package message
 
-import ()
+import (
+	"github.com/vitaminwater/daryl/daryl"
+)
 
 type messageProcessor interface {
-	matches(*UserMessageRequest) bool
-	process(*messageRouter, *UserMessageRequest)
+	matches(*daryl.UserMessageRequest) bool
+	process(*messageRouter, *daryl.UserMessageRequest)
 }
 
 type messageRouter struct {
-	s          *darylServer
+	d          *daryl.Daryl
 	c          chan interface{}
 	processors []messageProcessor
 }
 
 func messageRouterProcess(mr *messageRouter) {
 	for msg := range mr.c {
-		tm := msg.(topicMessage)
-		r := tm.msg.(*UserMessageRequest)
+		tm := msg.(daryl.TopicMessage)
+		r := tm.Msg.(*daryl.UserMessageRequest)
 		for _, processor := range mr.processors {
 			if processor.matches(r) {
 				processor.process(mr, r)
@@ -26,10 +28,10 @@ func messageRouterProcess(mr *messageRouter) {
 	}
 }
 
-func newMessageRouter(s *darylServer) *messageRouter {
-	mr := &messageRouter{s: s}
-	mr.c = s.pubsub.Sub(
-		USER_MESSAGE_TOPIC,
+func NewMessageRouter(d *daryl.Daryl) *messageRouter {
+	mr := &messageRouter{d: d}
+	mr.c = d.Sub(
+		daryl.USER_MESSAGE_TOPIC,
 	)
 	mr.processors = []messageProcessor{
 		newTodoMessageProcessor(),

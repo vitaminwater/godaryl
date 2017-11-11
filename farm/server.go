@@ -5,6 +5,8 @@ import (
 	"fmt"
 	log "github.com/sirupsen/logrus"
 	"github.com/vitaminwater/daryl/daryl"
+	"github.com/vitaminwater/daryl/habit"
+	"github.com/vitaminwater/daryl/message"
 	context "golang.org/x/net/context"
 	"sync"
 )
@@ -19,6 +21,8 @@ func (f *farmServer) StartDaryl(c context.Context, r *StartDarylRequest) (*Statu
 		return nil, errors.New(fmt.Sprintf("%s already registered", r.Identifier))
 	}
 	d := daryl.NewDaryl(r.Identifier)
+	message.NewMessageRouter(d)
+	habit.NewHabitWorker(d)
 	f.registry.Store(r.Identifier, d)
 	return &StatusResponse{true}, nil
 }
