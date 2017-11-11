@@ -1,0 +1,4 @@
+#!/bin/bash
+
+protoc --proto_path farm farm/farm.proto --go_out=plugins=grpc:farm
+protoc --proto_path daryl daryl/daryl.proto --go_out=plugins=grpc:daryl

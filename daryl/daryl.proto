@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package daryl;
+
+service Daryl {
+
+  rpc UserMessage(UserMessageRequest) returns (UserMessageResponse);
+  rpc AddHabit(AddHabitRequest) returns (AddHabitResponse);
+  rpc StartWorkSession(StartWorkSessionRequest) returns (StartWorkSessionResponse);
+
+}
+
+// UserMessage
+
+message UserMessageRequest {
+  string identifier = 1;
+  string text = 2;
+}
+
+message UserMessageResponse {
+}
+
+// AddHabit
+
+message AddHabitRequest {
+  string identifier = 1;
+}
+
+message AddHabitResponse {
+}
+
+// StartWorkSession
+
+message StartWorkSessionRequest {
+  string identifier = 1;
+}
+
+message StartWorkSessionResponse {
+}
