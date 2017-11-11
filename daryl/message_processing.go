@@ -4,10 +4,11 @@ import ()
 
 type messageProcessor interface {
 	matches(*UserMessageRequest) bool
-	process(*UserMessageRequest)
+	process(*messageRouter, *UserMessageRequest)
 }
 
 type messageRouter struct {
+	s          *darylServer
 	c          chan interface{}
 	processors []messageProcessor
 }
@@ -18,7 +19,7 @@ func messageRouterProcess(mr *messageRouter) {
 		r := tm.msg.(*UserMessageRequest)
 		for _, processor := range mr.processors {
 			if processor.matches(r) {
-				processor.process(r)
+				processor.process(mr, r)
 				break
 			}
 		}
@@ -26,7 +27,7 @@ func messageRouterProcess(mr *messageRouter) {
 }
 
 func newMessageRouter(s *darylServer) *messageRouter {
-	mr := &messageRouter{}
+	mr := &messageRouter{s: s}
 	mr.c = s.pubsub.Sub(
 		USER_MESSAGE_TOPIC,
 	)

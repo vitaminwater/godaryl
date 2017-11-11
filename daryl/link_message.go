@@ -5,6 +5,10 @@ import (
 	"regexp"
 )
 
+type linkMessage struct {
+	text string
+}
+
 type linkMessageProcessor struct {
 }
 
@@ -14,7 +18,8 @@ func (lmp *linkMessageProcessor) matches(r *UserMessageRequest) bool {
 	return linkRegexp.Match([]byte(r.Text))
 }
 
-func (lmp *linkMessageProcessor) process(r *UserMessageRequest) {
+func (lmp *linkMessageProcessor) process(mr *messageRouter, r *UserMessageRequest) {
+	mr.s.pub(linkMessage{r.Text}, LINK_LOG_TOPIC)
 	log.Info("linkMessageProcessor.process")
 }
 
