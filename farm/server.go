@@ -22,7 +22,7 @@ func (f *farmServer) StartDaryl(c context.Context, r *StartDarylRequest) (*Statu
 	}
 	d := daryl.NewDaryl(r.Identifier)
 	message.NewMessageRouter(d)
-	habit.NewHabitWorker(d)
+	habit.NewHabitStore(d)
 	f.registry.Store(r.Identifier, d)
 	return &StatusResponse{true}, nil
 }
