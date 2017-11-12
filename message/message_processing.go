@@ -4,7 +4,7 @@ import (
 	"github.com/vitaminwater/daryl/daryl"
 )
 
-type messageProcessor interface {
+type messageTypeProcessor interface {
 	matches(*daryl.UserMessageRequest) bool
 	process(*messageRouter, *daryl.UserMessageRequest)
 }
@@ -12,7 +12,7 @@ type messageProcessor interface {
 type messageRouter struct {
 	d          *daryl.Daryl
 	c          chan interface{}
-	processors []messageProcessor
+	processors []messageTypeProcessor
 }
 
 func messageRouterProcess(mr *messageRouter) {
@@ -28,12 +28,12 @@ func messageRouterProcess(mr *messageRouter) {
 	}
 }
 
-func NewMessageRouter(d *daryl.Daryl) *messageRouter {
+func newMessageRouter(d *daryl.Daryl) *messageRouter {
 	mr := &messageRouter{d: d}
 	mr.c = d.Sub(
 		daryl.USER_MESSAGE_TOPIC,
 	)
-	mr.processors = []messageProcessor{
+	mr.processors = []messageTypeProcessor{
 		newTodoMessageProcessor(),
 		newLinkMessageProcessor(),
 		newNoteMessageProcessor(),

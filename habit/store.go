@@ -23,7 +23,7 @@ func habitStoreProcess(hs *habitStore) {
 	}
 }
 
-func NewHabitStore(d *daryl.Daryl) *habitStore {
+func newHabitStore(d *daryl.Daryl) *habitStore {
 	hs := &habitStore{d: d, habits: make([]*habitWorker, 0, 10)}
 	hs.c = d.Sub(
 		daryl.ADD_HABIT_TOPIC,

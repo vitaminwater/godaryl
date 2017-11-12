@@ -17,8 +17,8 @@ func (s *darylServer) UserMessage(c context.Context, r *UserMessageRequest) (*Us
 	if ok != true {
 		return nil, fmt.Errorf("Unknown Daryl %s", r.Identifier)
 	}
-	d.(*Daryl).Pub(r, USER_MESSAGE_TOPIC)
-	return &UserMessageResponse{}, nil
+	resp, err := d.(*Daryl).MessageProcessor.UserMessage(r)
+	return resp, err
 }
 
 func (s *darylServer) AddHabit(c context.Context, r *AddHabitRequest) (*AddHabitResponse, error) {
@@ -28,8 +28,8 @@ func (s *darylServer) AddHabit(c context.Context, r *AddHabitRequest) (*AddHabit
 		return nil, fmt.Errorf("Unknown Daryl %s", r.Identifier)
 	}
 
-	d.(*Daryl).Pub(r, ADD_HABIT_TOPIC)
-	return &AddHabitResponse{}, nil
+	resp, err := d.(*Daryl).HabitProcessor.AddHabit(r)
+	return resp, err
 }
 
 func (s *darylServer) StartWorkSession(c context.Context, r *StartWorkSessionRequest) (*StartWorkSessionResponse, error) {
@@ -39,8 +39,8 @@ func (s *darylServer) StartWorkSession(c context.Context, r *StartWorkSessionReq
 		return nil, fmt.Errorf("Unknown Daryl %s", r.Identifier)
 	}
 
-	d.(*Daryl).Pub(r, START_WORK_SESSION_TOPIC)
-	return &StartWorkSessionResponse{}, nil
+	resp, err := d.(*Daryl).SessionProcessor.StartWorkSession(r)
+	return resp, err
 }
 
 func NewServer(registry *sync.Map) *darylServer {

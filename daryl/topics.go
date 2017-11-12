@@ -6,6 +6,7 @@ type TopicMessage struct {
 }
 
 const (
+	ALL_TOPIC = "ALL"
 	// From RPC
 	USER_MESSAGE_TOPIC       = "USER_MESSAGE"
 	ADD_HABIT_TOPIC          = "ADD_HABIT"
