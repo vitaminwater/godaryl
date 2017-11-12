@@ -2,11 +2,12 @@ package message
 
 import (
 	"github.com/vitaminwater/daryl/daryl"
+	"github.com/vitaminwater/daryl/protodef"
 )
 
 type messageTypeProcessor interface {
-	matches(*daryl.UserMessageRequest) bool
-	process(*messageRouter, *daryl.UserMessageRequest)
+	matches(*protodef.UserMessageRequest) bool
+	process(*messageRouter, *protodef.UserMessageRequest)
 }
 
 type messageRouter struct {
@@ -18,7 +19,7 @@ type messageRouter struct {
 func messageRouterProcess(mr *messageRouter) {
 	for msg := range mr.c {
 		tm := msg.(daryl.TopicMessage)
-		r := tm.Msg.(*daryl.UserMessageRequest)
+		r := tm.Msg.(*protodef.UserMessageRequest)
 		for _, processor := range mr.processors {
 			if processor.matches(r) {
 				processor.process(mr, r)

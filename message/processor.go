@@ -2,6 +2,7 @@ package message
 
 import (
 	"github.com/vitaminwater/daryl/daryl"
+	"github.com/vitaminwater/daryl/protodef"
 )
 
 type messageProcessor struct {
@@ -14,9 +15,9 @@ func (mp *messageProcessor) SetDaryl(d *daryl.Daryl) {
 	mp.mr = newMessageRouter(d)
 }
 
-func (mp *messageProcessor) UserMessage(r *daryl.UserMessageRequest) (*daryl.UserMessageResponse, error) {
+func (mp *messageProcessor) UserMessage(r *protodef.UserMessageRequest) (*protodef.UserMessageResponse, error) {
 	mp.d.Pub(r, daryl.USER_MESSAGE_TOPIC)
-	return &daryl.UserMessageResponse{}, nil
+	return &protodef.UserMessageResponse{}, nil
 }
 
 func NewMessageProcessor() *messageProcessor {

@@ -1,6 +1,31 @@
 syntax = "proto3";
 
-package daryl;
+package protodef;
+
+service Farm {
+
+  rpc StartDaryl(StartDarylRequest) returns (StatusResponse);
+  rpc HasDaryl(HasDarylRequest) returns (StatusResponse);
+
+}
+
+// StartDaryl
+
+message StartDarylRequest {
+  string identifier = 1;
+}
+
+// HasDaryl
+
+message HasDarylRequest {
+  string identifier = 1;
+}
+
+// Response
+
+message StatusResponse {
+  bool ok = 1;
+}
 
 service Daryl {
 

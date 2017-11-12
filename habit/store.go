@@ -3,6 +3,7 @@ package habit
 import (
 	//log "github.com/sirupsen/logrus"
 	"github.com/vitaminwater/daryl/daryl"
+	"github.com/vitaminwater/daryl/protodef"
 )
 
 type habitStore struct {
@@ -16,7 +17,7 @@ func habitStoreProcess(hs *habitStore) {
 		tm := msg.(daryl.TopicMessage)
 		switch t := tm.Topic; t {
 		case daryl.ADD_HABIT_TOPIC:
-			r := tm.Msg.(*daryl.AddHabitRequest)
+			r := tm.Msg.(*protodef.AddHabitRequest)
 			h := newHabitWorker(hs.d, r.Habit)
 			hs.habits = append(hs.habits, h)
 		}

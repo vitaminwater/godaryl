@@ -2,7 +2,7 @@ package message
 
 import (
 	log "github.com/sirupsen/logrus"
-	"github.com/vitaminwater/daryl/daryl"
+	"github.com/vitaminwater/daryl/protodef"
 )
 
 type noteMessage struct {
@@ -12,11 +12,11 @@ type noteMessage struct {
 type noteMessageProcessor struct {
 }
 
-func (nmp *noteMessageProcessor) matches(r *daryl.UserMessageRequest) bool {
+func (nmp *noteMessageProcessor) matches(r *protodef.UserMessageRequest) bool {
 	return true
 }
 
-func (nmp *noteMessageProcessor) process(mr *messageRouter, r *daryl.UserMessageRequest) {
+func (nmp *noteMessageProcessor) process(mr *messageRouter, r *protodef.UserMessageRequest) {
 	mr.d.Pub(noteMessage{r.Text}, NOTE_LOG_TOPIC)
 	log.Info("noteMessageProcessor.process ", r)
 }

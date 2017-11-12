@@ -2,17 +2,16 @@ package main
 
 import (
 	log "github.com/sirupsen/logrus"
-	"github.com/vitaminwater/daryl/daryl"
-	"github.com/vitaminwater/daryl/farm"
+	"github.com/vitaminwater/daryl/protodef"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 )
 
 const Identifier = "lol3"
 
-func startDaryl(client farm.FarmClient) {
+func startDaryl(client protodef.FarmClient) {
 	log.Info("startDaryl")
-	request := &farm.StartDarylRequest{Identifier: Identifier}
+	request := &protodef.StartDarylRequest{Identifier: Identifier}
 	response, err := client.StartDaryl(context.Background(), request)
 	if err != nil {
 		log.Fatalf("fail to stuff: %v", err)
@@ -20,9 +19,9 @@ func startDaryl(client farm.FarmClient) {
 	log.Println(response)
 }
 
-func hasDaryl(client farm.FarmClient) {
+func hasDaryl(client protodef.FarmClient) {
 	log.Info("hasDaryl")
-	request := &farm.HasDarylRequest{Identifier: Identifier}
+	request := &protodef.HasDarylRequest{Identifier: Identifier}
 	response, err := client.HasDaryl(context.Background(), request)
 	if err != nil {
 		log.Fatalf("fail to stuff: %v", err)
@@ -30,9 +29,9 @@ func hasDaryl(client farm.FarmClient) {
 	log.Println(response)
 }
 
-func userMessage(client daryl.DarylClient) {
+func userMessage(client protodef.DarylClient) {
 	log.Info("userMessage")
-	request := &daryl.UserMessageRequest{Identifier: Identifier, Text: "http://lol.com/pouet It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout."}
+	request := &protodef.UserMessageRequest{Identifier: Identifier, Text: "http://lol.com/pouet It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout."}
 	response, err := client.UserMessage(context.Background(), request)
 	if err != nil {
 		log.Fatalf("fail to stuff: %v", err)
@@ -40,11 +39,11 @@ func userMessage(client daryl.DarylClient) {
 	log.Println(response)
 }
 
-func addHabit(client daryl.DarylClient) {
+func addHabit(client protodef.DarylClient) {
 	log.Info("addHabit")
-	request := &daryl.AddHabitRequest{
+	request := &protodef.AddHabitRequest{
 		Identifier: Identifier,
-		Habit: &daryl.Habit{
+		Habit: &protodef.Habit{
 			Title:       "Habit de ouf !",
 			AvgDuration: 30,
 			Deadline:    "2002-10-02T15:00:00Z",
@@ -60,9 +59,9 @@ func addHabit(client daryl.DarylClient) {
 	log.Println(response)
 }
 
-func startWorkSession(client daryl.DarylClient) {
+func startWorkSession(client protodef.DarylClient) {
 	log.Info("startWorkSession")
-	request := &daryl.StartWorkSessionRequest{Identifier: Identifier}
+	request := &protodef.StartWorkSessionRequest{Identifier: Identifier}
 	response, err := client.StartWorkSession(context.Background(), request)
 	if err != nil {
 		log.Fatalf("fail to stuff: %v", err)
@@ -77,8 +76,8 @@ func main() {
 	}
 	defer conn.Close()
 
-	farm := farm.NewFarmClient(conn)
-	daryl := daryl.NewDarylClient(conn)
+	farm := protodef.NewFarmClient(conn)
+	daryl := protodef.NewDarylClient(conn)
 
 	startDaryl(farm)
 	hasDaryl(farm)

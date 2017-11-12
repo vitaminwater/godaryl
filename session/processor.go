@@ -2,6 +2,7 @@ package session
 
 import (
 	"github.com/vitaminwater/daryl/daryl"
+	"github.com/vitaminwater/daryl/protodef"
 )
 
 type sessionProcessor struct {
@@ -12,9 +13,9 @@ func (mp *sessionProcessor) SetDaryl(d *daryl.Daryl) {
 	mp.d = d
 }
 
-func (sp *sessionProcessor) StartWorkSession(r *daryl.StartWorkSessionRequest) (*daryl.StartWorkSessionResponse, error) {
+func (sp *sessionProcessor) StartWorkSession(r *protodef.StartWorkSessionRequest) (*protodef.StartWorkSessionResponse, error) {
 	sp.d.Pub(r, daryl.START_WORK_SESSION_TOPIC)
-	return &daryl.StartWorkSessionResponse{}, nil
+	return &protodef.StartWorkSessionResponse{}, nil
 }
 
 func NewSessionProcessor() *sessionProcessor {

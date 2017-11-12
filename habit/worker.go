@@ -3,6 +3,7 @@ package habit
 import (
 	log "github.com/sirupsen/logrus"
 	"github.com/vitaminwater/daryl/daryl"
+	"github.com/vitaminwater/daryl/protodef"
 	"time"
 )
 
@@ -35,7 +36,7 @@ func habitWorkerProcess(h *habitWorker) {
 	}
 }
 
-func newHabitWorker(d *daryl.Daryl, h *daryl.Habit) *habitWorker {
+func newHabitWorker(d *daryl.Daryl, h *protodef.Habit) *habitWorker {
 	var deadline *time.Time = nil
 	tDeadline := time.Now()
 	if err := tDeadline.UnmarshalText([]byte(h.Deadline)); err != nil {

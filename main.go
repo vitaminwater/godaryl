@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 	log "github.com/sirupsen/logrus"
-	"github.com/vitaminwater/daryl/daryl"
-	"github.com/vitaminwater/daryl/farm"
+	"github.com/vitaminwater/daryl/protodef"
+	"github.com/vitaminwater/daryl/server"
 	"google.golang.org/grpc"
 	"net"
 	"sync"
@@ -20,8 +20,8 @@ func main() {
 	registry := &sync.Map{}
 
 	grpcServer := grpc.NewServer()
-	farm.RegisterFarmServer(grpcServer, farm.NewServer(registry))
-	daryl.RegisterDarylServer(grpcServer, daryl.NewServer(registry))
+	protodef.RegisterFarmServer(grpcServer, server.NewFarmServer(registry))
+	protodef.RegisterDarylServer(grpcServer, server.NewDarylServer(registry))
 	log.Infof("Serving on port %d", port)
 	grpcServer.Serve(lis)
 }

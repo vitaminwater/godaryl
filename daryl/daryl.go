@@ -2,21 +2,22 @@ package daryl
 
 import (
 	"github.com/cskr/pubsub"
+	"github.com/vitaminwater/daryl/protodef"
 )
 
 type MessageProcessor interface {
 	SetDaryl(*Daryl)
-	UserMessage(*UserMessageRequest) (*UserMessageResponse, error)
+	UserMessage(*protodef.UserMessageRequest) (*protodef.UserMessageResponse, error)
 }
 
 type HabitProcessor interface {
 	SetDaryl(*Daryl)
-	AddHabit(*AddHabitRequest) (*AddHabitResponse, error)
+	AddHabit(*protodef.AddHabitRequest) (*protodef.AddHabitResponse, error)
 }
 
 type SessionProcessor interface {
 	SetDaryl(*Daryl)
-	StartWorkSession(*StartWorkSessionRequest) (*StartWorkSessionResponse, error)
+	StartWorkSession(*protodef.StartWorkSessionRequest) (*protodef.StartWorkSessionResponse, error)
 }
 
 type Daryl struct {
