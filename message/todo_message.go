@@ -14,11 +14,11 @@ type todoMessageProcessor struct {
 }
 
 func (lmp *todoMessageProcessor) matches(r *protodef.UserMessageRequest) bool {
-	return strings.HasPrefix(strings.ToLower(r.Text), "todo")
+	return strings.HasPrefix(strings.ToLower(r.Message.Text), "todo")
 }
 
 func (lmp *todoMessageProcessor) process(mr *messageRouter, r *protodef.UserMessageRequest) {
-	mr.d.Pub(todoMessage{r.Text}, TODO_LOG_TOPIC)
+	mr.d.Pub(todoMessage{r.Message.Text}, TODO_LOG_TOPIC)
 	log.Info("todoMessageProcessor.process")
 }
 

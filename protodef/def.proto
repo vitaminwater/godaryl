@@ -4,8 +4,8 @@ package protodef;
 
 service Farm {
 
-  rpc StartDaryl(StartDarylRequest) returns (StatusResponse);
-  rpc HasDaryl(HasDarylRequest) returns (StatusResponse);
+  rpc StartDaryl(StartDarylRequest) returns (StartDarylResponse);
+  rpc HasDaryl(HasDarylRequest) returns (HasDarylResponse);
 
 }
 
@@ -23,8 +23,11 @@ message HasDarylRequest {
 
 // Response
 
-message StatusResponse {
-  bool ok = 1;
+message StartDarylResponse {
+}
+
+message HasDarylResponse {
+  bool response = 1;
 }
 
 service Daryl {
@@ -39,21 +42,50 @@ service Daryl {
 
 message UserMessageRequest {
   string identifier = 1;
+  Message message = 2;
+}
+
+message MessageLink {
+  // @inject_tag: db:"link"
+  string link = 1;
+}
+
+message Message {
+  // @inject_tag: db:"id"
+  string id = 1;
+  // @inject_tag: db:"text"
   string text = 2;
+  // @inject_tag: db:"at"
+  string at = 3;
+  // @inject_tag: db:"link"
+  bool done = 4;
+  // @inject_tag: db:"todo"
+  string todo = 5;
+  // @inject_tag: db:"links"
+  repeated MessageLink links = 6;
 }
 
 message UserMessageResponse {
+  Message message = 2;
 }
 
 // AddHabit
 
 message Habit {
-  string title = 1;
-  uint32 avgDuration = 2;
-  string deadline = 3;
-  uint32 during = 4;
-  uint32 every = 5;
-  string everyUnit = 6;
+  // @inject_tag: db:"id"
+  string id = 1;
+  // @inject_tag: db:"title"
+  string title = 2;
+  // @inject_tag: db:"avgDuration"
+  uint32 avgDuration = 3;
+  // @inject_tag: db:"deadline"
+  string deadline = 4;
+  // @inject_tag: db:"during"
+  uint32 during = 5;
+  // @inject_tag: db:"every"
+  uint32 every = 6;
+  // @inject_tag: db:"everyUnit"
+  string everyUnit = 7;
 }
 
 message AddHabitRequest {
@@ -63,13 +95,33 @@ message AddHabitRequest {
 }
 
 message AddHabitResponse {
+  Habit habit = 2;
 }
 
 // StartWorkSession
+
+message SessionSlice {
+   // @inject_tag: db:"start"
+  string start = 1;
+  // @inject_tag: db:"end"
+  string end = 2;
+  // @inject_tag: db:"habit"
+  Habit habit = 3;
+}
+
+message Session {
+  // @inject_tag: db:"start"
+  string start = 1;
+  // @inject_tag: db:"end"
+  string end = 2;
+  // @inject_tag: db:"slices"
+  repeated SessionSlice slices = 3;
+}
 
 message StartWorkSessionRequest {
   string identifier = 1;
 }
 
 message StartWorkSessionResponse {
+  Session session = 2;
 }

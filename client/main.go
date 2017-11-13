@@ -31,7 +31,7 @@ func hasDaryl(client protodef.FarmClient) {
 
 func userMessage(client protodef.DarylClient) {
 	log.Info("userMessage")
-	request := &protodef.UserMessageRequest{Identifier: Identifier, Text: "http://lol.com/pouet It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout."}
+	request := &protodef.UserMessageRequest{Identifier: Identifier, Message: &protodef.Message{Text: "http://lol.com/pouet It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout."}}
 	response, err := client.UserMessage(context.Background(), request)
 	if err != nil {
 		log.Fatalf("fail to stuff: %v", err)

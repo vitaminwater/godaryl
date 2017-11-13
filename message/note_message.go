@@ -17,7 +17,7 @@ func (nmp *noteMessageProcessor) matches(r *protodef.UserMessageRequest) bool {
 }
 
 func (nmp *noteMessageProcessor) process(mr *messageRouter, r *protodef.UserMessageRequest) {
-	mr.d.Pub(noteMessage{r.Text}, NOTE_LOG_TOPIC)
+	mr.d.Pub(noteMessage{r.Message.Text}, NOTE_LOG_TOPIC)
 	log.Info("noteMessageProcessor.process ", r)
 }
 

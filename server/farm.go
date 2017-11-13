@@ -17,20 +17,20 @@ type farmServer struct {
 	registry *sync.Map
 }
 
-func (f *farmServer) StartDaryl(c context.Context, r *protodef.StartDarylRequest) (*protodef.StatusResponse, error) {
+func (f *farmServer) StartDaryl(c context.Context, r *protodef.StartDarylRequest) (*protodef.StartDarylResponse, error) {
 	log.Println("StartDaryl")
 	if _, ok := f.registry.Load(r.Identifier); ok != false {
 		return nil, errors.New(fmt.Sprintf("%s already registered", r.Identifier))
 	}
 	d := daryl.NewDaryl(r.Identifier, message.NewMessageProcessor(), habit.NewHabitProcessor(), session.NewSessionProcessor())
 	f.registry.Store(r.Identifier, d)
-	return &protodef.StatusResponse{true}, nil
+	return &protodef.StartDarylResponse{}, nil
 }
 
-func (f *farmServer) HasDaryl(c context.Context, r *protodef.HasDarylRequest) (*protodef.StatusResponse, error) {
+func (f *farmServer) HasDaryl(c context.Context, r *protodef.HasDarylRequest) (*protodef.HasDarylResponse, error) {
 	log.Println("HasDaryl")
 	_, ok := f.registry.Load(r.Identifier)
-	return &protodef.StatusResponse{ok}, nil
+	return &protodef.HasDarylResponse{ok}, nil
 }
 
 func NewFarmServer(registry *sync.Map) *farmServer {
