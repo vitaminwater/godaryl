@@ -1,13 +1,14 @@
 package main
 
 import (
+	"github.com/golang/protobuf/ptypes"
 	log "github.com/sirupsen/logrus"
 	"github.com/vitaminwater/daryl/protodef"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 )
 
-const Identifier = "lol3"
+const Identifier = "lol4"
 
 func startDaryl(client protodef.FarmClient) {
 	log.Info("startDaryl")
@@ -46,10 +47,11 @@ func addHabit(client protodef.DarylClient) {
 		Habit: &protodef.Habit{
 			Title:       "Habit de ouf !",
 			AvgDuration: 30,
-			Deadline:    "2002-10-02T15:00:00Z",
+			Deadline:    ptypes.TimestampNow(),
 			During:      30,
 			Every:       2,
 			EveryUnit:   "hours",
+			LastDone:    ptypes.TimestampNow(),
 		},
 	}
 	response, err := client.AddHabit(context.Background(), request)

@@ -1,4 +1,4 @@
 #!/bin/bash
 
-protoc --proto_path protodef protodef/def.proto --go_out=plugins=grpc:protodef
-protoc-go-inject-tag -input=protodef/def.pb.go
+protoc -I $GOPATH//src/github.com/golang/protobuf --proto_path protodef protodef/def.proto --go_out=plugins=grpc:protodef && \
+  protoc-go-inject-tag -input=protodef/def.pb.go

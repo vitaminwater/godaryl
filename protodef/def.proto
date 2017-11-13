@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+import "ptypes/timestamp/timestamp.proto";
+
 package protodef;
 
 service Farm {
@@ -56,7 +58,7 @@ message Message {
   // @inject_tag: db:"text"
   string text = 2;
   // @inject_tag: db:"at"
-  string at = 3;
+  google.protobuf.Timestamp at = 3;
   // @inject_tag: db:"link"
   bool done = 4;
   // @inject_tag: db:"todo"
@@ -79,13 +81,15 @@ message Habit {
   // @inject_tag: db:"avgDuration"
   uint32 avgDuration = 3;
   // @inject_tag: db:"deadline"
-  string deadline = 4;
+  google.protobuf.Timestamp deadline = 4;
   // @inject_tag: db:"during"
   uint32 during = 5;
   // @inject_tag: db:"every"
   uint32 every = 6;
   // @inject_tag: db:"everyUnit"
   string everyUnit = 7;
+  // @inject_tag: db:"lastDone"
+  google.protobuf.Timestamp lastDone = 8;
 }
 
 message AddHabitRequest {

@@ -1,26 +1,27 @@
 package habit
 
 import (
+	"github.com/golang/protobuf/ptypes"
 	log "github.com/sirupsen/logrus"
 	"github.com/vitaminwater/daryl/daryl"
 	"github.com/vitaminwater/daryl/protodef"
 	"time"
 )
 
-type habitFrequency struct {
-	during    uint
-	every     uint
-	everyUnit string
+type habit struct {
+	protodef.Habit
+	LastDone *time.Time
 }
 
-type habit struct {
-	title string
-
-	avgDuration uint
-	deadline    *time.Time
-	frequency   habitFrequency
-
-	lastDone *time.Time
+func newHabit(h *protodef.Habit) *habit {
+	lastDone, err := ptypes.Timestamp(h.LastDone)
+	if err != nil {
+		log.Info(err)
+	}
+	return &habit{
+		*h,
+		&lastDone,
+	}
 }
 
 type habitWorker struct {
@@ -37,24 +38,8 @@ func habitWorkerProcess(h *habitWorker) {
 }
 
 func newHabitWorker(d *daryl.Daryl, h *protodef.Habit) *habitWorker {
-	var deadline *time.Time = nil
-	tDeadline := time.Now()
-	if err := tDeadline.UnmarshalText([]byte(h.Deadline)); err != nil {
-		deadline = &tDeadline
-	}
-	ha := &habit{
-		h.Title,
-		uint(h.AvgDuration),
-		deadline,
-		habitFrequency{
-			uint(h.During),
-			uint(h.Every),
-			h.EveryUnit,
-		},
-		nil,
-	}
 	hw := &habitWorker{
-		ha,
+		newHabit(h),
 		d.Sub(
 			daryl.ADD_HABIT_TOPIC,
 		),
