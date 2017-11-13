@@ -3,32 +3,39 @@ package habit
 import (
 	//log "github.com/sirupsen/logrus"
 	"github.com/vitaminwater/daryl/daryl"
-	"github.com/vitaminwater/daryl/protodef"
 )
 
+type command interface {
+	execute(hs *habitStore)
+}
+
+type commandAddHabit struct {
+	h *habit
+}
+
+func (c *commandAddHabit) execute(hs *habitStore) {
+	hw := newHabitWorker(hs.d, c.h)
+	hs.habitWorkers = append(hs.habitWorkers, hw)
+}
+
 type habitStore struct {
-	d      *daryl.Daryl
-	c      chan interface{}
-	habits []*habitWorker
+	d            *daryl.Daryl
+	c            chan command
+	habitWorkers []*habitWorker
+}
+
+func (hs *habitStore) addHabit(h *habit) {
+	hs.c <- &commandAddHabit{h}
 }
 
 func habitStoreProcess(hs *habitStore) {
-	for msg := range hs.c {
-		tm := msg.(daryl.TopicMessage)
-		switch t := tm.Topic; t {
-		case daryl.ADD_HABIT_TOPIC:
-			r := tm.Msg.(*protodef.AddHabitRequest)
-			h := newHabitWorker(hs.d, r.Habit)
-			hs.habits = append(hs.habits, h)
-		}
+	for cmd := range hs.c {
+		cmd.execute(hs)
 	}
 }
 
 func newHabitStore(d *daryl.Daryl) *habitStore {
-	hs := &habitStore{d: d, habits: make([]*habitWorker, 0, 10)}
-	hs.c = d.Sub(
-		daryl.ADD_HABIT_TOPIC,
-	)
+	hs := &habitStore{d: d, habitWorkers: make([]*habitWorker, 0, 10)}
 	go habitStoreProcess(hs)
 	return hs
 }

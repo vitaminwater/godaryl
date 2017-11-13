@@ -2,27 +2,22 @@ package message
 
 import (
 	log "github.com/sirupsen/logrus"
-	"github.com/vitaminwater/daryl/protodef"
 	"strings"
 )
 
-type todoMessage struct {
-	text string
-}
-
 type todoMessageProcessor struct {
+	mp *messageProcessor
 }
 
-func (lmp *todoMessageProcessor) matches(r *protodef.UserMessageRequest) bool {
-	return strings.HasPrefix(strings.ToLower(r.Message.Text), "todo")
-}
-
-func (lmp *todoMessageProcessor) process(mr *messageRouter, r *protodef.UserMessageRequest) {
-	mr.d.Pub(todoMessage{r.Message.Text}, TODO_LOG_TOPIC)
+func (tmp *todoMessageProcessor) process(m *message) {
+	if strings.HasPrefix(strings.ToLower(m.Text), "todo") {
+		return
+	}
+	tmp.mp.d.Pub(m, TODO_LOG_TOPIC)
 	log.Info("todoMessageProcessor.process")
 }
 
-func newTodoMessageProcessor() *todoMessageProcessor {
-	lmp := &todoMessageProcessor{}
-	return lmp
+func newTodoMessageProcessor(mp *messageProcessor) *todoMessageProcessor {
+	tmp := &todoMessageProcessor{mp}
+	return tmp
 }

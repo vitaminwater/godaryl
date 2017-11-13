@@ -10,7 +10,8 @@ import (
 
 type habit struct {
 	protodef.Habit
-	LastDone *time.Time
+	Deadline *time.Time `db:"deadline"`
+	LastDone *time.Time `db:"lastDone"`
 }
 
 func newHabit(h *protodef.Habit) *habit {
@@ -18,8 +19,14 @@ func newHabit(h *protodef.Habit) *habit {
 	if err != nil {
 		log.Info(err)
 	}
+	deadline, err := ptypes.Timestamp(h.Deadline)
+	if err != nil {
+		log.Info(err)
+	}
+
 	return &habit{
 		*h,
+		&deadline,
 		&lastDone,
 	}
 }
@@ -37,9 +44,9 @@ func habitWorkerProcess(h *habitWorker) {
 	}
 }
 
-func newHabitWorker(d *daryl.Daryl, h *protodef.Habit) *habitWorker {
+func newHabitWorker(d *daryl.Daryl, h *habit) *habitWorker {
 	hw := &habitWorker{
-		newHabit(h),
+		h,
 		d.Sub(
 			daryl.ADD_HABIT_TOPIC,
 		),

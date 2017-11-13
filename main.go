@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
+	"net"
+	"sync"
+
 	log "github.com/sirupsen/logrus"
 	"github.com/vitaminwater/daryl/protodef"
 	"github.com/vitaminwater/daryl/server"
 	"google.golang.org/grpc"
-	"net"
-	"sync"
 )
 
 func main() {

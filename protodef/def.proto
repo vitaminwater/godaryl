@@ -80,7 +80,6 @@ message Habit {
   string title = 2;
   // @inject_tag: db:"avgDuration"
   uint32 avgDuration = 3;
-  // @inject_tag: db:"deadline"
   google.protobuf.Timestamp deadline = 4;
   // @inject_tag: db:"during"
   uint32 during = 5;
@@ -88,7 +87,6 @@ message Habit {
   uint32 every = 6;
   // @inject_tag: db:"everyUnit"
   string everyUnit = 7;
-  // @inject_tag: db:"lastDone"
   google.protobuf.Timestamp lastDone = 8;
 }
 

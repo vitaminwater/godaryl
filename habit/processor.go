@@ -16,7 +16,8 @@ func (hp *habitProcessor) SetDaryl(d *daryl.Daryl) {
 }
 
 func (hp *habitProcessor) AddHabit(r *protodef.AddHabitRequest) (*protodef.AddHabitResponse, error) {
-	hp.d.Pub(r, daryl.ADD_HABIT_TOPIC)
+	h := newHabit(r.Habit)
+	hp.d.Pub(h, daryl.ADD_HABIT_TOPIC)
 	return &protodef.AddHabitResponse{}, nil
 }
 
