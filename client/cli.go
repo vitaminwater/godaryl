@@ -68,6 +68,7 @@ func addHabit(client protodef.DarylClient, c *cli.Context) {
 			Deadline: deadline,
 			Cron:     c.String("cron"),
 			Duration: uint32(duration / time.Minute),
+			LastDone: ptypes.TimestampNow(),
 		},
 	}
 	log.Info(request)
