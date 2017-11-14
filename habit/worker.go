@@ -41,6 +41,7 @@ type workerCommandOnHabitTrigger struct{}
 
 func (oht *workerCommandOnHabitTrigger) execute(w *habitWorker) {
 	w.h.NMissed++
+	w.d.Pub(w.h, HABIT_SCHEDULED_TOPIC)
 	log.Info("onHabitTrigger ", w.h.NMissed)
 }
 

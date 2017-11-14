@@ -1,3 +1,5 @@
 package habit
 
-const ()
+const (
+	HABIT_SCHEDULED_TOPIC = "HABIT_SCHEDULED"
+)
