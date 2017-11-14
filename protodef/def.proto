@@ -79,15 +79,15 @@ message Habit {
   // @inject_tag: db:"title"
   string title = 2;
   // @inject_tag: db:"avgDuration"
-  uint32 avgDuration = 3;
+  uint32 duration = 3;
   google.protobuf.Timestamp deadline = 4;
   // @inject_tag: db:"during"
   uint32 during = 5;
-  // @inject_tag: db:"every"
-  uint32 every = 6;
-  // @inject_tag: db:"everyUnit"
-  string everyUnit = 7;
+  // @inject_tag: db:"cron"
+  string cron = 6;
   google.protobuf.Timestamp lastDone = 8;
+  // @inject_tag: db:"nMissed"
+  uint32 nMissed = 7;
 }
 
 message AddHabitRequest {
