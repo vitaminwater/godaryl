@@ -27,7 +27,8 @@ func (sp *sessionProcessor) StartWorkSession(r *protodef.StartWorkSessionRequest
 	sp.d.Pub(r, daryl.START_WORK_SESSION_TOPIC)
 	sp.sw = sw
 	sp.d.Pub(s, PROPOSE_WORK_SESSION_TOPIC)
-	return &protodef.StartWorkSessionResponse{s}, nil
+	se := s.GetSession()
+	return &protodef.StartWorkSessionResponse{&se}, nil
 }
 
 func NewSessionProcessor() *sessionProcessor {

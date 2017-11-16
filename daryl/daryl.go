@@ -5,6 +5,27 @@ import (
 	"github.com/vitaminwater/daryl/protodef"
 )
 
+/*
+	Weight calculation:
+	- short period -> higher weight
+	- long period -> higher weight
+	- avg period -> no weight change
+*/
+
+type Habit interface {
+	GetHabit() protodef.Habit
+	GetWeight() uint32
+}
+
+type SessionSlice interface {
+	GetSessionSlice() protodef.SessionSlice
+}
+
+type Session interface {
+	GetSession() protodef.Session
+	GetSessionSlices() []SessionSlice
+}
+
 type MessageProcessor interface {
 	SetDaryl(*Daryl)
 	UserMessage(*protodef.UserMessageRequest) (*protodef.UserMessageResponse, error)
@@ -17,7 +38,7 @@ type HabitProcessor interface {
 	AddHabit(*protodef.AddHabitRequest) (*protodef.AddHabitResponse, error)
 
 	/* API */
-	GetDueHabits() []*protodef.Habit
+	GetDueHabits() []Habit
 }
 
 type SessionProcessor interface {

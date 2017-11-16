@@ -11,10 +11,18 @@ import (
 )
 
 type habit struct {
-	protodef.Habit
+	h        protodef.Habit
 	Deadline *time.Time    `db:"deadline"`
 	LastDone *time.Time    `db:"lastDone"`
 	Duration time.Duration `db:"duration"`
+}
+
+func (h *habit) GetHabit() protodef.Habit {
+	return h.h
+}
+
+func (h *habit) GetWeight() uint32 {
+	return 0
 }
 
 func newHabit(h *protodef.Habit) *habit {
@@ -45,18 +53,18 @@ type workerCommand interface {
 type workerCommandOnHabitTrigger struct{}
 
 func (oht *workerCommandOnHabitTrigger) execute(w *habitWorker) {
-	w.h.Stats.NMissed++
-	w.h.Stats.Forget = uint64(float64(w.h.Stats.Forget) * 1.5)
+	w.h.h.Stats.NMissed++
+	w.h.h.Stats.Forget = uint64(float64(w.h.h.Stats.Forget) * 1.5)
 	w.d.Pub(w.h, HABIT_SCHEDULED_TOPIC)
-	log.Info("onHabitTrigger ", w.h.Stats.NMissed, " ", w.h.Stats.Forget)
+	log.Info("onHabitTrigger ", w.h.h.Stats.NMissed, " ", w.h.h.Stats.Forget)
 }
 
 type workerCommandGetHabit struct {
-	r chan protodef.Habit
+	r chan *habit
 }
 
 func (gh *workerCommandGetHabit) execute(w *habitWorker) {
-	gh.r <- w.h.Habit
+	gh.r <- w.h
 }
 
 type habitWorker struct {
@@ -74,7 +82,7 @@ func habitWorkerProcess(hw *habitWorker) {
 		select {
 		case _ = <-hw.tick:
 			p := float64(time.Since(*hw.h.LastDone)) / float64(hw.h.Duration) * 100
-			hw.h.Stats.Forget += uint64(p)
+			hw.h.h.Stats.Forget += uint64(p)
 		case cmd := <-hw.cmd:
 			cmd.execute(hw)
 		case msg := <-hw.sub:
@@ -94,7 +102,7 @@ func newHabitWorker(d *daryl.Daryl, h *habit) *habitWorker {
 		),
 		d,
 	}
-	hw.cr.AddFunc(h.Cron, func() { hw.cmd <- &workerCommandOnHabitTrigger{} })
+	hw.cr.AddFunc(h.h.Cron, func() { hw.cmd <- &workerCommandOnHabitTrigger{} })
 	go habitWorkerProcess(hw)
 	hw.cr.Start()
 	return hw

@@ -3,7 +3,6 @@ package habit
 import (
 	//log "github.com/sirupsen/logrus"
 	"github.com/vitaminwater/daryl/daryl"
-	"github.com/vitaminwater/daryl/protodef"
 )
 
 type storeCommand interface {
@@ -20,18 +19,18 @@ func (c *storeCommandAddHabit) execute(hs *habitStore) {
 }
 
 type storeCommandGetDueHabit struct {
-	r chan []*protodef.Habit
+	r chan []*habit
 }
 
 func (d *storeCommandGetDueHabit) execute(hs *habitStore) {
-	habits := make([]*protodef.Habit, 0, 10)
+	habits := make([]*habit, 0, 10)
 	for _, w := range hs.habitWorkers {
-		r := make(chan protodef.Habit)
+		r := make(chan *habit)
 		w.cmd <- &workerCommandGetHabit{r}
 		h := <-r
 		close(r)
-		if h.Stats.NMissed > 0 {
-			habits = append(habits, &h)
+		if h.GetHabit().Stats.NMissed > 0 {
+			habits = append(habits, h)
 		}
 	}
 	d.r <- habits

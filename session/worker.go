@@ -9,6 +9,43 @@ import (
 	"github.com/vitaminwater/daryl/protodef"
 )
 
+type session struct {
+	s protodef.Session
+
+	slices []daryl.SessionSlice
+}
+
+func newSession(ps *protodef.Session) *session {
+	s := &session{
+		s:      *ps,
+		slices: make([]daryl.SessionSlice, 0),
+	}
+	for _, ss := range ps.Slices {
+		s.slices = append(s.slices, newSessionSlice(ss))
+	}
+	return s
+}
+
+func (s *session) GetSession() protodef.Session {
+	return s.s
+}
+
+func (s *session) GetSessionSlices() []daryl.SessionSlice {
+	return s.slices
+}
+
+type sessionSlice struct {
+	ss protodef.SessionSlice
+}
+
+func newSessionSlice(ss *protodef.SessionSlice) *sessionSlice {
+	return &sessionSlice{*ss}
+}
+
+func (ss *sessionSlice) GetSessionSlice() protodef.SessionSlice {
+	return ss.ss
+}
+
 type sessionWorkerCommand interface {
 	execute(*sessionWorker)
 }
@@ -18,8 +55,8 @@ type sessionWorker struct {
 	r   *protodef.StartWorkSessionRequest
 	cmd chan sessionWorkerCommand
 
-	s   *protodef.Session
-	due []*protodef.Habit
+	s   *session
+	due []daryl.Habit
 }
 
 func (sw *sessionWorker) stop() {
@@ -32,27 +69,29 @@ func sessionWorkerProcess(sw *sessionWorker) {
 	}
 }
 
-func newSessionWorker(d *daryl.Daryl, r *protodef.StartWorkSessionRequest) (*sessionWorker, *protodef.Session, error) {
+func newSessionWorker(d *daryl.Daryl, r *protodef.StartWorkSessionRequest) (*sessionWorker, daryl.Session, error) {
 	due := d.HabitProcessor.GetDueHabits()
-	log.Info(due)
 
 	if len(due) == 0 {
 		return nil, nil, errors.New("All good ! You're free !")
 	}
 
-	ss := make([]*protodef.SessionSlice, 0)
+	pss := make([]*protodef.SessionSlice, 0)
 	for _, d := range due {
-		ss = append(ss, &protodef.SessionSlice{
+		h := d.GetHabit()
+		pss = append(pss, &protodef.SessionSlice{
 			Start: ptypes.TimestampNow(),
 			End:   ptypes.TimestampNow(),
-			Habit: d,
+			Habit: &h,
 		})
 	}
-	s := &protodef.Session{
+	ps := &protodef.Session{
 		Start:  ptypes.TimestampNow(),
 		End:    ptypes.TimestampNow(),
-		Slices: ss,
+		Slices: pss,
 	}
+
+	s := newSession(ps)
 
 	sw := &sessionWorker{d, r, make(chan sessionWorkerCommand), s, due}
 	go sessionWorkerProcess(sw)
