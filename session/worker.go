@@ -10,15 +10,15 @@ import (
 )
 
 type session struct {
-	s protodef.Session
+	protodef.Session
 
 	slices []daryl.SessionSlice
 }
 
 func newSession(ps *protodef.Session) *session {
 	s := &session{
-		s:      *ps,
-		slices: make([]daryl.SessionSlice, 0),
+		Session: *ps,
+		slices:  make([]daryl.SessionSlice, 0),
 	}
 	for _, ss := range ps.Slices {
 		s.slices = append(s.slices, newSessionSlice(ss))
@@ -27,7 +27,7 @@ func newSession(ps *protodef.Session) *session {
 }
 
 func (s *session) GetSession() protodef.Session {
-	return s.s
+	return s.Session
 }
 
 func (s *session) GetSessionSlices() []daryl.SessionSlice {
@@ -35,7 +35,7 @@ func (s *session) GetSessionSlices() []daryl.SessionSlice {
 }
 
 type sessionSlice struct {
-	ss protodef.SessionSlice
+	protodef.SessionSlice
 }
 
 func newSessionSlice(ss *protodef.SessionSlice) *sessionSlice {
@@ -43,7 +43,7 @@ func newSessionSlice(ss *protodef.SessionSlice) *sessionSlice {
 }
 
 func (ss *sessionSlice) GetSessionSlice() protodef.SessionSlice {
-	return ss.ss
+	return ss.SessionSlice
 }
 
 type sessionWorkerCommand interface {
