@@ -1,0 +1,5 @@
+package session
+
+const (
+	PROPOSE_WORK_SESSION_TOPIC = "PROPOSE_WORK_SESSION"
+)

@@ -56,22 +56,17 @@ func addHabit(client protodef.DarylClient, c *cli.Context) {
 		log.Fatal(err)
 	}
 
-	duration, err := time.ParseDuration(c.String("duration"))
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	request := &protodef.AddHabitRequest{
 		Identifier: c.String("identifier"),
 		Habit: &protodef.Habit{
 			Title:    c.String("title"),
 			Deadline: deadline,
 			Cron:     c.String("cron"),
-			Duration: uint32(duration / time.Minute),
+			Duration: c.String("duration"),
 			LastDone: ptypes.TimestampNow(),
+			Stats:    &protodef.HabitStat{0, 0},
 		},
 	}
-	log.Info(request)
 	response, err := client.AddHabit(context.Background(), request)
 	if err != nil {
 		log.Fatalf("fail to stuff: %v", err)
@@ -106,7 +101,7 @@ func main() {
 	app.Name = "Daryl"
 	app.Usage = "Show me what you got"
 	app.Commands = []cli.Command{
-		cli.Command{
+		{
 			Name:    "start",
 			Aliases: []string{"s"},
 			Usage:   "Start a new daryl",
@@ -122,7 +117,7 @@ func main() {
 				return nil
 			},
 		},
-		cli.Command{
+		{
 			Name:    "hasdaryl",
 			Aliases: []string{"hd"},
 			Usage:   "Check if daryl exists here",
@@ -138,7 +133,7 @@ func main() {
 				return nil
 			},
 		},
-		cli.Command{
+		{
 			Name:    "message",
 			Aliases: []string{"hd"},
 			Usage:   "Sends a message to a daryl",
@@ -158,7 +153,7 @@ func main() {
 				return nil
 			},
 		},
-		cli.Command{
+		{
 			Name:    "addhabit",
 			Aliases: []string{"a"},
 			Usage:   "Add a new habit",
@@ -190,7 +185,7 @@ func main() {
 				return nil
 			},
 		},
-		cli.Command{
+		{
 			Name:    "work",
 			Aliases: []string{"s"},
 			Usage:   "Start a new work session",

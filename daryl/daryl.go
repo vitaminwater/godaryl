@@ -12,7 +12,12 @@ type MessageProcessor interface {
 
 type HabitProcessor interface {
 	SetDaryl(*Daryl)
+
+	/* RPC */
 	AddHabit(*protodef.AddHabitRequest) (*protodef.AddHabitResponse, error)
+
+	/* API */
+	GetDueHabits() []*protodef.Habit
 }
 
 type SessionProcessor interface {

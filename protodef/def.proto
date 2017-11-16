@@ -73,21 +73,24 @@ message UserMessageResponse {
 
 // AddHabit
 
+message HabitStat {
+  // @inject_tag: db:"forget"
+  uint64 forget = 1;
+  // @inject_tag: db:"nMissed"
+  uint64 nMissed = 2;
+}
+
 message Habit {
   // @inject_tag: db:"id"
   string id = 1;
   // @inject_tag: db:"title"
   string title = 2;
-  // @inject_tag: db:"avgDuration"
-  uint32 duration = 3;
+  string duration = 3;
   google.protobuf.Timestamp deadline = 4;
-  // @inject_tag: db:"during"
-  uint32 during = 5;
   // @inject_tag: db:"cron"
   string cron = 6;
-  google.protobuf.Timestamp lastDone = 8;
-  // @inject_tag: db:"nMissed"
-  uint32 nMissed = 7;
+  google.protobuf.Timestamp lastDone = 7;
+  HabitStat stats = 8;
 }
 
 message AddHabitRequest {
@@ -104,24 +107,25 @@ message AddHabitResponse {
 
 message SessionSlice {
    // @inject_tag: db:"start"
-  string start = 1;
+  google.protobuf.Timestamp start = 1;
   // @inject_tag: db:"end"
-  string end = 2;
+  google.protobuf.Timestamp end = 2;
   // @inject_tag: db:"habit"
   Habit habit = 3;
 }
 
 message Session {
   // @inject_tag: db:"start"
-  string start = 1;
+  google.protobuf.Timestamp start = 1;
   // @inject_tag: db:"end"
-  string end = 2;
+  google.protobuf.Timestamp end = 2;
   // @inject_tag: db:"slices"
   repeated SessionSlice slices = 3;
 }
 
 message StartWorkSessionRequest {
   string identifier = 1;
+  uint32 duration = 2;
 }
 
 message StartWorkSessionResponse {
