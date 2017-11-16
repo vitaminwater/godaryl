@@ -28,7 +28,7 @@ func newHabit(h *protodef.Habit) *habit {
 	}
 	duration, err := time.ParseDuration(h.Duration)
 	if err != nil {
-		log.Fatal(err)
+		log.Info(err)
 	}
 	return &habit{
 		*h,
