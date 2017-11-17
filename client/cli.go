@@ -227,7 +227,7 @@ func main() {
 				},
 				{
 					Name:    "cancel",
-					Aliases: []string{"s"},
+					Aliases: []string{"c"},
 					Usage:   "Cancel the current work session",
 					Flags: []cli.Flag{
 						cli.StringFlag{
