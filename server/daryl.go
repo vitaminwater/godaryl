@@ -3,10 +3,11 @@ package server
 import (
 	"context"
 	"fmt"
+	"sync"
+
 	log "github.com/sirupsen/logrus"
 	"github.com/vitaminwater/daryl/daryl"
 	"github.com/vitaminwater/daryl/protodef"
-	"sync"
 )
 
 type darylServer struct {
@@ -42,6 +43,26 @@ func (s *darylServer) StartWorkSession(c context.Context, r *protodef.StartWorkS
 	}
 
 	resp, err := d.(*daryl.Daryl).SessionProcessor.StartWorkSession(r)
+	return resp, err
+}
+
+func (s *darylServer) CancelWorkSession(ctx context.Context, in *protodef.CancelWorkSessionRequest) (*protodef.CancelWorkSessionResponse, error) {
+	d, ok := s.registry.Load(in.Identifier)
+	if ok != true {
+		return nil, fmt.Errorf("Unknown Daryl %s", in.Identifier)
+	}
+
+	resp, err := d.(*daryl.Daryl).SessionProcessor.CancelWorkSession(in)
+	return resp, err
+}
+
+func (s *darylServer) RefuseWorkSession(ctx context.Context, in *protodef.RefuseWorkSessionRequest) (*protodef.RefuseWorkSessionResponse, error) {
+	d, ok := s.registry.Load(in.Identifier)
+	if ok != true {
+		return nil, fmt.Errorf("Unknown Daryl %s", in.Identifier)
+	}
+
+	resp, err := d.(*daryl.Daryl).SessionProcessor.RefuseWorkSession(in)
 	return resp, err
 }
 

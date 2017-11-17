@@ -84,6 +84,26 @@ func startWorkSession(client protodef.DarylClient, c *cli.Context) {
 	log.Println(response)
 }
 
+func cancelWorkSession(client protodef.DarylClient, c *cli.Context) {
+	log.Info("cancelWorkSession")
+	request := &protodef.CancelWorkSessionRequest{Identifier: c.String("identifier")}
+	response, err := client.CancelWorkSession(context.Background(), request)
+	if err != nil {
+		log.Fatalf("fail to stuff: %v", err)
+	}
+	log.Println(response)
+}
+
+func refuseWorkSession(client protodef.DarylClient, c *cli.Context) {
+	log.Info("refuseWorkSession")
+	request := &protodef.RefuseWorkSessionRequest{Identifier: c.String("identifier"), Index: uint32(c.Uint("index"))}
+	response, err := client.RefuseWorkSession(context.Background(), request)
+	if err != nil {
+		log.Fatalf("fail to stuff: %v", err)
+	}
+	log.Println(response)
+}
+
 func openConnection(c *cli.Context) (protodef.FarmClient, protodef.DarylClient) {
 	conn, err := grpc.Dial("localhost:8080", grpc.WithInsecure())
 	if err != nil {
@@ -187,18 +207,60 @@ func main() {
 		},
 		{
 			Name:    "work",
-			Aliases: []string{"s"},
-			Usage:   "Start a new work session",
-			Flags: []cli.Flag{
-				cli.StringFlag{
-					Name:  "identifier, i",
-					Usage: "Daryl's identifier",
+			Aliases: []string{"w"},
+			Subcommands: []cli.Command{
+				{
+					Name:    "start",
+					Aliases: []string{"s"},
+					Usage:   "Start a new work session",
+					Flags: []cli.Flag{
+						cli.StringFlag{
+							Name:  "identifier, i",
+							Usage: "Daryl's identifier",
+						},
+					},
+					Action: func(c *cli.Context) error {
+						_, daryl := openConnection(c)
+						startWorkSession(daryl, c)
+						return nil
+					},
 				},
-			},
-			Action: func(c *cli.Context) error {
-				_, daryl := openConnection(c)
-				startWorkSession(daryl, c)
-				return nil
+				{
+					Name:    "cancel",
+					Aliases: []string{"s"},
+					Usage:   "Cancel the current work session",
+					Flags: []cli.Flag{
+						cli.StringFlag{
+							Name:  "identifier, i",
+							Usage: "Daryl's identifier",
+						},
+					},
+					Action: func(c *cli.Context) error {
+						_, daryl := openConnection(c)
+						cancelWorkSession(daryl, c)
+						return nil
+					},
+				},
+				{
+					Name:    "refuse",
+					Aliases: []string{"r"},
+					Usage:   "Refuse on habit from the current work session",
+					Flags: []cli.Flag{
+						cli.StringFlag{
+							Name:  "identifier, i",
+							Usage: "Daryl's identifier",
+						},
+						cli.StringFlag{
+							Name:  "index, idx",
+							Usage: "Habit's index",
+						},
+					},
+					Action: func(c *cli.Context) error {
+						_, daryl := openConnection(c)
+						refuseWorkSession(daryl, c)
+						return nil
+					},
+				},
 			},
 		},
 	}

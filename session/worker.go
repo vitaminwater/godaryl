@@ -2,9 +2,9 @@ package session
 
 import (
 	"errors"
+	"sort"
 
 	"github.com/golang/protobuf/ptypes"
-	log "github.com/sirupsen/logrus"
 	"github.com/vitaminwater/daryl/daryl"
 	"github.com/vitaminwater/daryl/protodef"
 )
@@ -64,17 +64,34 @@ func (sw *sessionWorker) stop() {
 }
 
 func sessionWorkerProcess(sw *sessionWorker) {
-	for c := range sw.cmd {
-		log.Info(c)
+	for _ = range sw.cmd {
 	}
 }
 
+type sortedHabits []daryl.Habit
+
+func (sh sortedHabits) Len() int {
+	return len(sh)
+}
+
+func (sh sortedHabits) Less(i, j int) bool {
+	return sh[i].GetWeight() < sh[j].GetWeight()
+}
+
+func (sh sortedHabits) Swap(i, j int) {
+	tmp := sh[j]
+	sh[j] = sh[i]
+	sh[i] = tmp
+}
+
 func newSessionWorker(d *daryl.Daryl, r *protodef.StartWorkSessionRequest) (*sessionWorker, daryl.Session, error) {
-	due := d.HabitProcessor.GetDueHabits()
+	due := sortedHabits(d.HabitProcessor.GetDueHabits())
 
 	if len(due) == 0 {
 		return nil, nil, errors.New("All good ! You're free !")
 	}
+
+	sort.Sort(due)
 
 	pss := make([]*protodef.SessionSlice, 0)
 	for _, d := range due {

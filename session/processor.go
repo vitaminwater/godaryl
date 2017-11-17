@@ -31,6 +31,14 @@ func (sp *sessionProcessor) StartWorkSession(r *protodef.StartWorkSessionRequest
 	return &protodef.StartWorkSessionResponse{&se}, nil
 }
 
+func (sp *sessionProcessor) CancelWorkSession(*protodef.CancelWorkSessionRequest) (*protodef.CancelWorkSessionResponse, error) {
+	return &protodef.CancelWorkSessionResponse{}, nil
+}
+
+func (sp *sessionProcessor) RefuseWorkSession(*protodef.RefuseWorkSessionRequest) (*protodef.RefuseWorkSessionResponse, error) {
+	return &protodef.RefuseWorkSessionResponse{}, nil
+}
+
 func NewSessionProcessor() *sessionProcessor {
 	sp := &sessionProcessor{}
 	return sp

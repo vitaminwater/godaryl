@@ -37,6 +37,8 @@ service Daryl {
   rpc UserMessage(UserMessageRequest) returns (UserMessageResponse);
   rpc AddHabit(AddHabitRequest) returns (AddHabitResponse);
   rpc StartWorkSession(StartWorkSessionRequest) returns (StartWorkSessionResponse);
+  rpc CancelWorkSession(CancelWorkSessionRequest) returns (CancelWorkSessionResponse);
+  rpc RefuseWorkSession(RefuseWorkSessionRequest) returns (RefuseWorkSessionResponse);
 
 }
 
@@ -75,9 +77,9 @@ message UserMessageResponse {
 
 message HabitStat {
   // @inject_tag: db:"forget"
-  uint64 forget = 1;
+  uint32 forget = 1;
   // @inject_tag: db:"nMissed"
-  uint64 nMissed = 2;
+  uint32 nMissed = 2;
 }
 
 message Habit {
@@ -130,4 +132,19 @@ message StartWorkSessionRequest {
 
 message StartWorkSessionResponse {
   Session session = 2;
+}
+
+message CancelWorkSessionRequest {
+  string identifier = 1;
+}
+
+message CancelWorkSessionResponse {
+}
+
+message RefuseWorkSessionRequest {
+  string identifier = 1;
+  uint32 index = 2;
+}
+
+message RefuseWorkSessionResponse {
 }
