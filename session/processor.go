@@ -37,11 +37,11 @@ func (sp *sessionProcessor) CancelWorkSession(*protodef.CancelWorkSessionRequest
 	return &protodef.CancelWorkSessionResponse{}, nil
 }
 
-func (sp *sessionProcessor) RefuseWorkSession(*protodef.RefuseWorkSessionRequest) (*protodef.RefuseWorkSessionResponse, error) {
+func (sp *sessionProcessor) RefuseSessionSlice(*protodef.RefuseSessionSliceRequest) (*protodef.RefuseSessionSliceResponse, error) {
 	if sp.sw == nil {
 		return nil, errors.New("No work session yet, create it first")
 	}
-	return &protodef.RefuseWorkSessionResponse{}, nil
+	return &protodef.RefuseSessionSliceResponse{}, nil
 }
 
 func NewSessionProcessor() *sessionProcessor {

@@ -4,16 +4,6 @@ import "ptypes/timestamp/timestamp.proto";
 
 package protodef;
 
-service Public {
-
-  rpc UserMessage(UserMessageRequest) returns (UserMessageResponse);
-  rpc AddHabit(AddHabitRequest) returns (AddHabitResponse);
-  rpc StartWorkSession(StartWorkSessionRequest) returns (StartWorkSessionResponse);
-  rpc CancelWorkSession(CancelWorkSessionRequest) returns (CancelWorkSessionResponse);
-  rpc RefuseWorkSession(RefuseWorkSessionRequest) returns (RefuseWorkSessionResponse);
-
-}
-
 service Farm {
 
   rpc StartDaryl(StartDarylRequest) returns (StartDarylResponse);
@@ -48,7 +38,7 @@ service Daryl {
   rpc AddHabit(AddHabitRequest) returns (AddHabitResponse);
   rpc StartWorkSession(StartWorkSessionRequest) returns (StartWorkSessionResponse);
   rpc CancelWorkSession(CancelWorkSessionRequest) returns (CancelWorkSessionResponse);
-  rpc RefuseWorkSession(RefuseWorkSessionRequest) returns (RefuseWorkSessionResponse);
+  rpc RefuseSessionSlice(RefuseSessionSliceRequest) returns (RefuseSessionSliceResponse);
 
 }
 
@@ -135,9 +125,13 @@ message Session {
   repeated SessionSlice slices = 3;
 }
 
+message SessionConfig {
+  uint32 duration = 1;
+}
+
 message StartWorkSessionRequest {
   string identifier = 1;
-  uint32 duration = 2;
+  SessionConfig config = 2;
 }
 
 message StartWorkSessionResponse {
@@ -151,10 +145,14 @@ message CancelWorkSessionRequest {
 message CancelWorkSessionResponse {
 }
 
-message RefuseWorkSessionRequest {
-  string identifier = 1;
-  uint32 index = 2;
+message SessionSliceIndex {
+  uint32 index = 1;
 }
 
-message RefuseWorkSessionResponse {
+message RefuseSessionSliceRequest {
+  string identifier = 1;
+  SessionSliceIndex index = 2;
+}
+
+message RefuseSessionSliceResponse {
 }

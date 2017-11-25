@@ -39,13 +39,21 @@ func userMessage(c *gin.Context) {
 }
 
 func addHabit(c *gin.Context) {
-	url := c.MustGet("daryl_url")
+	url := c.MustGet("daryl_url").(string)
 	h := protodef.Habit{}
 	if err := c.BindJSON(&h); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{})
 		return
 	}
-	log.Info(url, h)
+	d := openDarylConnection(url)
+	ah := protodef.AddHabitRequest{Identifier: "lol", Habit: &h}
+	resp, err := d.AddHabit(context.Background(), &ah)
+	if err != nil {
+		log.Info(err)
+		c.JSON(http.StatusBadRequest, gin.H{})
+		return
+	}
+	log.Info(url, h, resp)
 	c.JSON(200, gin.H{
 		"status": "posted",
 	})

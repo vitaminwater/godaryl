@@ -57,14 +57,14 @@ func (s *darylServer) CancelWorkSession(ctx context.Context, in *protodef.Cancel
 	return resp, err
 }
 
-func (s *darylServer) RefuseWorkSession(ctx context.Context, in *protodef.RefuseWorkSessionRequest) (*protodef.RefuseWorkSessionResponse, error) {
-	log.Info("RefuseWorkSession")
+func (s *darylServer) RefuseSessionSlice(ctx context.Context, in *protodef.RefuseSessionSliceRequest) (*protodef.RefuseSessionSliceResponse, error) {
+	log.Info("RefuseSessionSlice")
 	d, ok := s.registry.Load(in.Identifier)
 	if ok != true {
 		return nil, fmt.Errorf("Unknown Daryl %s", in.Identifier)
 	}
 
-	resp, err := d.(*daryl.Daryl).SessionProcessor.RefuseWorkSession(in)
+	resp, err := d.(*daryl.Daryl).SessionProcessor.RefuseSessionSlice(in)
 	return resp, err
 }
 
