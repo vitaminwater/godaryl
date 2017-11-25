@@ -1,8 +1,10 @@
-package server
+package main
 
 import (
 	"errors"
 	"fmt"
+	"sync"
+
 	log "github.com/sirupsen/logrus"
 	"github.com/vitaminwater/daryl/daryl"
 	"github.com/vitaminwater/daryl/habit"
@@ -10,7 +12,6 @@ import (
 	"github.com/vitaminwater/daryl/protodef"
 	"github.com/vitaminwater/daryl/session"
 	context "golang.org/x/net/context"
-	"sync"
 )
 
 type farmServer struct {
@@ -30,7 +31,7 @@ func (f *farmServer) StartDaryl(c context.Context, r *protodef.StartDarylRequest
 func (f *farmServer) HasDaryl(c context.Context, r *protodef.HasDarylRequest) (*protodef.HasDarylResponse, error) {
 	log.Println("HasDaryl")
 	_, ok := f.registry.Load(r.Identifier)
-	return &protodef.HasDarylResponse{ok}, nil
+	return &protodef.HasDarylResponse{Response: ok}, nil
 }
 
 func NewFarmServer(registry *sync.Map) *farmServer {

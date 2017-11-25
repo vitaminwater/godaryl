@@ -1,9 +1,10 @@
 package message
 
 import (
+	"regexp"
+
 	log "github.com/sirupsen/logrus"
 	"github.com/vitaminwater/daryl/protodef"
-	"regexp"
 )
 
 type linkMessageProcessor struct {
@@ -20,7 +21,7 @@ func (lmp *linkMessageProcessor) process(m *message) {
 	}
 
 	for _, match := range matches {
-		m.Links = append(m.Links, &protodef.MessageLink{match[0]})
+		m.Links = append(m.Links, &protodef.MessageLink{Link: match[0]})
 	}
 
 	lmp.mp.d.Pub(m, LINK_LOG_TOPIC)

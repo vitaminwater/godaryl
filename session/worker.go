@@ -50,6 +50,13 @@ type sessionWorkerCommand interface {
 	execute(*sessionWorker)
 }
 
+type sessionWorkerCommandStop struct {
+}
+
+func (sws *sessionWorkerCommandStop) execute(sw *sessionWorker) {
+	close(sw.cmd)
+}
+
 type sessionWorker struct {
 	d   *daryl.Daryl
 	r   *protodef.StartWorkSessionRequest
@@ -60,11 +67,10 @@ type sessionWorker struct {
 }
 
 func (sw *sessionWorker) stop() {
-	close(sw.cmd)
 }
 
 func sessionWorkerProcess(sw *sessionWorker) {
-	for _ = range sw.cmd {
+	for range sw.cmd {
 	}
 }
 

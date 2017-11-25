@@ -1,4 +1,4 @@
-package server
+package main
 
 import (
 	"context"
@@ -47,6 +47,7 @@ func (s *darylServer) StartWorkSession(c context.Context, r *protodef.StartWorkS
 }
 
 func (s *darylServer) CancelWorkSession(ctx context.Context, in *protodef.CancelWorkSessionRequest) (*protodef.CancelWorkSessionResponse, error) {
+	log.Info("CancelWorkSession")
 	d, ok := s.registry.Load(in.Identifier)
 	if ok != true {
 		return nil, fmt.Errorf("Unknown Daryl %s", in.Identifier)
@@ -57,6 +58,7 @@ func (s *darylServer) CancelWorkSession(ctx context.Context, in *protodef.Cancel
 }
 
 func (s *darylServer) RefuseWorkSession(ctx context.Context, in *protodef.RefuseWorkSessionRequest) (*protodef.RefuseWorkSessionResponse, error) {
+	log.Info("RefuseWorkSession")
 	d, ok := s.registry.Load(in.Identifier)
 	if ok != true {
 		return nil, fmt.Errorf("Unknown Daryl %s", in.Identifier)

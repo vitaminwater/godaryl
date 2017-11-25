@@ -4,6 +4,16 @@ import "ptypes/timestamp/timestamp.proto";
 
 package protodef;
 
+service Public {
+
+  rpc UserMessage(UserMessageRequest) returns (UserMessageResponse);
+  rpc AddHabit(AddHabitRequest) returns (AddHabitResponse);
+  rpc StartWorkSession(StartWorkSessionRequest) returns (StartWorkSessionResponse);
+  rpc CancelWorkSession(CancelWorkSessionRequest) returns (CancelWorkSessionResponse);
+  rpc RefuseWorkSession(RefuseWorkSessionRequest) returns (RefuseWorkSessionResponse);
+
+}
+
 service Farm {
 
   rpc StartDaryl(StartDarylRequest) returns (StartDarylResponse);
@@ -76,8 +86,8 @@ message UserMessageResponse {
 // AddHabit
 
 message HabitStat {
-  // @inject_tag: db:"forget"
-  uint32 forget = 1;
+  // @inject_tag: db:"urgent"
+  uint32 urgent = 1;
   // @inject_tag: db:"nMissed"
   uint32 nMissed = 2;
 }

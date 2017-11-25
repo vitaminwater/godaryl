@@ -28,14 +28,19 @@ func (sp *sessionProcessor) StartWorkSession(r *protodef.StartWorkSessionRequest
 	sp.sw = sw
 	sp.d.Pub(s, PROPOSE_WORK_SESSION_TOPIC)
 	se := s.GetSession()
-	return &protodef.StartWorkSessionResponse{&se}, nil
+	return &protodef.StartWorkSessionResponse{Session: &se}, nil
 }
 
 func (sp *sessionProcessor) CancelWorkSession(*protodef.CancelWorkSessionRequest) (*protodef.CancelWorkSessionResponse, error) {
+	sp.sw.stop()
+	sp.sw = nil
 	return &protodef.CancelWorkSessionResponse{}, nil
 }
 
 func (sp *sessionProcessor) RefuseWorkSession(*protodef.RefuseWorkSessionRequest) (*protodef.RefuseWorkSessionResponse, error) {
+	if sp.sw == nil {
+		return nil, errors.New("No work session yet, create it first")
+	}
 	return &protodef.RefuseWorkSessionResponse{}, nil
 }
 

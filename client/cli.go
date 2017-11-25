@@ -64,7 +64,7 @@ func addHabit(client protodef.DarylClient, c *cli.Context) {
 			Cron:     c.String("cron"),
 			Duration: c.String("duration"),
 			LastDone: ptypes.TimestampNow(),
-			Stats:    &protodef.HabitStat{0, 0},
+			Stats:    &protodef.HabitStat{Urgent: 0, NMissed: 0},
 		},
 	}
 	response, err := client.AddHabit(context.Background(), request)
@@ -105,7 +105,7 @@ func refuseWorkSession(client protodef.DarylClient, c *cli.Context) {
 }
 
 func openConnection(c *cli.Context) (protodef.FarmClient, protodef.DarylClient) {
-	conn, err := grpc.Dial("localhost:8080", grpc.WithInsecure())
+	conn, err := grpc.Dial("localhost:8081", grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("fail to dial: %v", err)
 	}

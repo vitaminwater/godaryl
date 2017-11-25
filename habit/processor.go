@@ -27,7 +27,7 @@ func (hp *habitProcessor) AddHabit(r *protodef.AddHabitRequest) (*protodef.AddHa
 	h := newHabit(r.Habit)
 	hp.store.addHabit(h)
 	hp.d.Pub(h, daryl.ADD_HABIT_TOPIC)
-	return &protodef.AddHabitResponse{r.Habit}, nil
+	return &protodef.AddHabitResponse{Habit: r.Habit}, nil
 }
 
 func (hp *habitProcessor) GetDueHabits() []daryl.Habit {

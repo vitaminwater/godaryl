@@ -1,0 +1,32 @@
+settings:
+  resources:
+    outputs: outputs.log
+    logs: logs.log
+    errors: errors.log
+  server:
+    status: true
+    open: false
+    host: localhost
+    port: 8080
+projects:
+- name: private
+  path: /Users/stant/Documents/perso/daryl/backend/src/github.com/vitaminwater/daryl/private
+  commands:
+    vet: true
+    fmt: true
+    test: false
+    generate: false
+    bin:
+      status: true
+    build:
+      status: false
+    run: true
+  watcher:
+    preview: false
+    paths:
+    - ./
+    - ../
+    ignore_paths:
+    - ../public
+    exts:
+    - .go

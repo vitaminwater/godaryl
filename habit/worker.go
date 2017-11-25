@@ -22,7 +22,7 @@ func (h *habit) GetHabit() protodef.Habit {
 }
 
 func (h *habit) GetWeight() uint32 {
-	return h.Stats.Forget
+	return h.Stats.Urgent
 }
 
 func newHabit(h *protodef.Habit) *habit {
@@ -54,9 +54,8 @@ type workerCommandOnHabitTrigger struct{}
 
 func (oht *workerCommandOnHabitTrigger) execute(w *habitWorker) {
 	w.h.Stats.NMissed++
-	w.h.Stats.Forget = uint32(float32(w.h.Stats.Forget) * 1.5)
+	w.h.Stats.Urgent *= 2
 	w.d.Pub(w.h, HABIT_SCHEDULED_TOPIC)
-	log.Info("onHabitTrigger ", w.h.Stats.NMissed, " ", w.h.Stats.Forget)
 }
 
 type workerCommandGetHabit struct {
@@ -67,22 +66,32 @@ func (gh *workerCommandGetHabit) execute(w *habitWorker) {
 	gh.r <- w.h
 }
 
+type worker interface {
+	tick()
+}
+
 type habitWorker struct {
 	h *habit
 
-	cr   *cron.Cron
-	tick <-chan time.Time
-	cmd  chan workerCommand
-	sub  chan interface{}
-	d    *daryl.Daryl
+	cr  *cron.Cron
+	t   <-chan time.Time
+	cmd chan workerCommand
+	sub chan interface{}
+	d   *daryl.Daryl
+}
+
+func (hw *habitWorker) tick() {
+	if hw.h.Stats.NMissed > 0 {
+		p := float64(time.Since(*hw.h.LastDone)/time.Minute) * float64(hw.h.Stats.NMissed)
+		hw.h.Stats.Urgent += uint32(p)
+	}
 }
 
 func habitWorkerProcess(hw *habitWorker) {
 	for {
 		select {
-		case _ = <-hw.tick:
-			p := float64(time.Since(*hw.h.LastDone)) / float64(hw.h.Duration) * 100
-			hw.h.Stats.Forget += uint32(p)
+		case _ = <-hw.t:
+			hw.tick()
 		case cmd := <-hw.cmd:
 			cmd.execute(hw)
 		case msg := <-hw.sub:
@@ -95,7 +104,7 @@ func newHabitWorker(d *daryl.Daryl, h *habit) *habitWorker {
 	hw := &habitWorker{
 		h,
 		cron.New(),
-		time.Tick(time.Duration(1) * time.Minute),
+		time.Tick(time.Duration(10) * time.Minute),
 		make(chan workerCommand, 10),
 		d.Sub(
 			daryl.ADD_HABIT_TOPIC,

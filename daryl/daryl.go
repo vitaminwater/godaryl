@@ -12,13 +12,6 @@ import (
 	"github.com/vitaminwater/daryl/protodef"
 )
 
-/*
-	Weight calculation:
-	- short period -> higher weight
-	- long period -> higher weight
-	- avg period -> no weight change
-*/
-
 type Habit interface {
 	GetHabit() protodef.Habit
 	GetWeight() uint32
@@ -100,7 +93,7 @@ func advertiseEtcd(d *Daryl) {
 		}
 
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-		_, err = cli.Put(ctx, fmt.Sprintf("daryl_%s", d.identifier), getEnv("PUBLIC_URL", "http://localhost:8080"), clientv3.WithLease(gr.ID))
+		_, err = cli.Put(ctx, fmt.Sprintf("daryl_%s", d.identifier), getEnv("PUBLIC_URL", "localhost:8081"), clientv3.WithLease(gr.ID))
 		cancel()
 		if err != nil {
 			log.Fatal(err)
