@@ -96,8 +96,8 @@ func cancelWorkSession(client protodef.DarylClient, c *cli.Context) {
 
 func refuseWorkSession(client protodef.DarylClient, c *cli.Context) {
 	log.Info("refuseWorkSession")
-	request := &protodef.RefuseWorkSessionRequest{Identifier: c.String("identifier"), Index: uint32(c.Uint("index"))}
-	response, err := client.RefuseWorkSession(context.Background(), request)
+	request := &protodef.RefuseSessionSliceRequest{Identifier: c.String("identifier"), Index: &protodef.SessionSliceIndex{uint32(c.Uint("index"))}}
+	response, err := client.RefuseSessionSlice(context.Background(), request)
 	if err != nil {
 		log.Fatalf("fail to stuff: %v", err)
 	}

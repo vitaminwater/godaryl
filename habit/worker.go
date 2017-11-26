@@ -26,9 +26,11 @@ func (h *habit) GetWeight() uint32 {
 }
 
 func newHabit(h *protodef.Habit) *habit {
+	log.Info(h)
 	lastDone, err := ptypes.Timestamp(h.LastDone)
 	if err != nil {
 		log.Info(err)
+		lastDone = time.Now()
 	}
 	deadline, err := ptypes.Timestamp(h.Deadline)
 	if err != nil {
@@ -38,11 +40,12 @@ func newHabit(h *protodef.Habit) *habit {
 	if err != nil {
 		log.Info(err)
 	}
+	h.Stats = &protodef.HabitStat{}
 	return &habit{
-		*h,
-		&deadline,
-		&lastDone,
-		duration,
+		Habit:    *h,
+		Deadline: &deadline,
+		LastDone: &lastDone,
+		Duration: duration,
 	}
 }
 
