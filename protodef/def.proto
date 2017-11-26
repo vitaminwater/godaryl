@@ -126,7 +126,7 @@ message Session {
 }
 
 message SessionConfig {
-  uint32 duration = 1;
+  string duration = 1;
 }
 
 message StartWorkSessionRequest {

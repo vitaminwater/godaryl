@@ -3,8 +3,10 @@ package session
 import (
 	"errors"
 	"sort"
+	"time"
 
 	"github.com/golang/protobuf/ptypes"
+	"github.com/labstack/gommon/log"
 	"github.com/vitaminwater/daryl/daryl"
 	"github.com/vitaminwater/daryl/protodef"
 )
@@ -91,6 +93,11 @@ func (sh sortedHabits) Swap(i, j int) {
 }
 
 func newSessionWorker(d *daryl.Daryl, r *protodef.StartWorkSessionRequest) (*sessionWorker, daryl.Session, error) {
+	_, err := time.ParseDuration(r.Config.Duration)
+	if err != nil {
+		log.Info(err)
+	}
+
 	due := sortedHabits(d.HabitProcessor.GetDueHabits())
 
 	if len(due) == 0 {
