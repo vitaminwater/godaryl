@@ -7,9 +7,9 @@ import (
 	"google.golang.org/grpc"
 )
 
-var daryls map[string]protodef.DarylClient = make(map[string]protodef.DarylClient)
+var daryls map[string]protodef.DarylServiceClient = make(map[string]protodef.DarylServiceClient)
 
-func openDarylConnection(url string) protodef.DarylClient {
+func openDarylConnection(url string) protodef.DarylServiceClient {
 	if d, ok := daryls[url]; ok == true {
 		return d
 	}
@@ -17,7 +17,7 @@ func openDarylConnection(url string) protodef.DarylClient {
 	if err != nil {
 		log.Fatalf("fail to dial: %v", err)
 	}
-	daryl := protodef.NewDarylClient(conn)
+	daryl := protodef.NewDarylServiceClient(conn)
 	daryls[url] = daryl
 	return daryl
 }

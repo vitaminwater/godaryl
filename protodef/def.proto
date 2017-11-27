@@ -4,7 +4,7 @@ import "ptypes/timestamp/timestamp.proto";
 
 package protodef;
 
-service Farm {
+service FarmService {
 
   rpc StartDaryl(StartDarylRequest) returns (StartDarylResponse);
   rpc HasDaryl(HasDarylRequest) returns (HasDarylResponse);
@@ -14,13 +14,13 @@ service Farm {
 // StartDaryl
 
 message StartDarylRequest {
-  string identifier = 1;
+  string daryl_identifier = 1;
 }
 
 // HasDaryl
 
 message HasDarylRequest {
-  string identifier = 1;
+  string daryl_identifier = 1;
 }
 
 // Response
@@ -32,7 +32,7 @@ message HasDarylResponse {
   bool response = 1;
 }
 
-service Daryl {
+service DarylService {
 
   rpc UserMessage(UserMessageRequest) returns (UserMessageResponse);
   rpc AddHabit(AddHabitRequest) returns (AddHabitResponse);
@@ -42,30 +42,38 @@ service Daryl {
 
 }
 
+message Daryl {
+  // @inject_tag: db:"id" access:"s"
+  string id = 1;
+  // @inject_tag: db:"name" access:"i,s"
+  string name = 2;
+  // @inject_tag: db:"password" access:"i,u,s"
+  string password = 3;
+}
+
 // UserMessage
 
 message UserMessageRequest {
-  string identifier = 1;
+  string daryl_identifier = 1;
   Message message = 2;
 }
 
 message MessageLink {
-  // @inject_tag: db:"link"
+  // @inject_tag: db:"link" access:"i,u,s"
   string link = 1;
 }
 
 message Message {
-  // @inject_tag: db:"id"
+  // @inject_tag: db:"id" access:"s"
   string id = 1;
-  // @inject_tag: db:"text"
+  // @inject_tag: db:"text" access:"i,u,s"
   string text = 2;
-  // @inject_tag: db:"at"
+  // @inject_tag: db:"at" access:"i,s"
   google.protobuf.Timestamp at = 3;
-  // @inject_tag: db:"link"
+  // @inject_tag: db:"done" access:"i,u,s"
   bool done = 4;
-  // @inject_tag: db:"todo"
+  // @inject_tag: db:"todo" access:"i,u,s"
   string todo = 5;
-  // @inject_tag: db:"links"
   repeated MessageLink links = 6;
 }
 
@@ -76,27 +84,28 @@ message UserMessageResponse {
 // AddHabit
 
 message HabitStat {
-  // @inject_tag: db:"urgent"
+  // @inject_tag: db:"urgent" access:"i,u,s"
   uint32 urgent = 1;
-  // @inject_tag: db:"nMissed"
+  // @inject_tag: db:"nMissed" access:"i,u,s"
   uint32 nMissed = 2;
 }
 
 message Habit {
   // @inject_tag: db:"id"
   string id = 1;
-  // @inject_tag: db:"title"
+  // @inject_tag: db:"title" access:"i,u,s"
   string title = 2;
+  // @inject_tag: db:"duration" access:"i,u,s"
   string duration = 3;
   google.protobuf.Timestamp deadline = 4;
-  // @inject_tag: db:"cron"
+  // @inject_tag: db:"cron" access:"i,u,s"
   string cron = 6;
   google.protobuf.Timestamp lastDone = 7;
   HabitStat stats = 8;
 }
 
 message AddHabitRequest {
-  string identifier = 1;
+  string daryl_identifier = 1;
 
   Habit habit = 2;
 }
@@ -108,20 +117,16 @@ message AddHabitResponse {
 // StartWorkSession
 
 message SessionSlice {
-   // @inject_tag: db:"start"
   google.protobuf.Timestamp start = 1;
-  // @inject_tag: db:"end"
   google.protobuf.Timestamp end = 2;
-  // @inject_tag: db:"habit"
+  // @inject_tag: db:"habit" access:"i,u,s"
   Habit habit = 3;
 }
 
 message Session {
-  // @inject_tag: db:"start"
   google.protobuf.Timestamp start = 1;
-  // @inject_tag: db:"end"
   google.protobuf.Timestamp end = 2;
-  // @inject_tag: db:"slices"
+  // @inject_tag: db:"slices" access:"i,u,s"
   repeated SessionSlice slices = 3;
 }
 
@@ -130,7 +135,7 @@ message SessionConfig {
 }
 
 message StartWorkSessionRequest {
-  string identifier = 1;
+  string daryl_identifier = 1;
   SessionConfig config = 2;
 }
 
@@ -139,7 +144,7 @@ message StartWorkSessionResponse {
 }
 
 message CancelWorkSessionRequest {
-  string identifier = 1;
+  string daryl_identifier = 1;
 }
 
 message CancelWorkSessionResponse {
@@ -150,7 +155,7 @@ message SessionSliceIndex {
 }
 
 message RefuseSessionSliceRequest {
-  string identifier = 1;
+  string daryl_identifier = 1;
   SessionSliceIndex index = 2;
 }
 

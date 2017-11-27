@@ -25,6 +25,7 @@ projects:
     preview: false
     paths:
     - ./
+    - ../db
     - ../protodef
     ignore_paths: []
     exts:

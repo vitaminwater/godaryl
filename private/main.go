@@ -20,8 +20,8 @@ func main() {
 	registry := &sync.Map{}
 
 	grpcServer := grpc.NewServer()
-	protodef.RegisterFarmServer(grpcServer, NewFarmServer(registry))
-	protodef.RegisterDarylServer(grpcServer, NewDarylServer(registry))
+	protodef.RegisterFarmServiceServer(grpcServer, NewFarmServer(registry))
+	protodef.RegisterDarylServiceServer(grpcServer, NewDarylServer(registry))
 	log.Infof("Serving on port %d", port)
 	grpcServer.Serve(lis)
 }

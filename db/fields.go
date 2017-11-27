@@ -3,9 +3,11 @@ package daryl_db
 import (
 	"errors"
 	"fmt"
-	sq "github.com/Masterminds/squirrel"
 	"reflect"
 	"strings"
+
+	sq "github.com/Masterminds/squirrel"
+	log "github.com/sirupsen/logrus"
 )
 
 func ToExpr(fields ...string) []interface{} {
@@ -16,7 +18,7 @@ func ToExpr(fields ...string) []interface{} {
 	return v
 }
 
-func ListField(s interface{}, access string) ([]string, error) {
+func ListField(s interface{}, prefix, access string) ([]string, error) {
 	t := reflect.TypeOf(s)
 
 	if t.Kind() == reflect.Ptr {
@@ -31,12 +33,27 @@ func ListField(s interface{}, access string) ([]string, error) {
 
 	for i := 0; i < t.NumField(); i++ {
 		if tg, ok := t.Field(i).Tag.Lookup("db"); ok == true {
+			abs := tg
+			if prefix != "" {
+				abs = fmt.Sprintf("%s.%s", prefix, tg)
+			}
+			log.Info(abs)
 			if a, ok := t.Field(i).Tag.Lookup("access"); ok == true {
 				if !strings.Contains(a, access) {
 					continue
 				}
 			}
-			fields = append(fields, tg)
+			if t.Field(i).Type.Kind() == reflect.Struct || (t.Field(i).Type.Kind() == reflect.Ptr && t.Elem().Kind() == reflect.Struct) {
+				f, err := ListField(reflect.ValueOf(s).Field(i), abs, access)
+				if err != nil {
+					return fields, err
+				}
+				fields = append(fields, f...)
+				log.Info("1", fields, i)
+			} else {
+				fields = append(fields, abs)
+				log.Info("2", fields, i)
+			}
 		}
 	}
 	return fields, nil

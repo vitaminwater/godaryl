@@ -12,9 +12,9 @@ import (
 	"google.golang.org/grpc"
 )
 
-func startDaryl(client protodef.FarmClient, c *cli.Context) {
+func startDaryl(client protodef.FarmServiceClient, c *cli.Context) {
 	log.Info("startDaryl")
-	request := &protodef.StartDarylRequest{Identifier: c.String("identifier")}
+	request := &protodef.StartDarylRequest{DarylIdentifier: c.String("identifier")}
 	response, err := client.StartDaryl(context.Background(), request)
 	if err != nil {
 		log.Fatalf("fail to stuff: %v", err)
@@ -22,9 +22,9 @@ func startDaryl(client protodef.FarmClient, c *cli.Context) {
 	log.Println(response)
 }
 
-func hasDaryl(client protodef.FarmClient, c *cli.Context) {
+func hasDaryl(client protodef.FarmServiceClient, c *cli.Context) {
 	log.Info("hasDaryl")
-	request := &protodef.HasDarylRequest{Identifier: c.String("identifier")}
+	request := &protodef.HasDarylRequest{DarylIdentifier: c.String("identifier")}
 	response, err := client.HasDaryl(context.Background(), request)
 	if err != nil {
 		log.Fatalf("fail to stuff: %v", err)
@@ -32,11 +32,11 @@ func hasDaryl(client protodef.FarmClient, c *cli.Context) {
 	log.Println(response)
 }
 
-func userMessage(client protodef.DarylClient, c *cli.Context) {
+func userMessage(client protodef.DarylServiceClient, c *cli.Context) {
 	log.Info("userMessage")
 	request := &protodef.UserMessageRequest{
-		Identifier: c.String("identifier"),
-		Message:    &protodef.Message{Text: c.String("message"), At: ptypes.TimestampNow()}}
+		DarylIdentifier: c.String("identifier"),
+		Message:         &protodef.Message{Text: c.String("message"), At: ptypes.TimestampNow()}}
 	response, err := client.UserMessage(context.Background(), request)
 	if err != nil {
 		log.Fatalf("fail to stuff: %v", err)
@@ -44,7 +44,7 @@ func userMessage(client protodef.DarylClient, c *cli.Context) {
 	log.Println(response)
 }
 
-func addHabit(client protodef.DarylClient, c *cli.Context) {
+func addHabit(client protodef.DarylServiceClient, c *cli.Context) {
 	log.Info("addHabit")
 	deadlinet := time.Time{}
 	err := deadlinet.UnmarshalText([]byte(c.String("deadline")))
@@ -57,7 +57,7 @@ func addHabit(client protodef.DarylClient, c *cli.Context) {
 	}
 
 	request := &protodef.AddHabitRequest{
-		Identifier: c.String("identifier"),
+		DarylIdentifier: c.String("identifier"),
 		Habit: &protodef.Habit{
 			Title:    c.String("title"),
 			Deadline: deadline,
@@ -74,9 +74,9 @@ func addHabit(client protodef.DarylClient, c *cli.Context) {
 	log.Println(response)
 }
 
-func startWorkSession(client protodef.DarylClient, c *cli.Context) {
+func startWorkSession(client protodef.DarylServiceClient, c *cli.Context) {
 	log.Info("startWorkSession")
-	request := &protodef.StartWorkSessionRequest{Identifier: c.String("identifier")}
+	request := &protodef.StartWorkSessionRequest{DarylIdentifier: c.String("identifier")}
 	response, err := client.StartWorkSession(context.Background(), request)
 	if err != nil {
 		log.Fatalf("fail to stuff: %v", err)
@@ -84,9 +84,9 @@ func startWorkSession(client protodef.DarylClient, c *cli.Context) {
 	log.Println(response)
 }
 
-func cancelWorkSession(client protodef.DarylClient, c *cli.Context) {
+func cancelWorkSession(client protodef.DarylServiceClient, c *cli.Context) {
 	log.Info("cancelWorkSession")
-	request := &protodef.CancelWorkSessionRequest{Identifier: c.String("identifier")}
+	request := &protodef.CancelWorkSessionRequest{DarylIdentifier: c.String("identifier")}
 	response, err := client.CancelWorkSession(context.Background(), request)
 	if err != nil {
 		log.Fatalf("fail to stuff: %v", err)
@@ -94,9 +94,9 @@ func cancelWorkSession(client protodef.DarylClient, c *cli.Context) {
 	log.Println(response)
 }
 
-func refuseWorkSession(client protodef.DarylClient, c *cli.Context) {
+func refuseWorkSession(client protodef.DarylServiceClient, c *cli.Context) {
 	log.Info("refuseWorkSession")
-	request := &protodef.RefuseSessionSliceRequest{Identifier: c.String("identifier"), Index: &protodef.SessionSliceIndex{uint32(c.Uint("index"))}}
+	request := &protodef.RefuseSessionSliceRequest{DarylIdentifier: c.String("identifier"), Index: &protodef.SessionSliceIndex{uint32(c.Uint("index"))}}
 	response, err := client.RefuseSessionSlice(context.Background(), request)
 	if err != nil {
 		log.Fatalf("fail to stuff: %v", err)
@@ -104,14 +104,14 @@ func refuseWorkSession(client protodef.DarylClient, c *cli.Context) {
 	log.Println(response)
 }
 
-func openConnection(c *cli.Context) (protodef.FarmClient, protodef.DarylClient) {
+func openConnection(c *cli.Context) (protodef.FarmServiceClient, protodef.DarylServiceClient) {
 	conn, err := grpc.Dial("localhost:8081", grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("fail to dial: %v", err)
 	}
 
-	farm := protodef.NewFarmClient(conn)
-	daryl := protodef.NewDarylClient(conn)
+	farm := protodef.NewFarmServiceClient(conn)
+	daryl := protodef.NewDarylServiceClient(conn)
 
 	return farm, daryl
 }

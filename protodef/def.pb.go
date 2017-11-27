@@ -12,6 +12,7 @@ It has these top-level messages:
 	HasDarylRequest
 	StartDarylResponse
 	HasDarylResponse
+	Daryl
 	UserMessageRequest
 	MessageLink
 	Message
@@ -55,7 +56,7 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 
 type StartDarylRequest struct {
-	Identifier string `protobuf:"bytes,1,opt,name=identifier" json:"identifier,omitempty"`
+	DarylIdentifier string `protobuf:"bytes,1,opt,name=daryl_identifier,json=darylIdentifier" json:"daryl_identifier,omitempty"`
 }
 
 func (m *StartDarylRequest) Reset()                    { *m = StartDarylRequest{} }
@@ -63,15 +64,15 @@ func (m *StartDarylRequest) String() string            { return proto.CompactTex
 func (*StartDarylRequest) ProtoMessage()               {}
 func (*StartDarylRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
 
-func (m *StartDarylRequest) GetIdentifier() string {
+func (m *StartDarylRequest) GetDarylIdentifier() string {
 	if m != nil {
-		return m.Identifier
+		return m.DarylIdentifier
 	}
 	return ""
 }
 
 type HasDarylRequest struct {
-	Identifier string `protobuf:"bytes,1,opt,name=identifier" json:"identifier,omitempty"`
+	DarylIdentifier string `protobuf:"bytes,1,opt,name=daryl_identifier,json=darylIdentifier" json:"daryl_identifier,omitempty"`
 }
 
 func (m *HasDarylRequest) Reset()                    { *m = HasDarylRequest{} }
@@ -79,9 +80,9 @@ func (m *HasDarylRequest) String() string            { return proto.CompactTextS
 func (*HasDarylRequest) ProtoMessage()               {}
 func (*HasDarylRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
 
-func (m *HasDarylRequest) GetIdentifier() string {
+func (m *HasDarylRequest) GetDarylIdentifier() string {
 	if m != nil {
-		return m.Identifier
+		return m.DarylIdentifier
 	}
 	return ""
 }
@@ -110,19 +111,54 @@ func (m *HasDarylResponse) GetResponse() bool {
 	return false
 }
 
+type Daryl struct {
+	// @inject_tag: db:"id" access:"s"
+	Id string `protobuf:"bytes,1,opt,name=id" json:"id,omitempty" db:"id" access:"s"`
+	// @inject_tag: db:"name" access:"i,s"
+	Name string `protobuf:"bytes,2,opt,name=name" json:"name,omitempty" db:"name" access:"i,s"`
+	// @inject_tag: db:"password" access:"i,u,s"
+	Password string `protobuf:"bytes,3,opt,name=password" json:"password,omitempty" db:"password" access:"i,u,s"`
+}
+
+func (m *Daryl) Reset()                    { *m = Daryl{} }
+func (m *Daryl) String() string            { return proto.CompactTextString(m) }
+func (*Daryl) ProtoMessage()               {}
+func (*Daryl) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{4} }
+
+func (m *Daryl) GetId() string {
+	if m != nil {
+		return m.Id
+	}
+	return ""
+}
+
+func (m *Daryl) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+func (m *Daryl) GetPassword() string {
+	if m != nil {
+		return m.Password
+	}
+	return ""
+}
+
 type UserMessageRequest struct {
-	Identifier string   `protobuf:"bytes,1,opt,name=identifier" json:"identifier,omitempty"`
-	Message    *Message `protobuf:"bytes,2,opt,name=message" json:"message,omitempty"`
+	DarylIdentifier string   `protobuf:"bytes,1,opt,name=daryl_identifier,json=darylIdentifier" json:"daryl_identifier,omitempty"`
+	Message         *Message `protobuf:"bytes,2,opt,name=message" json:"message,omitempty"`
 }
 
 func (m *UserMessageRequest) Reset()                    { *m = UserMessageRequest{} }
 func (m *UserMessageRequest) String() string            { return proto.CompactTextString(m) }
 func (*UserMessageRequest) ProtoMessage()               {}
-func (*UserMessageRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{4} }
+func (*UserMessageRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{5} }
 
-func (m *UserMessageRequest) GetIdentifier() string {
+func (m *UserMessageRequest) GetDarylIdentifier() string {
 	if m != nil {
-		return m.Identifier
+		return m.DarylIdentifier
 	}
 	return ""
 }
@@ -135,14 +171,14 @@ func (m *UserMessageRequest) GetMessage() *Message {
 }
 
 type MessageLink struct {
-	// @inject_tag: db:"link"
-	Link string `protobuf:"bytes,1,opt,name=link" json:"link,omitempty" db:"link"`
+	// @inject_tag: db:"link" access:"i,u,s"
+	Link string `protobuf:"bytes,1,opt,name=link" json:"link,omitempty" db:"link" access:"i,u,s"`
 }
 
 func (m *MessageLink) Reset()                    { *m = MessageLink{} }
 func (m *MessageLink) String() string            { return proto.CompactTextString(m) }
 func (*MessageLink) ProtoMessage()               {}
-func (*MessageLink) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{5} }
+func (*MessageLink) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{6} }
 
 func (m *MessageLink) GetLink() string {
 	if m != nil {
@@ -152,24 +188,23 @@ func (m *MessageLink) GetLink() string {
 }
 
 type Message struct {
-	// @inject_tag: db:"id"
-	Id string `protobuf:"bytes,1,opt,name=id" json:"id,omitempty" db:"id"`
-	// @inject_tag: db:"text"
-	Text string `protobuf:"bytes,2,opt,name=text" json:"text,omitempty" db:"text"`
-	// @inject_tag: db:"at"
-	At *google_protobuf.Timestamp `protobuf:"bytes,3,opt,name=at" json:"at,omitempty" db:"at"`
-	// @inject_tag: db:"link"
-	Done bool `protobuf:"varint,4,opt,name=done" json:"done,omitempty" db:"link"`
-	// @inject_tag: db:"todo"
-	Todo string `protobuf:"bytes,5,opt,name=todo" json:"todo,omitempty" db:"todo"`
-	// @inject_tag: db:"links"
-	Links []*MessageLink `protobuf:"bytes,6,rep,name=links" json:"links,omitempty" db:"links"`
+	// @inject_tag: db:"id" access:"s"
+	Id string `protobuf:"bytes,1,opt,name=id" json:"id,omitempty" db:"id" access:"s"`
+	// @inject_tag: db:"text" access:"i,u,s"
+	Text string `protobuf:"bytes,2,opt,name=text" json:"text,omitempty" db:"text" access:"i,u,s"`
+	// @inject_tag: db:"at" access:"i,s"
+	At *google_protobuf.Timestamp `protobuf:"bytes,3,opt,name=at" json:"at,omitempty" db:"at" access:"i,s"`
+	// @inject_tag: db:"done" access:"i,u,s"
+	Done bool `protobuf:"varint,4,opt,name=done" json:"done,omitempty" db:"done" access:"i,u,s"`
+	// @inject_tag: db:"todo" access:"i,u,s"
+	Todo  string         `protobuf:"bytes,5,opt,name=todo" json:"todo,omitempty" db:"todo" access:"i,u,s"`
+	Links []*MessageLink `protobuf:"bytes,6,rep,name=links" json:"links,omitempty"`
 }
 
 func (m *Message) Reset()                    { *m = Message{} }
 func (m *Message) String() string            { return proto.CompactTextString(m) }
 func (*Message) ProtoMessage()               {}
-func (*Message) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{6} }
+func (*Message) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{7} }
 
 func (m *Message) GetId() string {
 	if m != nil {
@@ -220,7 +255,7 @@ type UserMessageResponse struct {
 func (m *UserMessageResponse) Reset()                    { *m = UserMessageResponse{} }
 func (m *UserMessageResponse) String() string            { return proto.CompactTextString(m) }
 func (*UserMessageResponse) ProtoMessage()               {}
-func (*UserMessageResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{7} }
+func (*UserMessageResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{8} }
 
 func (m *UserMessageResponse) GetMessage() *Message {
 	if m != nil {
@@ -230,16 +265,16 @@ func (m *UserMessageResponse) GetMessage() *Message {
 }
 
 type HabitStat struct {
-	// @inject_tag: db:"urgent"
-	Urgent uint32 `protobuf:"varint,1,opt,name=urgent" json:"urgent,omitempty" db:"urgent"`
-	// @inject_tag: db:"nMissed"
-	NMissed uint32 `protobuf:"varint,2,opt,name=nMissed" json:"nMissed,omitempty" db:"nMissed"`
+	// @inject_tag: db:"urgent" access:"i,u,s"
+	Urgent uint32 `protobuf:"varint,1,opt,name=urgent" json:"urgent,omitempty" db:"urgent" access:"i,u,s"`
+	// @inject_tag: db:"nMissed" access:"i,u,s"
+	NMissed uint32 `protobuf:"varint,2,opt,name=nMissed" json:"nMissed,omitempty" db:"nMissed" access:"i,u,s"`
 }
 
 func (m *HabitStat) Reset()                    { *m = HabitStat{} }
 func (m *HabitStat) String() string            { return proto.CompactTextString(m) }
 func (*HabitStat) ProtoMessage()               {}
-func (*HabitStat) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{8} }
+func (*HabitStat) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{9} }
 
 func (m *HabitStat) GetUrgent() uint32 {
 	if m != nil {
@@ -258,12 +293,13 @@ func (m *HabitStat) GetNMissed() uint32 {
 type Habit struct {
 	// @inject_tag: db:"id"
 	Id string `protobuf:"bytes,1,opt,name=id" json:"id,omitempty" db:"id"`
-	// @inject_tag: db:"title"
-	Title    string                     `protobuf:"bytes,2,opt,name=title" json:"title,omitempty" db:"title"`
-	Duration string                     `protobuf:"bytes,3,opt,name=duration" json:"duration,omitempty"`
+	// @inject_tag: db:"title" access:"i,u,s"
+	Title string `protobuf:"bytes,2,opt,name=title" json:"title,omitempty" db:"title" access:"i,u,s"`
+	// @inject_tag: db:"duration" access:"i,u,s"
+	Duration string                     `protobuf:"bytes,3,opt,name=duration" json:"duration,omitempty" db:"duration" access:"i,u,s"`
 	Deadline *google_protobuf.Timestamp `protobuf:"bytes,4,opt,name=deadline" json:"deadline,omitempty"`
-	// @inject_tag: db:"cron"
-	Cron     string                     `protobuf:"bytes,6,opt,name=cron" json:"cron,omitempty" db:"cron"`
+	// @inject_tag: db:"cron" access:"i,u,s"
+	Cron     string                     `protobuf:"bytes,6,opt,name=cron" json:"cron,omitempty" db:"cron" access:"i,u,s"`
 	LastDone *google_protobuf.Timestamp `protobuf:"bytes,7,opt,name=lastDone" json:"lastDone,omitempty"`
 	Stats    *HabitStat                 `protobuf:"bytes,8,opt,name=stats" json:"stats,omitempty"`
 }
@@ -271,7 +307,7 @@ type Habit struct {
 func (m *Habit) Reset()                    { *m = Habit{} }
 func (m *Habit) String() string            { return proto.CompactTextString(m) }
 func (*Habit) ProtoMessage()               {}
-func (*Habit) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{9} }
+func (*Habit) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{10} }
 
 func (m *Habit) GetId() string {
 	if m != nil {
@@ -323,18 +359,18 @@ func (m *Habit) GetStats() *HabitStat {
 }
 
 type AddHabitRequest struct {
-	Identifier string `protobuf:"bytes,1,opt,name=identifier" json:"identifier,omitempty"`
-	Habit      *Habit `protobuf:"bytes,2,opt,name=habit" json:"habit,omitempty"`
+	DarylIdentifier string `protobuf:"bytes,1,opt,name=daryl_identifier,json=darylIdentifier" json:"daryl_identifier,omitempty"`
+	Habit           *Habit `protobuf:"bytes,2,opt,name=habit" json:"habit,omitempty"`
 }
 
 func (m *AddHabitRequest) Reset()                    { *m = AddHabitRequest{} }
 func (m *AddHabitRequest) String() string            { return proto.CompactTextString(m) }
 func (*AddHabitRequest) ProtoMessage()               {}
-func (*AddHabitRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{10} }
+func (*AddHabitRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{11} }
 
-func (m *AddHabitRequest) GetIdentifier() string {
+func (m *AddHabitRequest) GetDarylIdentifier() string {
 	if m != nil {
-		return m.Identifier
+		return m.DarylIdentifier
 	}
 	return ""
 }
@@ -353,7 +389,7 @@ type AddHabitResponse struct {
 func (m *AddHabitResponse) Reset()                    { *m = AddHabitResponse{} }
 func (m *AddHabitResponse) String() string            { return proto.CompactTextString(m) }
 func (*AddHabitResponse) ProtoMessage()               {}
-func (*AddHabitResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{11} }
+func (*AddHabitResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{12} }
 
 func (m *AddHabitResponse) GetHabit() *Habit {
 	if m != nil {
@@ -363,18 +399,16 @@ func (m *AddHabitResponse) GetHabit() *Habit {
 }
 
 type SessionSlice struct {
-	// @inject_tag: db:"start"
-	Start *google_protobuf.Timestamp `protobuf:"bytes,1,opt,name=start" json:"start,omitempty" db:"start"`
-	// @inject_tag: db:"end"
-	End *google_protobuf.Timestamp `protobuf:"bytes,2,opt,name=end" json:"end,omitempty" db:"end"`
-	// @inject_tag: db:"habit"
-	Habit *Habit `protobuf:"bytes,3,opt,name=habit" json:"habit,omitempty" db:"habit"`
+	Start *google_protobuf.Timestamp `protobuf:"bytes,1,opt,name=start" json:"start,omitempty"`
+	End   *google_protobuf.Timestamp `protobuf:"bytes,2,opt,name=end" json:"end,omitempty"`
+	// @inject_tag: db:"habit" access:"i,u,s"
+	Habit *Habit `protobuf:"bytes,3,opt,name=habit" json:"habit,omitempty" db:"habit" access:"i,u,s"`
 }
 
 func (m *SessionSlice) Reset()                    { *m = SessionSlice{} }
 func (m *SessionSlice) String() string            { return proto.CompactTextString(m) }
 func (*SessionSlice) ProtoMessage()               {}
-func (*SessionSlice) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{12} }
+func (*SessionSlice) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{13} }
 
 func (m *SessionSlice) GetStart() *google_protobuf.Timestamp {
 	if m != nil {
@@ -398,18 +432,16 @@ func (m *SessionSlice) GetHabit() *Habit {
 }
 
 type Session struct {
-	// @inject_tag: db:"start"
-	Start *google_protobuf.Timestamp `protobuf:"bytes,1,opt,name=start" json:"start,omitempty" db:"start"`
-	// @inject_tag: db:"end"
-	End *google_protobuf.Timestamp `protobuf:"bytes,2,opt,name=end" json:"end,omitempty" db:"end"`
-	// @inject_tag: db:"slices"
-	Slices []*SessionSlice `protobuf:"bytes,3,rep,name=slices" json:"slices,omitempty" db:"slices"`
+	Start *google_protobuf.Timestamp `protobuf:"bytes,1,opt,name=start" json:"start,omitempty"`
+	End   *google_protobuf.Timestamp `protobuf:"bytes,2,opt,name=end" json:"end,omitempty"`
+	// @inject_tag: db:"slices" access:"i,u,s"
+	Slices []*SessionSlice `protobuf:"bytes,3,rep,name=slices" json:"slices,omitempty" db:"slices" access:"i,u,s"`
 }
 
 func (m *Session) Reset()                    { *m = Session{} }
 func (m *Session) String() string            { return proto.CompactTextString(m) }
 func (*Session) ProtoMessage()               {}
-func (*Session) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{13} }
+func (*Session) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{14} }
 
 func (m *Session) GetStart() *google_protobuf.Timestamp {
 	if m != nil {
@@ -439,7 +471,7 @@ type SessionConfig struct {
 func (m *SessionConfig) Reset()                    { *m = SessionConfig{} }
 func (m *SessionConfig) String() string            { return proto.CompactTextString(m) }
 func (*SessionConfig) ProtoMessage()               {}
-func (*SessionConfig) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{14} }
+func (*SessionConfig) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{15} }
 
 func (m *SessionConfig) GetDuration() string {
 	if m != nil {
@@ -449,18 +481,18 @@ func (m *SessionConfig) GetDuration() string {
 }
 
 type StartWorkSessionRequest struct {
-	Identifier string         `protobuf:"bytes,1,opt,name=identifier" json:"identifier,omitempty"`
-	Config     *SessionConfig `protobuf:"bytes,2,opt,name=config" json:"config,omitempty"`
+	DarylIdentifier string         `protobuf:"bytes,1,opt,name=daryl_identifier,json=darylIdentifier" json:"daryl_identifier,omitempty"`
+	Config          *SessionConfig `protobuf:"bytes,2,opt,name=config" json:"config,omitempty"`
 }
 
 func (m *StartWorkSessionRequest) Reset()                    { *m = StartWorkSessionRequest{} }
 func (m *StartWorkSessionRequest) String() string            { return proto.CompactTextString(m) }
 func (*StartWorkSessionRequest) ProtoMessage()               {}
-func (*StartWorkSessionRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{15} }
+func (*StartWorkSessionRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{16} }
 
-func (m *StartWorkSessionRequest) GetIdentifier() string {
+func (m *StartWorkSessionRequest) GetDarylIdentifier() string {
 	if m != nil {
-		return m.Identifier
+		return m.DarylIdentifier
 	}
 	return ""
 }
@@ -479,7 +511,7 @@ type StartWorkSessionResponse struct {
 func (m *StartWorkSessionResponse) Reset()                    { *m = StartWorkSessionResponse{} }
 func (m *StartWorkSessionResponse) String() string            { return proto.CompactTextString(m) }
 func (*StartWorkSessionResponse) ProtoMessage()               {}
-func (*StartWorkSessionResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{16} }
+func (*StartWorkSessionResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{17} }
 
 func (m *StartWorkSessionResponse) GetSession() *Session {
 	if m != nil {
@@ -489,17 +521,17 @@ func (m *StartWorkSessionResponse) GetSession() *Session {
 }
 
 type CancelWorkSessionRequest struct {
-	Identifier string `protobuf:"bytes,1,opt,name=identifier" json:"identifier,omitempty"`
+	DarylIdentifier string `protobuf:"bytes,1,opt,name=daryl_identifier,json=darylIdentifier" json:"daryl_identifier,omitempty"`
 }
 
 func (m *CancelWorkSessionRequest) Reset()                    { *m = CancelWorkSessionRequest{} }
 func (m *CancelWorkSessionRequest) String() string            { return proto.CompactTextString(m) }
 func (*CancelWorkSessionRequest) ProtoMessage()               {}
-func (*CancelWorkSessionRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{17} }
+func (*CancelWorkSessionRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{18} }
 
-func (m *CancelWorkSessionRequest) GetIdentifier() string {
+func (m *CancelWorkSessionRequest) GetDarylIdentifier() string {
 	if m != nil {
-		return m.Identifier
+		return m.DarylIdentifier
 	}
 	return ""
 }
@@ -510,7 +542,7 @@ type CancelWorkSessionResponse struct {
 func (m *CancelWorkSessionResponse) Reset()                    { *m = CancelWorkSessionResponse{} }
 func (m *CancelWorkSessionResponse) String() string            { return proto.CompactTextString(m) }
 func (*CancelWorkSessionResponse) ProtoMessage()               {}
-func (*CancelWorkSessionResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{18} }
+func (*CancelWorkSessionResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{19} }
 
 type SessionSliceIndex struct {
 	Index uint32 `protobuf:"varint,1,opt,name=index" json:"index,omitempty"`
@@ -519,7 +551,7 @@ type SessionSliceIndex struct {
 func (m *SessionSliceIndex) Reset()                    { *m = SessionSliceIndex{} }
 func (m *SessionSliceIndex) String() string            { return proto.CompactTextString(m) }
 func (*SessionSliceIndex) ProtoMessage()               {}
-func (*SessionSliceIndex) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{19} }
+func (*SessionSliceIndex) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{20} }
 
 func (m *SessionSliceIndex) GetIndex() uint32 {
 	if m != nil {
@@ -529,18 +561,18 @@ func (m *SessionSliceIndex) GetIndex() uint32 {
 }
 
 type RefuseSessionSliceRequest struct {
-	Identifier string             `protobuf:"bytes,1,opt,name=identifier" json:"identifier,omitempty"`
-	Index      *SessionSliceIndex `protobuf:"bytes,2,opt,name=index" json:"index,omitempty"`
+	DarylIdentifier string             `protobuf:"bytes,1,opt,name=daryl_identifier,json=darylIdentifier" json:"daryl_identifier,omitempty"`
+	Index           *SessionSliceIndex `protobuf:"bytes,2,opt,name=index" json:"index,omitempty"`
 }
 
 func (m *RefuseSessionSliceRequest) Reset()                    { *m = RefuseSessionSliceRequest{} }
 func (m *RefuseSessionSliceRequest) String() string            { return proto.CompactTextString(m) }
 func (*RefuseSessionSliceRequest) ProtoMessage()               {}
-func (*RefuseSessionSliceRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{20} }
+func (*RefuseSessionSliceRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{21} }
 
-func (m *RefuseSessionSliceRequest) GetIdentifier() string {
+func (m *RefuseSessionSliceRequest) GetDarylIdentifier() string {
 	if m != nil {
-		return m.Identifier
+		return m.DarylIdentifier
 	}
 	return ""
 }
@@ -558,13 +590,14 @@ type RefuseSessionSliceResponse struct {
 func (m *RefuseSessionSliceResponse) Reset()                    { *m = RefuseSessionSliceResponse{} }
 func (m *RefuseSessionSliceResponse) String() string            { return proto.CompactTextString(m) }
 func (*RefuseSessionSliceResponse) ProtoMessage()               {}
-func (*RefuseSessionSliceResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{21} }
+func (*RefuseSessionSliceResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{22} }
 
 func init() {
 	proto.RegisterType((*StartDarylRequest)(nil), "protodef.StartDarylRequest")
 	proto.RegisterType((*HasDarylRequest)(nil), "protodef.HasDarylRequest")
 	proto.RegisterType((*StartDarylResponse)(nil), "protodef.StartDarylResponse")
 	proto.RegisterType((*HasDarylResponse)(nil), "protodef.HasDarylResponse")
+	proto.RegisterType((*Daryl)(nil), "protodef.Daryl")
 	proto.RegisterType((*UserMessageRequest)(nil), "protodef.UserMessageRequest")
 	proto.RegisterType((*MessageLink)(nil), "protodef.MessageLink")
 	proto.RegisterType((*Message)(nil), "protodef.Message")
@@ -593,106 +626,106 @@ var _ grpc.ClientConn
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion4
 
-// Client API for Farm service
+// Client API for FarmService service
 
-type FarmClient interface {
+type FarmServiceClient interface {
 	StartDaryl(ctx context.Context, in *StartDarylRequest, opts ...grpc.CallOption) (*StartDarylResponse, error)
 	HasDaryl(ctx context.Context, in *HasDarylRequest, opts ...grpc.CallOption) (*HasDarylResponse, error)
 }
 
-type farmClient struct {
+type farmServiceClient struct {
 	cc *grpc.ClientConn
 }
 
-func NewFarmClient(cc *grpc.ClientConn) FarmClient {
-	return &farmClient{cc}
+func NewFarmServiceClient(cc *grpc.ClientConn) FarmServiceClient {
+	return &farmServiceClient{cc}
 }
 
-func (c *farmClient) StartDaryl(ctx context.Context, in *StartDarylRequest, opts ...grpc.CallOption) (*StartDarylResponse, error) {
+func (c *farmServiceClient) StartDaryl(ctx context.Context, in *StartDarylRequest, opts ...grpc.CallOption) (*StartDarylResponse, error) {
 	out := new(StartDarylResponse)
-	err := grpc.Invoke(ctx, "/protodef.Farm/StartDaryl", in, out, c.cc, opts...)
+	err := grpc.Invoke(ctx, "/protodef.FarmService/StartDaryl", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *farmClient) HasDaryl(ctx context.Context, in *HasDarylRequest, opts ...grpc.CallOption) (*HasDarylResponse, error) {
+func (c *farmServiceClient) HasDaryl(ctx context.Context, in *HasDarylRequest, opts ...grpc.CallOption) (*HasDarylResponse, error) {
 	out := new(HasDarylResponse)
-	err := grpc.Invoke(ctx, "/protodef.Farm/HasDaryl", in, out, c.cc, opts...)
+	err := grpc.Invoke(ctx, "/protodef.FarmService/HasDaryl", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// Server API for Farm service
+// Server API for FarmService service
 
-type FarmServer interface {
+type FarmServiceServer interface {
 	StartDaryl(context.Context, *StartDarylRequest) (*StartDarylResponse, error)
 	HasDaryl(context.Context, *HasDarylRequest) (*HasDarylResponse, error)
 }
 
-func RegisterFarmServer(s *grpc.Server, srv FarmServer) {
-	s.RegisterService(&_Farm_serviceDesc, srv)
+func RegisterFarmServiceServer(s *grpc.Server, srv FarmServiceServer) {
+	s.RegisterService(&_FarmService_serviceDesc, srv)
 }
 
-func _Farm_StartDaryl_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _FarmService_StartDaryl_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(StartDarylRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(FarmServer).StartDaryl(ctx, in)
+		return srv.(FarmServiceServer).StartDaryl(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/protodef.Farm/StartDaryl",
+		FullMethod: "/protodef.FarmService/StartDaryl",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(FarmServer).StartDaryl(ctx, req.(*StartDarylRequest))
+		return srv.(FarmServiceServer).StartDaryl(ctx, req.(*StartDarylRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Farm_HasDaryl_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _FarmService_HasDaryl_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(HasDarylRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(FarmServer).HasDaryl(ctx, in)
+		return srv.(FarmServiceServer).HasDaryl(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/protodef.Farm/HasDaryl",
+		FullMethod: "/protodef.FarmService/HasDaryl",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(FarmServer).HasDaryl(ctx, req.(*HasDarylRequest))
+		return srv.(FarmServiceServer).HasDaryl(ctx, req.(*HasDarylRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-var _Farm_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "protodef.Farm",
-	HandlerType: (*FarmServer)(nil),
+var _FarmService_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "protodef.FarmService",
+	HandlerType: (*FarmServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "StartDaryl",
-			Handler:    _Farm_StartDaryl_Handler,
+			Handler:    _FarmService_StartDaryl_Handler,
 		},
 		{
 			MethodName: "HasDaryl",
-			Handler:    _Farm_HasDaryl_Handler,
+			Handler:    _FarmService_HasDaryl_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "def.proto",
 }
 
-// Client API for Daryl service
+// Client API for DarylService service
 
-type DarylClient interface {
+type DarylServiceClient interface {
 	UserMessage(ctx context.Context, in *UserMessageRequest, opts ...grpc.CallOption) (*UserMessageResponse, error)
 	AddHabit(ctx context.Context, in *AddHabitRequest, opts ...grpc.CallOption) (*AddHabitResponse, error)
 	StartWorkSession(ctx context.Context, in *StartWorkSessionRequest, opts ...grpc.CallOption) (*StartWorkSessionResponse, error)
@@ -700,62 +733,62 @@ type DarylClient interface {
 	RefuseSessionSlice(ctx context.Context, in *RefuseSessionSliceRequest, opts ...grpc.CallOption) (*RefuseSessionSliceResponse, error)
 }
 
-type darylClient struct {
+type darylServiceClient struct {
 	cc *grpc.ClientConn
 }
 
-func NewDarylClient(cc *grpc.ClientConn) DarylClient {
-	return &darylClient{cc}
+func NewDarylServiceClient(cc *grpc.ClientConn) DarylServiceClient {
+	return &darylServiceClient{cc}
 }
 
-func (c *darylClient) UserMessage(ctx context.Context, in *UserMessageRequest, opts ...grpc.CallOption) (*UserMessageResponse, error) {
+func (c *darylServiceClient) UserMessage(ctx context.Context, in *UserMessageRequest, opts ...grpc.CallOption) (*UserMessageResponse, error) {
 	out := new(UserMessageResponse)
-	err := grpc.Invoke(ctx, "/protodef.Daryl/UserMessage", in, out, c.cc, opts...)
+	err := grpc.Invoke(ctx, "/protodef.DarylService/UserMessage", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *darylClient) AddHabit(ctx context.Context, in *AddHabitRequest, opts ...grpc.CallOption) (*AddHabitResponse, error) {
+func (c *darylServiceClient) AddHabit(ctx context.Context, in *AddHabitRequest, opts ...grpc.CallOption) (*AddHabitResponse, error) {
 	out := new(AddHabitResponse)
-	err := grpc.Invoke(ctx, "/protodef.Daryl/AddHabit", in, out, c.cc, opts...)
+	err := grpc.Invoke(ctx, "/protodef.DarylService/AddHabit", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *darylClient) StartWorkSession(ctx context.Context, in *StartWorkSessionRequest, opts ...grpc.CallOption) (*StartWorkSessionResponse, error) {
+func (c *darylServiceClient) StartWorkSession(ctx context.Context, in *StartWorkSessionRequest, opts ...grpc.CallOption) (*StartWorkSessionResponse, error) {
 	out := new(StartWorkSessionResponse)
-	err := grpc.Invoke(ctx, "/protodef.Daryl/StartWorkSession", in, out, c.cc, opts...)
+	err := grpc.Invoke(ctx, "/protodef.DarylService/StartWorkSession", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *darylClient) CancelWorkSession(ctx context.Context, in *CancelWorkSessionRequest, opts ...grpc.CallOption) (*CancelWorkSessionResponse, error) {
+func (c *darylServiceClient) CancelWorkSession(ctx context.Context, in *CancelWorkSessionRequest, opts ...grpc.CallOption) (*CancelWorkSessionResponse, error) {
 	out := new(CancelWorkSessionResponse)
-	err := grpc.Invoke(ctx, "/protodef.Daryl/CancelWorkSession", in, out, c.cc, opts...)
+	err := grpc.Invoke(ctx, "/protodef.DarylService/CancelWorkSession", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *darylClient) RefuseSessionSlice(ctx context.Context, in *RefuseSessionSliceRequest, opts ...grpc.CallOption) (*RefuseSessionSliceResponse, error) {
+func (c *darylServiceClient) RefuseSessionSlice(ctx context.Context, in *RefuseSessionSliceRequest, opts ...grpc.CallOption) (*RefuseSessionSliceResponse, error) {
 	out := new(RefuseSessionSliceResponse)
-	err := grpc.Invoke(ctx, "/protodef.Daryl/RefuseSessionSlice", in, out, c.cc, opts...)
+	err := grpc.Invoke(ctx, "/protodef.DarylService/RefuseSessionSlice", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// Server API for Daryl service
+// Server API for DarylService service
 
-type DarylServer interface {
+type DarylServiceServer interface {
 	UserMessage(context.Context, *UserMessageRequest) (*UserMessageResponse, error)
 	AddHabit(context.Context, *AddHabitRequest) (*AddHabitResponse, error)
 	StartWorkSession(context.Context, *StartWorkSessionRequest) (*StartWorkSessionResponse, error)
@@ -763,123 +796,123 @@ type DarylServer interface {
 	RefuseSessionSlice(context.Context, *RefuseSessionSliceRequest) (*RefuseSessionSliceResponse, error)
 }
 
-func RegisterDarylServer(s *grpc.Server, srv DarylServer) {
-	s.RegisterService(&_Daryl_serviceDesc, srv)
+func RegisterDarylServiceServer(s *grpc.Server, srv DarylServiceServer) {
+	s.RegisterService(&_DarylService_serviceDesc, srv)
 }
 
-func _Daryl_UserMessage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _DarylService_UserMessage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UserMessageRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(DarylServer).UserMessage(ctx, in)
+		return srv.(DarylServiceServer).UserMessage(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/protodef.Daryl/UserMessage",
+		FullMethod: "/protodef.DarylService/UserMessage",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DarylServer).UserMessage(ctx, req.(*UserMessageRequest))
+		return srv.(DarylServiceServer).UserMessage(ctx, req.(*UserMessageRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Daryl_AddHabit_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _DarylService_AddHabit_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(AddHabitRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(DarylServer).AddHabit(ctx, in)
+		return srv.(DarylServiceServer).AddHabit(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/protodef.Daryl/AddHabit",
+		FullMethod: "/protodef.DarylService/AddHabit",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DarylServer).AddHabit(ctx, req.(*AddHabitRequest))
+		return srv.(DarylServiceServer).AddHabit(ctx, req.(*AddHabitRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Daryl_StartWorkSession_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _DarylService_StartWorkSession_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(StartWorkSessionRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(DarylServer).StartWorkSession(ctx, in)
+		return srv.(DarylServiceServer).StartWorkSession(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/protodef.Daryl/StartWorkSession",
+		FullMethod: "/protodef.DarylService/StartWorkSession",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DarylServer).StartWorkSession(ctx, req.(*StartWorkSessionRequest))
+		return srv.(DarylServiceServer).StartWorkSession(ctx, req.(*StartWorkSessionRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Daryl_CancelWorkSession_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _DarylService_CancelWorkSession_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CancelWorkSessionRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(DarylServer).CancelWorkSession(ctx, in)
+		return srv.(DarylServiceServer).CancelWorkSession(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/protodef.Daryl/CancelWorkSession",
+		FullMethod: "/protodef.DarylService/CancelWorkSession",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DarylServer).CancelWorkSession(ctx, req.(*CancelWorkSessionRequest))
+		return srv.(DarylServiceServer).CancelWorkSession(ctx, req.(*CancelWorkSessionRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Daryl_RefuseSessionSlice_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _DarylService_RefuseSessionSlice_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(RefuseSessionSliceRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(DarylServer).RefuseSessionSlice(ctx, in)
+		return srv.(DarylServiceServer).RefuseSessionSlice(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/protodef.Daryl/RefuseSessionSlice",
+		FullMethod: "/protodef.DarylService/RefuseSessionSlice",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DarylServer).RefuseSessionSlice(ctx, req.(*RefuseSessionSliceRequest))
+		return srv.(DarylServiceServer).RefuseSessionSlice(ctx, req.(*RefuseSessionSliceRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-var _Daryl_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "protodef.Daryl",
-	HandlerType: (*DarylServer)(nil),
+var _DarylService_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "protodef.DarylService",
+	HandlerType: (*DarylServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "UserMessage",
-			Handler:    _Daryl_UserMessage_Handler,
+			Handler:    _DarylService_UserMessage_Handler,
 		},
 		{
 			MethodName: "AddHabit",
-			Handler:    _Daryl_AddHabit_Handler,
+			Handler:    _DarylService_AddHabit_Handler,
 		},
 		{
 			MethodName: "StartWorkSession",
-			Handler:    _Daryl_StartWorkSession_Handler,
+			Handler:    _DarylService_StartWorkSession_Handler,
 		},
 		{
 			MethodName: "CancelWorkSession",
-			Handler:    _Daryl_CancelWorkSession_Handler,
+			Handler:    _DarylService_CancelWorkSession_Handler,
 		},
 		{
 			MethodName: "RefuseSessionSlice",
-			Handler:    _Daryl_RefuseSessionSlice_Handler,
+			Handler:    _DarylService_RefuseSessionSlice_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -889,56 +922,58 @@ var _Daryl_serviceDesc = grpc.ServiceDesc{
 func init() { proto.RegisterFile("def.proto", fileDescriptor0) }
 
 var fileDescriptor0 = []byte{
-	// 805 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x55, 0x5d, 0x4f, 0x1b, 0x39,
-	0x14, 0xd5, 0x24, 0xe4, 0xeb, 0x66, 0x59, 0x88, 0x61, 0x61, 0x18, 0xd8, 0x55, 0xf0, 0xee, 0x4a,
-	0xb0, 0xac, 0x42, 0x01, 0xa9, 0x52, 0x2b, 0xf5, 0x81, 0x82, 0x0a, 0xad, 0xca, 0xcb, 0xa4, 0x55,
-	0x5b, 0xa9, 0x52, 0x65, 0x62, 0x27, 0x75, 0x99, 0x8c, 0xd3, 0xb1, 0x23, 0xc1, 0xdf, 0xa8, 0xd4,
-	0x87, 0xfe, 0x89, 0xaa, 0x3f, 0xaf, 0x8f, 0xd5, 0xd8, 0x9e, 0xcc, 0x24, 0x13, 0xd2, 0xf0, 0xd0,
-	0xa7, 0xb1, 0x3d, 0xe7, 0x9e, 0x7b, 0x7c, 0xee, 0xb5, 0x0d, 0x35, 0xca, 0xba, 0xad, 0x41, 0x24,
-	0x94, 0x40, 0x55, 0xfd, 0xa1, 0xac, 0xeb, 0x35, 0x07, 0xea, 0x66, 0xc0, 0xe4, 0xbe, 0xe2, 0x7d,
-	0x26, 0x15, 0xe9, 0x0f, 0xd2, 0x91, 0xc1, 0xe2, 0x23, 0x68, 0xb4, 0x15, 0x89, 0xd4, 0x29, 0x89,
-	0x6e, 0x02, 0x9f, 0x7d, 0x1c, 0x32, 0xa9, 0xd0, 0x5f, 0x00, 0x9c, 0xb2, 0x50, 0xf1, 0x2e, 0x67,
-	0x91, 0xeb, 0x34, 0x9d, 0x9d, 0x9a, 0x9f, 0x59, 0xc1, 0x07, 0xb0, 0x74, 0x4e, 0xe4, 0x9d, 0x42,
-	0x56, 0x01, 0x65, 0xf3, 0xc8, 0x81, 0x08, 0x25, 0xc3, 0x2d, 0x58, 0x4e, 0x89, 0xcc, 0x1a, 0xf2,
-	0xa0, 0x1a, 0xd9, 0xb1, 0xe6, 0xa9, 0xfa, 0xa3, 0x39, 0x26, 0x80, 0x5e, 0x4a, 0x16, 0x5d, 0x30,
-	0x29, 0x49, 0x8f, 0xcd, 0x99, 0x1b, 0xed, 0x41, 0xa5, 0x6f, 0x22, 0xdc, 0x42, 0xd3, 0xd9, 0xa9,
-	0x1f, 0x36, 0x5a, 0x89, 0x43, 0xad, 0x84, 0x2a, 0x41, 0xe0, 0x6d, 0xa8, 0xdb, 0xb5, 0xe7, 0x3c,
-	0xbc, 0x42, 0x08, 0x16, 0x02, 0x1e, 0x5e, 0x59, 0x56, 0x3d, 0xc6, 0x5f, 0x1d, 0xa8, 0x58, 0x0c,
-	0xfa, 0x1d, 0x0a, 0x9c, 0xda, 0xbf, 0x05, 0x4e, 0x63, 0xbc, 0x62, 0xd7, 0x4a, 0x27, 0xaa, 0xf9,
-	0x7a, 0x8c, 0xfe, 0x83, 0x02, 0x51, 0x6e, 0x51, 0xa7, 0xf6, 0x5a, 0x3d, 0x21, 0x7a, 0x01, 0x33,
-	0x0a, 0x2e, 0x87, 0xdd, 0xd6, 0x8b, 0xa4, 0x22, 0x7e, 0x81, 0xa8, 0x38, 0x9e, 0x8a, 0x90, 0xb9,
-	0x0b, 0x7a, 0xe7, 0x7a, 0xac, 0x39, 0x05, 0x15, 0x6e, 0xc9, 0x72, 0x0a, 0x2a, 0xd0, 0x1e, 0x94,
-	0x62, 0x2d, 0xd2, 0x2d, 0x37, 0x8b, 0x3b, 0xf5, 0xc3, 0x3f, 0x72, 0x3b, 0x8a, 0xd5, 0xfb, 0x06,
-	0x83, 0x1f, 0xc3, 0xca, 0x98, 0x6d, 0xd6, 0xe9, 0x3b, 0xf9, 0xf2, 0x08, 0x6a, 0xe7, 0xe4, 0x92,
-	0xab, 0xb6, 0x22, 0x0a, 0xad, 0x41, 0x79, 0x18, 0xf5, 0x58, 0xa8, 0xf4, 0xce, 0x17, 0x7d, 0x3b,
-	0x43, 0x2e, 0x54, 0xc2, 0x0b, 0x2e, 0x25, 0xa3, 0x9a, 0x71, 0xd1, 0x4f, 0xa6, 0xf8, 0xbb, 0x03,
-	0x25, 0x1d, 0x9f, 0x73, 0x6c, 0x15, 0x4a, 0x8a, 0xab, 0x80, 0x59, 0xcb, 0xcc, 0x24, 0xee, 0x02,
-	0x3a, 0x8c, 0x88, 0xe2, 0x22, 0xd4, 0xce, 0xd5, 0xfc, 0xd1, 0x1c, 0xdd, 0x87, 0x2a, 0x65, 0x84,
-	0x06, 0xdc, 0xfa, 0x34, 0xdb, 0xd5, 0x11, 0x36, 0xf6, 0xb1, 0x13, 0x89, 0xd0, 0x2d, 0x1b, 0x1f,
-	0xe3, 0x71, 0xcc, 0x15, 0x10, 0xa9, 0x4e, 0x63, 0xcf, 0x2b, 0x3f, 0xe7, 0x4a, 0xb0, 0x68, 0x17,
-	0x4a, 0x52, 0x11, 0x25, 0xdd, 0xaa, 0x0e, 0x5a, 0x49, 0x9d, 0x1b, 0xb9, 0xe4, 0x1b, 0x04, 0x7e,
-	0x0d, 0x4b, 0xc7, 0x94, 0xea, 0xe5, 0x79, 0x3b, 0xf6, 0x5f, 0x28, 0xbd, 0x8f, 0xf1, 0xb6, 0x2e,
-	0x4b, 0x13, 0xec, 0xbe, 0xf9, 0x8b, 0x1f, 0xc0, 0x72, 0xca, 0x6c, 0x8b, 0x3a, 0x67, 0xe8, 0x67,
-	0x07, 0x7e, 0x6b, 0x33, 0x29, 0xb9, 0x08, 0xdb, 0x01, 0xef, 0x30, 0x74, 0x4f, 0x6f, 0x28, 0x32,
-	0x15, 0x9d, 0xed, 0x82, 0x01, 0xa2, 0xff, 0xa1, 0xc8, 0x42, 0x6a, 0xf3, 0xcc, 0xc2, 0xc7, 0xb0,
-	0x54, 0x57, 0x71, 0xa6, 0xae, 0x2f, 0x0e, 0x54, 0xac, 0xae, 0x5f, 0x2e, 0xa9, 0x05, 0x65, 0x19,
-	0xef, 0x5d, 0xba, 0x45, 0x7d, 0x88, 0xd6, 0x52, 0x4d, 0x59, 0x6b, 0x7c, 0x8b, 0xc2, 0x7b, 0xb0,
-	0x68, 0xd7, 0x4f, 0x44, 0xd8, 0xe5, 0xbd, 0xb1, 0x26, 0x75, 0xc6, 0x9b, 0x14, 0x7f, 0x80, 0x75,
-	0x7d, 0xe1, 0xbd, 0x12, 0xd1, 0x95, 0x8d, 0x9a, 0xb7, 0xfa, 0xfb, 0x50, 0xee, 0xe8, 0x04, 0x76,
-	0x23, 0xeb, 0x39, 0x5d, 0x26, 0xbf, 0x6f, 0x61, 0xf8, 0x0c, 0xdc, 0x7c, 0xae, 0xf4, 0x90, 0x4b,
-	0xb3, 0x94, 0x3f, 0xe4, 0x09, 0x36, 0x41, 0xe0, 0x87, 0xe0, 0x9e, 0x90, 0xb0, 0xc3, 0x82, 0xbb,
-	0xab, 0xc6, 0x9b, 0xb0, 0x31, 0x25, 0xd6, 0x5e, 0xdc, 0xbb, 0xd0, 0xc8, 0x5a, 0xfa, 0x34, 0xa4,
-	0xec, 0x3a, 0x3e, 0xf9, 0x3c, 0x1e, 0xd8, 0x4b, 0xc4, 0x4c, 0x70, 0x08, 0x1b, 0x3e, 0xeb, 0x0e,
-	0x25, 0x1b, 0xab, 0xc1, 0x9c, 0xd6, 0x1d, 0x24, 0x94, 0x66, 0xaf, 0x9b, 0xd3, 0x2b, 0xaa, 0xd3,
-	0x27, 0xf9, 0xb6, 0xc0, 0x9b, 0x96, 0xcf, 0x08, 0x3f, 0xfc, 0xe4, 0xc0, 0xc2, 0x13, 0x12, 0xf5,
-	0xd1, 0x19, 0x40, 0xfa, 0x80, 0xa1, 0x2c, 0xf1, 0xe4, 0xf3, 0xe9, 0x6d, 0x4d, 0xff, 0x69, 0x0b,
-	0x72, 0x0c, 0xd5, 0xe4, 0xcd, 0x43, 0x1b, 0xd9, 0x53, 0x30, 0xf6, 0xa0, 0x7a, 0xde, 0xb4, 0x5f,
-	0x56, 0xd4, 0xb7, 0x22, 0x94, 0x0c, 0xc1, 0x33, 0xa8, 0x67, 0x6e, 0x76, 0x94, 0xc9, 0x9c, 0x7f,
-	0x27, 0xbd, 0x3f, 0x6f, 0xf9, 0x9b, 0x0a, 0x4b, 0x6e, 0x93, 0xac, 0xb0, 0x89, 0xbb, 0x2b, 0x2b,
-	0x2c, 0x77, 0xf9, 0xbc, 0x81, 0xe5, 0xc9, 0x46, 0x44, 0xdb, 0x13, 0x6e, 0xe4, 0x5b, 0xcb, 0xc3,
-	0xb3, 0x20, 0x96, 0xfa, 0x2d, 0x34, 0x72, 0xed, 0x85, 0x32, 0x81, 0xb7, 0xf5, 0xad, 0xf7, 0xf7,
-	0x4c, 0x8c, 0x65, 0x7f, 0x07, 0x28, 0xdf, 0x04, 0x28, 0x13, 0x7a, 0x6b, 0x4b, 0x7a, 0xff, 0xcc,
-	0x06, 0x99, 0x04, 0x97, 0x65, 0x0d, 0x3a, 0xfa, 0x11, 0x00, 0x00, 0xff, 0xff, 0xbf, 0x9c, 0x40,
-	0x56, 0xa7, 0x09, 0x00, 0x00,
+	// 842 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x55, 0xdd, 0x6e, 0x2b, 0x35,
+	0x10, 0xd6, 0x26, 0x27, 0x3f, 0x9d, 0x9c, 0x92, 0xc4, 0xe7, 0x70, 0xce, 0x76, 0x5b, 0xa4, 0xd6,
+	0x80, 0xd4, 0x52, 0x94, 0x42, 0x90, 0x90, 0x90, 0x00, 0xa9, 0xb4, 0xd0, 0x16, 0xd1, 0x9b, 0x0d,
+	0x08, 0x21, 0x21, 0x55, 0x6e, 0xec, 0x04, 0xab, 0x9b, 0x75, 0x58, 0x3b, 0xd0, 0x3e, 0x08, 0x17,
+	0x7d, 0x09, 0x6e, 0x79, 0x35, 0x2e, 0x91, 0xff, 0xb2, 0x9b, 0x6c, 0x1a, 0x68, 0xd1, 0xb9, 0x5a,
+	0x7b, 0xf6, 0x9b, 0x99, 0x6f, 0xbe, 0x19, 0xdb, 0xb0, 0x41, 0xd9, 0xa8, 0x37, 0xcd, 0x84, 0x12,
+	0xa8, 0x69, 0x3e, 0x94, 0x8d, 0xa2, 0xdd, 0xa9, 0xba, 0x9b, 0x32, 0x79, 0xa4, 0xf8, 0x84, 0x49,
+	0x45, 0x26, 0xd3, 0x7c, 0x65, 0xb1, 0xf8, 0x4b, 0xe8, 0x0e, 0x14, 0xc9, 0xd4, 0x29, 0xc9, 0xee,
+	0x92, 0x98, 0xfd, 0x3a, 0x63, 0x52, 0xa1, 0x03, 0xe8, 0x50, 0xbd, 0xbf, 0xe2, 0x94, 0xa5, 0x8a,
+	0x8f, 0x38, 0xcb, 0xc2, 0x60, 0x37, 0xd8, 0xdf, 0x88, 0xdb, 0xc6, 0x7e, 0x31, 0x37, 0xe3, 0xcf,
+	0xa1, 0x7d, 0x4e, 0xe4, 0x53, 0xbd, 0x5f, 0x02, 0x2a, 0x66, 0x97, 0x53, 0x91, 0x4a, 0x86, 0x7b,
+	0xd0, 0xc9, 0x63, 0x5a, 0x1b, 0x8a, 0xa0, 0x99, 0xb9, 0xb5, 0x09, 0xd6, 0x8c, 0xe7, 0x7b, 0x7c,
+	0x06, 0x35, 0x03, 0x46, 0x6f, 0x41, 0x85, 0x53, 0x97, 0xab, 0xc2, 0x29, 0x42, 0xf0, 0x2c, 0x25,
+	0x13, 0x16, 0x56, 0x8c, 0xc5, 0xac, 0x75, 0xa0, 0x29, 0x91, 0xf2, 0x77, 0x91, 0xd1, 0xb0, 0x6a,
+	0xec, 0xf3, 0x3d, 0x4e, 0x00, 0xfd, 0x20, 0x59, 0x76, 0xc9, 0xa4, 0x24, 0x63, 0xf6, 0xf8, 0x7a,
+	0xd0, 0x21, 0x34, 0x26, 0xd6, 0xd9, 0xe4, 0x6c, 0xf5, 0xbb, 0x3d, 0xdf, 0x8b, 0x9e, 0x8f, 0xea,
+	0x11, 0x78, 0x0f, 0x5a, 0xce, 0xf6, 0x1d, 0x4f, 0x6f, 0x34, 0xd9, 0x84, 0xa7, 0x37, 0x2e, 0xb4,
+	0x59, 0xe3, 0x3f, 0x03, 0x68, 0x38, 0xcc, 0xaa, 0xe2, 0x14, 0xbb, 0x55, 0xbe, 0x38, 0xbd, 0x46,
+	0x1f, 0x40, 0x85, 0x28, 0x53, 0x56, 0xab, 0x1f, 0xf5, 0xc6, 0x42, 0x8c, 0x13, 0x66, 0x19, 0x5c,
+	0xcf, 0x46, 0xbd, 0xef, 0x7d, 0xef, 0xe3, 0x0a, 0x51, 0xda, 0x9f, 0x8a, 0x94, 0x85, 0xcf, 0x8c,
+	0x9a, 0x66, 0x6d, 0x62, 0x0a, 0x2a, 0xc2, 0x9a, 0x8b, 0x29, 0xa8, 0x40, 0x87, 0x50, 0xd3, 0x5c,
+	0x64, 0x58, 0xdf, 0xad, 0xee, 0xb7, 0xfa, 0x6f, 0x97, 0x2a, 0xd2, 0xec, 0x63, 0x8b, 0xc1, 0x5f,
+	0xc1, 0x8b, 0x05, 0x05, 0x5d, 0xf7, 0x1e, 0xa5, 0xcb, 0x17, 0xb0, 0x71, 0x4e, 0xae, 0xb9, 0x1a,
+	0x28, 0xa2, 0xd0, 0x2b, 0xa8, 0xcf, 0xb2, 0x31, 0x4b, 0x95, 0xa9, 0x7c, 0x33, 0x76, 0x3b, 0x14,
+	0x42, 0x23, 0xbd, 0xe4, 0x52, 0x32, 0x6a, 0x22, 0x6e, 0xc6, 0x7e, 0x8b, 0xff, 0x0e, 0xa0, 0x66,
+	0xfc, 0x4b, 0x8a, 0xbd, 0x84, 0x9a, 0xe2, 0x2a, 0xf1, 0xf3, 0x60, 0x37, 0x7a, 0x20, 0xe8, 0x2c,
+	0x23, 0x8a, 0x8b, 0xd4, 0x0f, 0x84, 0xdf, 0xa3, 0x4f, 0xa1, 0x49, 0x19, 0xa1, 0x09, 0x77, 0x3a,
+	0xad, 0x57, 0x75, 0x8e, 0xd5, 0x3a, 0x0e, 0x33, 0x91, 0x86, 0x75, 0xab, 0xa3, 0x5e, 0xeb, 0x58,
+	0x09, 0x91, 0xea, 0x54, 0x6b, 0xde, 0xf8, 0xf7, 0x58, 0x1e, 0x8b, 0x0e, 0xa0, 0x26, 0x15, 0x51,
+	0x32, 0x6c, 0x1a, 0xa7, 0x17, 0xb9, 0x72, 0x73, 0x95, 0x62, 0x8b, 0xc0, 0x43, 0x68, 0x1f, 0x53,
+	0x6a, 0xcc, 0x4f, 0x18, 0xde, 0xf7, 0xa1, 0xf6, 0x8b, 0x76, 0x75, 0x2d, 0x6a, 0x2f, 0x25, 0x8a,
+	0xed, 0x5f, 0xfc, 0x19, 0x74, 0xf2, 0x24, 0xae, 0xbf, 0xff, 0xd1, 0xf5, 0x8f, 0x00, 0x9e, 0x0f,
+	0x98, 0x94, 0x5c, 0xa4, 0x83, 0x84, 0x0f, 0x19, 0xfa, 0xc8, 0xd4, 0x96, 0xd9, 0xe6, 0xae, 0x17,
+	0xc4, 0x02, 0xd1, 0x87, 0x50, 0x65, 0x29, 0x75, 0x79, 0xd6, 0xe1, 0x35, 0x2c, 0xe7, 0x55, 0x5d,
+	0xcb, 0xeb, 0x3e, 0x80, 0x86, 0xe3, 0xf5, 0xc6, 0x29, 0xf5, 0xa0, 0x2e, 0x75, 0xed, 0x32, 0xac,
+	0x9a, 0xf3, 0xf4, 0x2a, 0xe7, 0x54, 0x94, 0x26, 0x76, 0x28, 0x7c, 0x08, 0x9b, 0xce, 0x7e, 0x22,
+	0xd2, 0x11, 0x1f, 0x2f, 0xcc, 0x6b, 0xb0, 0x38, 0xaf, 0x78, 0x06, 0xaf, 0xcd, 0x7d, 0xfa, 0xa3,
+	0xc8, 0x6e, 0x9c, 0xd7, 0x13, 0x06, 0xe1, 0x08, 0xea, 0x43, 0x93, 0xcb, 0xd5, 0xf4, 0xba, 0x44,
+	0xd1, 0x52, 0x89, 0x1d, 0x0c, 0x9f, 0x41, 0x58, 0x4e, 0x9b, 0x1f, 0x7d, 0x69, 0x4d, 0xe5, 0xa3,
+	0xef, 0xb1, 0x1e, 0x81, 0xbf, 0x86, 0xf0, 0x84, 0xa4, 0x43, 0x96, 0xfc, 0xaf, 0x02, 0xf0, 0x36,
+	0x6c, 0xad, 0x08, 0xe3, 0x5e, 0x8b, 0x03, 0xe8, 0x16, 0x85, 0xbe, 0x48, 0x29, 0xbb, 0xd5, 0x57,
+	0x03, 0xd7, 0x0b, 0x77, 0xcb, 0xd8, 0x0d, 0xbe, 0x83, 0xad, 0x98, 0x8d, 0x66, 0x92, 0x2d, 0x74,
+	0xe6, 0xf1, 0x82, 0x7e, 0xec, 0xa3, 0x5b, 0x05, 0xb6, 0x57, 0xb7, 0xdc, 0x30, 0xf1, 0xa9, 0x77,
+	0x20, 0x5a, 0x95, 0xda, 0xd6, 0xd0, 0xbf, 0x0f, 0xa0, 0xf5, 0x0d, 0xc9, 0x26, 0x03, 0x96, 0xfd,
+	0xa6, 0xcf, 0xd1, 0x19, 0x40, 0xfe, 0x8e, 0xa2, 0x62, 0xfc, 0xe5, 0xb7, 0x3d, 0xda, 0x59, 0xfd,
+	0xd3, 0x75, 0xeb, 0x18, 0x9a, 0xfe, 0xe9, 0x45, 0x5b, 0xc5, 0xd3, 0xb2, 0xf0, 0xc4, 0x47, 0xd1,
+	0xaa, 0x5f, 0x8e, 0xdb, 0x5f, 0x55, 0x78, 0x6e, 0x2c, 0x9e, 0xdc, 0xb7, 0xd0, 0x2a, 0xbc, 0x09,
+	0xa8, 0x40, 0xa0, 0xfc, 0xd8, 0x46, 0xef, 0x3c, 0xf0, 0x37, 0xe7, 0xe7, 0x2f, 0x9f, 0x22, 0xbf,
+	0xa5, 0x5b, 0xaf, 0xc8, 0xaf, 0x74, 0x57, 0xfd, 0x04, 0x9d, 0xe5, 0x61, 0x45, 0x7b, 0x4b, 0xa2,
+	0x94, 0xc7, 0x2f, 0xc2, 0xeb, 0x20, 0x2e, 0xf4, 0xcf, 0xd0, 0x2d, 0xcd, 0x1d, 0x2a, 0x38, 0x3e,
+	0x34, 0xdb, 0xd1, 0xbb, 0x6b, 0x31, 0x2e, 0xfa, 0x15, 0xa0, 0xf2, 0x48, 0xa0, 0x82, 0xeb, 0x83,
+	0xb3, 0x1a, 0xbd, 0xb7, 0x1e, 0x64, 0x13, 0x5c, 0xd7, 0x0d, 0xe8, 0x93, 0x7f, 0x02, 0x00, 0x00,
+	0xff, 0xff, 0xdc, 0x92, 0xad, 0x0e, 0x4b, 0x0a, 0x00, 0x00,
 }

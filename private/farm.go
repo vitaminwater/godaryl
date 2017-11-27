@@ -20,17 +20,17 @@ type farmServer struct {
 
 func (f *farmServer) StartDaryl(c context.Context, r *protodef.StartDarylRequest) (*protodef.StartDarylResponse, error) {
 	log.Println("StartDaryl")
-	if _, ok := f.registry.Load(r.Identifier); ok != false {
-		return nil, errors.New(fmt.Sprintf("%s already registered", r.Identifier))
+	if _, ok := f.registry.Load(r.DarylIdentifier); ok != false {
+		return nil, errors.New(fmt.Sprintf("%s already registered", r.DarylIdentifier))
 	}
-	d := daryl.NewDaryl(r.Identifier, message.NewMessageProcessor(), habit.NewHabitProcessor(), session.NewSessionProcessor())
-	f.registry.Store(r.Identifier, d)
+	d := daryl.NewDaryl(r.DarylIdentifier, message.NewMessageProcessor(), habit.NewHabitProcessor(), session.NewSessionProcessor())
+	f.registry.Store(r.DarylIdentifier, d)
 	return &protodef.StartDarylResponse{}, nil
 }
 
 func (f *farmServer) HasDaryl(c context.Context, r *protodef.HasDarylRequest) (*protodef.HasDarylResponse, error) {
 	log.Println("HasDaryl")
-	_, ok := f.registry.Load(r.Identifier)
+	_, ok := f.registry.Load(r.DarylIdentifier)
 	return &protodef.HasDarylResponse{Response: ok}, nil
 }
 
