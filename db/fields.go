@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	sq "github.com/Masterminds/squirrel"
-	log "github.com/sirupsen/logrus"
 )
 
 func ToExpr(fields ...string) []interface{} {
@@ -37,7 +36,6 @@ func ListField(s interface{}, prefix, access string) ([]string, error) {
 			if prefix != "" {
 				abs = fmt.Sprintf("%s.%s", prefix, tg)
 			}
-			log.Info(abs)
 			if a, ok := t.Field(i).Tag.Lookup("access"); ok == true {
 				if !strings.Contains(a, access) {
 					continue
@@ -49,17 +47,15 @@ func ListField(s interface{}, prefix, access string) ([]string, error) {
 					return fields, err
 				}
 				fields = append(fields, f...)
-				log.Info("1", fields, i)
 			} else {
 				fields = append(fields, abs)
-				log.Info("2", fields, i)
 			}
 		}
 	}
 	return fields, nil
 }
 
-func SetModelIntField(s interface{}, field string, value int) error {
+func SetModelStringField(s interface{}, field, value string) error {
 	t := reflect.TypeOf(s)
 
 	if t.Kind() != reflect.Ptr {
@@ -69,9 +65,9 @@ func SetModelIntField(s interface{}, field string, value int) error {
 	ps := reflect.ValueOf(s).Elem()
 
 	f := ps.FieldByName(field)
-	if !f.IsValid() || !f.CanSet() || f.Kind() != reflect.Int {
+	if !f.IsValid() || !f.CanSet() || f.Kind() != reflect.String {
 		return errors.New("SetModelIntField Invalid field or cannot set or not Int")
 	}
-	f.SetInt(int64(value))
+	f.SetString(value)
 	return nil
 }

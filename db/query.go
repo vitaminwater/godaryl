@@ -13,7 +13,7 @@ func InsertQuery(t string, s interface{}) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	log.Info(fields, qi)
+	log.Info(qi)
 	return qi, nil
 }
 

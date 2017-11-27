@@ -26,6 +26,7 @@ projects:
     paths:
     - ./
     - ../db
+    - ../distributed
     - ../protodef
     ignore_paths: []
     exts:

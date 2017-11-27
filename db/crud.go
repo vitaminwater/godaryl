@@ -12,11 +12,11 @@ func Insert(t string, s interface{}) error {
 	if stmt, err := db.PrepareNamed(q); err != nil {
 		return err
 	} else {
-		var id int
+		var id string
 		if err := stmt.Get(&id, s); err != nil {
 			return err
 		}
-		return SetModelIntField(s, "Id", id)
+		return SetModelStringField(s, "Id", id)
 	}
 }
 
