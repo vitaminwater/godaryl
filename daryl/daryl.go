@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/cskr/pubsub"
+	"github.com/vitaminwater/daryl/config"
 	"github.com/vitaminwater/daryl/distributed"
 	"github.com/vitaminwater/daryl/protodef"
 )
@@ -78,6 +79,6 @@ func NewDaryl(identifier string, messageProcessor MessageProcessor, habitProcess
 	messageProcessor.SetDaryl(d)
 	habitProcessor.SetDaryl(d)
 	sessionProcessor.SetDaryl(d)
-	go distributed.Beacon(fmt.Sprintf("daryl_%s", d.identifier), getEnv("PUBLIC_URL", "localhost:8081"))
+	go distributed.Beacon(fmt.Sprintf("daryl_%s", d.identifier), config.AppContext.String("advertized-url"))
 	return d
 }
