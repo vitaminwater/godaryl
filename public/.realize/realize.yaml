@@ -28,6 +28,7 @@ projects:
     - ../db
     - ../distributed
     - ../protodef
+    - ../redis
     ignore_paths: []
     exts:
     - .go

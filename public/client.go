@@ -21,3 +21,18 @@ func openDarylConnection(url string) protodef.DarylServiceClient {
 	daryls[url] = daryl
 	return daryl
 }
+
+var farms map[string]protodef.FarmServiceClient = make(map[string]protodef.FarmServiceClient)
+
+func openFarmConnection(url string) protodef.FarmServiceClient {
+	if d, ok := farms[url]; ok == true {
+		return d
+	}
+	conn, err := grpc.Dial(url, grpc.WithInsecure())
+	if err != nil {
+		log.Fatalf("fail to dial: %v", err)
+	}
+	farm := protodef.NewFarmServiceClient(conn)
+	farms[url] = farm
+	return farm
+}

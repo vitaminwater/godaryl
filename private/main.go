@@ -11,6 +11,7 @@ import (
 	"github.com/vitaminwater/daryl/config"
 	"github.com/vitaminwater/daryl/db"
 	"github.com/vitaminwater/daryl/distributed"
+	"github.com/vitaminwater/daryl/kv"
 	"github.com/vitaminwater/daryl/protodef"
 	"google.golang.org/grpc"
 )
@@ -40,6 +41,7 @@ func main() {
 		config.AppContext = c
 		distributed.Init()
 		daryl_db.Init()
+		kv.Init()
 		startServer()
 		return nil
 	}

@@ -14,10 +14,12 @@ import (
 	"github.com/vitaminwater/daryl/protodef"
 )
 
+const AUTH_TOKEN_HEADER = "X-Daryl-Auth-Token"
+
 type DarylCommand interface {
 	Name() string
 	Object() interface{}
-	Execute(protodef.DarylServiceClient, interface{}) (interface{}, error)
+	Execute(*gin.Context, protodef.DarylServiceClient, interface{}) (interface{}, error)
 }
 
 type UserMessageCommand struct {
@@ -31,8 +33,9 @@ func (c *UserMessageCommand) Object() interface{} {
 	return &protodef.Message{}
 }
 
-func (c *UserMessageCommand) Execute(d protodef.DarylServiceClient, o interface{}) (interface{}, error) {
-	um := protodef.UserMessageRequest{DarylIdentifier: "lol", Message: o.(*protodef.Message)}
+func (c *UserMessageCommand) Execute(co *gin.Context, d protodef.DarylServiceClient, o interface{}) (interface{}, error) {
+	i := co.MustGet("daryl_id").(string)
+	um := protodef.UserMessageRequest{DarylIdentifier: i, Message: o.(*protodef.Message)}
 	return d.UserMessage(context.Background(), &um)
 }
 
@@ -49,8 +52,9 @@ func (c *AddHabitCommand) Object() interface{} {
 	return &AddHabitCommand{}
 }
 
-func (c *AddHabitCommand) Execute(d protodef.DarylServiceClient, o interface{}) (interface{}, error) {
-	ah := protodef.AddHabitRequest{DarylIdentifier: "lol", Habit: &(o.(*AddHabitCommand).Habit)}
+func (c *AddHabitCommand) Execute(co *gin.Context, d protodef.DarylServiceClient, o interface{}) (interface{}, error) {
+	i := co.MustGet("daryl_id").(string)
+	ah := protodef.AddHabitRequest{DarylIdentifier: i, Habit: &(o.(*AddHabitCommand).Habit)}
 
 	deadline, err := ptypes.TimestampProto(c.Deadline)
 	if err != nil {
@@ -73,8 +77,9 @@ func (c *StartWorkSessionCommand) Object() interface{} {
 	return &protodef.SessionConfig{}
 }
 
-func (c *StartWorkSessionCommand) Execute(d protodef.DarylServiceClient, o interface{}) (interface{}, error) {
-	r := protodef.StartWorkSessionRequest{DarylIdentifier: "lol", Config: o.(*protodef.SessionConfig)}
+func (c *StartWorkSessionCommand) Execute(co *gin.Context, d protodef.DarylServiceClient, o interface{}) (interface{}, error) {
+	i := co.MustGet("daryl_id").(string)
+	r := protodef.StartWorkSessionRequest{DarylIdentifier: i, Config: o.(*protodef.SessionConfig)}
 	return d.StartWorkSession(context.Background(), &r)
 }
 
@@ -89,8 +94,9 @@ func (c *CancelWorkSessionCommand) Object() interface{} {
 	return nil
 }
 
-func (c *CancelWorkSessionCommand) Execute(d protodef.DarylServiceClient, o interface{}) (interface{}, error) {
-	r := protodef.CancelWorkSessionRequest{DarylIdentifier: "lol"}
+func (c *CancelWorkSessionCommand) Execute(co *gin.Context, d protodef.DarylServiceClient, o interface{}) (interface{}, error) {
+	i := co.MustGet("daryl_id").(string)
+	r := protodef.CancelWorkSessionRequest{DarylIdentifier: i}
 	return d.CancelWorkSession(context.Background(), &r)
 }
 
@@ -105,8 +111,9 @@ func (c *RefuseSessionSliceCommand) Object() interface{} {
 	return &protodef.SessionSliceIndex{}
 }
 
-func (c *RefuseSessionSliceCommand) Execute(d protodef.DarylServiceClient, o interface{}) (interface{}, error) {
-	r := protodef.RefuseSessionSliceRequest{DarylIdentifier: "lol", Index: o.(*protodef.SessionSliceIndex)}
+func (c *RefuseSessionSliceCommand) Execute(co *gin.Context, d protodef.DarylServiceClient, o interface{}) (interface{}, error) {
+	i := co.MustGet("daryl_id").(string)
+	r := protodef.RefuseSessionSliceRequest{DarylIdentifier: i, Index: o.(*protodef.SessionSliceIndex)}
 	return d.RefuseSessionSlice(context.Background(), &r)
 }
 
@@ -125,6 +132,7 @@ func handleHTTPCommand(c *gin.Context) {
 		c.JSON(400, gin.H{
 			"status": "error", "error": "not found cmd",
 		})
+		c.Abort()
 		return
 	}
 	url := c.MustGet("daryl_url").(string)
@@ -133,22 +141,22 @@ func handleHTTPCommand(c *gin.Context) {
 		if err := c.BindJSON(&o); err != nil {
 			log.Info(err)
 			c.JSON(http.StatusBadRequest, gin.H{"status": "error", "error": err})
+			c.Abort()
 			return
 		}
 	}
 	d := openDarylConnection(url)
-	resp, err := cmd.Execute(d, o)
+	resp, err := cmd.Execute(c, d, o)
 	if err != nil {
 		log.Info(err)
 		c.JSON(http.StatusBadRequest, gin.H{"status": "error", "error": err})
+		c.Abort()
 		return
 	}
-	log.Info(url, o, resp)
 	c.JSON(200, gin.H{
 		"status": "ok",
 		"resp":   resp,
 	})
-
 }
 
 func findDarylServer() func(string) (string, error) {
@@ -168,7 +176,6 @@ func findDarylServer() func(string) (string, error) {
 		}
 		if len(resp.Kvs) != 0 {
 			url := string(resp.Kvs[0].Value)
-			log.Info(url)
 			return url, nil
 		}
 		return "", errors.New("Daryl not found")
@@ -178,7 +185,14 @@ func findDarylServer() func(string) (string, error) {
 func setDarylServer() func(*gin.Context) {
 	fds := findDarylServer()
 	return func(c *gin.Context) {
-		url, err := fds("lol")
+		h := c.GetHeader(AUTH_TOKEN_HEADER)
+		t, err := newTokenFromToken(h)
+		if err != nil {
+			c.JSON(http.StatusServiceUnavailable, gin.H{"status": "error", "error": err})
+			c.Abort()
+			return
+		}
+		url, err := fds(t.Daryl.Id)
 		if err != nil {
 			c.JSON(http.StatusServiceUnavailable, gin.H{"status": "error", "error": err})
 			c.Abort()
@@ -186,5 +200,6 @@ func setDarylServer() func(*gin.Context) {
 		}
 		log.Infof("Daryl at %s", url)
 		c.Set("daryl_url", url)
+		c.Set("daryl_id", t.Daryl.Id)
 	}
 }
