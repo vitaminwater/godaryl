@@ -1,12 +1,15 @@
 package daryl
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 
 	"github.com/cskr/pubsub"
+	"github.com/labstack/gommon/log"
 	"github.com/vitaminwater/daryl/config"
 	"github.com/vitaminwater/daryl/distributed"
+	"github.com/vitaminwater/daryl/kv"
 	"github.com/vitaminwater/daryl/protodef"
 )
 
@@ -60,11 +63,20 @@ func (d *Daryl) Sub(topics ...string) chan interface{} {
 }
 
 func (d *Daryl) Pub(msg interface{}, msgType string, topics ...string) {
-	d.pubsub.Pub(TopicMessage{msgType, msg}, ALL_TOPIC)
-	d.pubsub.Pub(TopicMessage{msgType, msg}, msgType)
+	m := TopicMessage{msgType, msg}
+	d.pubsub.Pub(m, ALL_TOPIC)
+	d.pubsub.Pub(m, msgType)
 	for _, topic := range topics {
-		d.pubsub.Pub(TopicMessage{msgType, msg}, topic)
+		d.pubsub.Pub(m, topic)
 	}
+
+	c := kv.Pool.Get()
+
+	j, err := json.Marshal(m)
+	if err != nil {
+		log.Info(err)
+	}
+	c.Do("PUBLISH", fmt.Sprintf("daryl.%s", d.identifier), string(j))
 }
 
 func getEnv(key, fallback string) string {

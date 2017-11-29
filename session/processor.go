@@ -26,21 +26,23 @@ func (sp *sessionProcessor) StartWorkSession(r *protodef.StartWorkSessionRequest
 	}
 	sp.d.Pub(r, daryl.START_WORK_SESSION_TOPIC)
 	sp.sw = sw
-	sp.d.Pub(s, PROPOSE_WORK_SESSION_TOPIC)
+	sp.d.Pub(s, MAKEUP_WORK_SESSION_TOPIC)
 	se := s.GetSession()
 	return &protodef.StartWorkSessionResponse{Session: &se}, nil
 }
 
-func (sp *sessionProcessor) CancelWorkSession(*protodef.CancelWorkSessionRequest) (*protodef.CancelWorkSessionResponse, error) {
+func (sp *sessionProcessor) CancelWorkSession(r *protodef.CancelWorkSessionRequest) (*protodef.CancelWorkSessionResponse, error) {
 	sp.sw.stop()
 	sp.sw = nil
+	sp.d.Pub(r, CANCEL_WORK_SESSION_TOPIC)
 	return &protodef.CancelWorkSessionResponse{}, nil
 }
 
-func (sp *sessionProcessor) RefuseSessionSlice(*protodef.RefuseSessionSliceRequest) (*protodef.RefuseSessionSliceResponse, error) {
+func (sp *sessionProcessor) RefuseSessionSlice(r *protodef.RefuseSessionSliceRequest) (*protodef.RefuseSessionSliceResponse, error) {
 	if sp.sw == nil {
 		return nil, errors.New("No work session yet, create it first")
 	}
+	sp.d.Pub(r, REFUSE_SESSION_SLICE_TOPIC)
 	return &protodef.RefuseSessionSliceResponse{}, nil
 }
 
