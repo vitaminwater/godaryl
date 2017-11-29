@@ -10,7 +10,8 @@ import (
 	"github.com/coreos/etcd/clientv3"
 	"github.com/gin-gonic/gin"
 	"github.com/golang/protobuf/ptypes"
-	"github.com/labstack/gommon/log"
+	log "github.com/sirupsen/logrus"
+	"github.com/vitaminwater/daryl/db"
 	"github.com/vitaminwater/daryl/protodef"
 )
 
@@ -159,6 +160,34 @@ func handleHTTPCommand(c *gin.Context) {
 	})
 }
 
+func handleCreateDaryl(c *gin.Context) {
+	d := &protodef.Daryl{}
+	if err := c.Bind(d); err != nil {
+		c.JSON(500, gin.H{"status": "error", "error": err})
+		c.Abort()
+		return
+	}
+	err := daryl_db.Insert("daryl", d)
+	if err != nil {
+		c.JSON(500, gin.H{"status": "error", "error": err})
+		c.Abort()
+		return
+	}
+	t, err := newTokenForDaryl(d)
+	if err != nil {
+		c.JSON(500, gin.H{"status": "error", "error": err})
+		c.Abort()
+		return
+	}
+	f := openFarmConnection("localhost:8081")
+	f.StartDaryl(context.Background(), &protodef.StartDarylRequest{DarylIdentifier: d.Id})
+	c.JSON(200, gin.H{
+		"status": "ok",
+		"daryl":  gin.H{"id": d.Id},
+		"token":  gin.H{"hash": t.Hash},
+	})
+}
+
 func findDarylServer() func(string) (string, error) {
 	cli, err := clientv3.New(clientv3.Config{
 		Endpoints:   []string{"localhost:2379"},
@@ -186,6 +215,14 @@ func setDarylServer() func(*gin.Context) {
 	fds := findDarylServer()
 	return func(c *gin.Context) {
 		h := c.GetHeader(AUTH_TOKEN_HEADER)
+		if h == "" {
+			h = c.Param("token")
+		}
+		if h == "" {
+			c.JSON(http.StatusServiceUnavailable, gin.H{"status": "error", "error": errors.New("Access denied")})
+			c.Abort()
+			return
+		}
 		t, err := newTokenFromToken(h)
 		if err != nil {
 			c.JSON(http.StatusServiceUnavailable, gin.H{"status": "error", "error": err})

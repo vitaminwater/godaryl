@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"os"
 
 	"github.com/gin-gonic/gin"
@@ -10,7 +9,6 @@ import (
 	"github.com/vitaminwater/daryl/db"
 	"github.com/vitaminwater/daryl/distributed"
 	"github.com/vitaminwater/daryl/kv"
-	"github.com/vitaminwater/daryl/protodef"
 )
 
 func startServer() {
@@ -23,36 +21,9 @@ func startServer() {
 	{
 		dr.Use(setDarylServer())
 		dr.POST("/cmd/:command", handleHTTPCommand)
+		dr.GET("/stream/:token", handleWS)
 	}
 	router.Run()
-}
-
-func handleCreateDaryl(c *gin.Context) {
-	d := &protodef.Daryl{}
-	if err := c.Bind(d); err != nil {
-		c.JSON(500, gin.H{"status": "error", "error": err})
-		c.Abort()
-		return
-	}
-	err := daryl_db.Insert("daryl", d)
-	if err != nil {
-		c.JSON(500, gin.H{"status": "error", "error": err})
-		c.Abort()
-		return
-	}
-	t, err := newTokenForDaryl(d)
-	if err != nil {
-		c.JSON(500, gin.H{"status": "error", "error": err})
-		c.Abort()
-		return
-	}
-	f := openFarmConnection("localhost:8081")
-	f.StartDaryl(context.Background(), &protodef.StartDarylRequest{DarylIdentifier: d.Id})
-	c.JSON(200, gin.H{
-		"status": "ok",
-		"daryl":  gin.H{"id": d.Id},
-		"token":  gin.H{"hash": t.Hash},
-	})
 }
 
 func main() {
