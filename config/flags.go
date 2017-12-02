@@ -6,12 +6,12 @@ var Flags = []cli.Flag{
 	cli.StringFlag{
 		Name:  "advertized-url, u",
 		Value: "localhost:8081",
-		Usage: "Advertized URL",
+		Usage: "gRPC Advertized URL",
 	},
 	cli.StringFlag{
 		Name:  "bind-string, b",
 		Value: "localhost:8081",
-		Usage: "Advertized IP",
+		Usage: "gRPC (for private) / HTTP (for public) Advertized IP",
 	},
 	cli.StringFlag{
 		Name:  "etcd-url, e",

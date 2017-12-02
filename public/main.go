@@ -23,7 +23,7 @@ func startServer() {
 		dr.POST("/cmd/:command", handleHTTPCommand)
 		dr.GET("/stream/:token", handleWS)
 	}
-	router.Run()
+	router.Run(config.AppContext.String("bind-string"))
 }
 
 func main() {

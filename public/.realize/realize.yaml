@@ -21,6 +21,9 @@ projects:
     build:
       status: false
     run: true
+  args:
+  - -b 0.0.0.0:8042
+  - -u 0.0.0.0:8042
   watcher:
     preview: false
     paths:

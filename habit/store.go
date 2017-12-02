@@ -2,35 +2,54 @@ package habit
 
 import (
 	//log "github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"github.com/vitaminwater/daryl/daryl"
+	"github.com/vitaminwater/daryl/model"
 )
 
 type storeCommand interface {
 	execute(hs *habitStore)
 }
 
+type storeCommandGetAttrs struct {
+	h model.Habit
+	r chan Attributes
+}
+
+func (c *storeCommandGetAttrs) execute(hs *habitStore) {
+	for _, w := range hs.habitWorkers {
+		h := w.GetHabit()
+		if h.h.Id == c.h.Id {
+			c.r <- h.a
+			return
+		}
+	}
+}
+
 type storeCommandAddHabit struct {
-	h *habit
+	h model.Habit
 }
 
 func (c *storeCommandAddHabit) execute(hs *habitStore) {
+	err := c.h.Insert()
+	if err != nil {
+		log.Info(err)
+		return
+	}
 	hw := newHabitWorker(hs.d, c.h)
 	hs.habitWorkers = append(hs.habitWorkers, hw)
 }
 
-type storeCommandGetDueHabit struct {
-	r chan []*habit
+type storeCommandGetDueHabits struct {
+	r chan []model.Habit
 }
 
-func (d *storeCommandGetDueHabit) execute(hs *habitStore) {
-	habits := make([]*habit, 0, 10)
+func (d *storeCommandGetDueHabits) execute(hs *habitStore) {
+	habits := make([]model.Habit, 0, 10)
 	for _, w := range hs.habitWorkers {
-		r := make(chan *habit)
-		w.cmd <- &workerCommandGetHabit{r}
-		h := <-r
-		close(r)
-		if h.GetHabit().Stats.NMissed > 0 {
-			habits = append(habits, h)
+		h := w.GetHabit()
+		if h.a.NMissed > 0 {
+			habits = append(habits, h.h)
 		}
 	}
 	d.r <- habits
@@ -42,7 +61,23 @@ type habitStore struct {
 	habitWorkers []*habitWorker
 }
 
-func (hs *habitStore) addHabit(h *habit) {
+func (s *habitStore) getDueHabits() []model.Habit {
+	r := make(chan []model.Habit)
+	s.c <- &storeCommandGetDueHabits{r}
+	hs := <-r
+	close(r)
+	return hs
+}
+
+func (s *habitStore) getAttributes(h model.Habit) Attributes {
+	r := make(chan Attributes)
+	s.c <- &storeCommandGetAttrs{h, r}
+	a := <-r
+	close(r)
+	return a
+}
+
+func (hs *habitStore) addHabit(h model.Habit) {
 	hs.c <- &storeCommandAddHabit{h}
 }
 

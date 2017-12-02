@@ -7,8 +7,10 @@ import (
 
 	log "github.com/sirupsen/logrus"
 	"github.com/vitaminwater/daryl/daryl"
+	"github.com/vitaminwater/daryl/db"
 	"github.com/vitaminwater/daryl/habit"
 	"github.com/vitaminwater/daryl/message"
+	"github.com/vitaminwater/daryl/model"
 	"github.com/vitaminwater/daryl/protodef"
 	"github.com/vitaminwater/daryl/session"
 	context "golang.org/x/net/context"
@@ -19,19 +21,33 @@ type farmServer struct {
 }
 
 func (f *farmServer) StartDaryl(c context.Context, r *protodef.StartDarylRequest) (*protodef.StartDarylResponse, error) {
-	log.Println("StartDaryl")
-	if _, ok := f.registry.Load(r.DarylIdentifier); ok != false {
-		return nil, errors.New(fmt.Sprintf("%s already registered", r.DarylIdentifier))
+	da, err := model.NewDarylFromProtodef(r.Daryl)
+	if err != nil {
+		return nil, err
 	}
-	d := daryl.NewDaryl(r.DarylIdentifier, message.NewMessageProcessor(), habit.NewHabitProcessor(), session.NewSessionProcessor())
-	f.registry.Store(r.DarylIdentifier, d)
-	return &protodef.StartDarylResponse{}, nil
+	if da.Id == "" {
+		err := daryl_db.Insert("daryl", &da)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		if _, ok := f.registry.Load(r.Daryl.Id); ok != false {
+			return nil, errors.New(fmt.Sprintf("%s already registered", r.Daryl.Id))
+		}
+	}
+	d := daryl.NewDaryl(da, message.NewMessageProcessor(), habit.NewHabitProcessor(), session.NewSessionProcessor())
+	f.registry.Store(da.Id, d)
+	p, err := da.ToProtodef()
+	if err != nil {
+		return nil, err
+	}
+	return &protodef.StartDarylResponse{Daryl: p}, nil
 }
 
 func (f *farmServer) HasDaryl(c context.Context, r *protodef.HasDarylRequest) (*protodef.HasDarylResponse, error) {
 	log.Println("HasDaryl")
 	_, ok := f.registry.Load(r.DarylIdentifier)
-	return &protodef.HasDarylResponse{Response: ok}, nil
+	return &protodef.HasDarylResponse{ok}, nil
 }
 
 func NewFarmServer(registry *sync.Map) *farmServer {

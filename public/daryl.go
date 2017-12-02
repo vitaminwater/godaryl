@@ -9,121 +9,111 @@ import (
 
 	"github.com/coreos/etcd/clientv3"
 	"github.com/gin-gonic/gin"
-	"github.com/golang/protobuf/ptypes"
 	log "github.com/sirupsen/logrus"
-	"github.com/vitaminwater/daryl/db"
+	"github.com/vitaminwater/daryl/config"
 	"github.com/vitaminwater/daryl/protodef"
 )
 
 const AUTH_TOKEN_HEADER = "X-Daryl-Auth-Token"
 
-type DarylCommand interface {
+type darylCommand interface {
 	Name() string
 	Object() interface{}
 	Execute(*gin.Context, protodef.DarylServiceClient, interface{}) (interface{}, error)
 }
 
-type UserMessageCommand struct {
+type userMessageCommand struct {
 }
 
-func (c *UserMessageCommand) Name() string {
+func (c *userMessageCommand) Name() string {
 	return "message"
 }
 
-func (c *UserMessageCommand) Object() interface{} {
+func (c *userMessageCommand) Object() interface{} {
 	return &protodef.Message{}
 }
 
-func (c *UserMessageCommand) Execute(co *gin.Context, d protodef.DarylServiceClient, o interface{}) (interface{}, error) {
+func (c *userMessageCommand) Execute(co *gin.Context, d protodef.DarylServiceClient, o interface{}) (interface{}, error) {
 	i := co.MustGet("daryl_id").(string)
 	um := protodef.UserMessageRequest{DarylIdentifier: i, Message: o.(*protodef.Message)}
 	return d.UserMessage(context.Background(), &um)
 }
 
-type AddHabitCommand struct {
-	protodef.Habit
-	Deadline time.Time `json:"deadline"`
+type addHabitCommand struct {
 }
 
-func (c *AddHabitCommand) Name() string {
+func (c *addHabitCommand) Name() string {
 	return "habit"
 }
 
-func (c *AddHabitCommand) Object() interface{} {
-	return &AddHabitCommand{}
+func (c *addHabitCommand) Object() interface{} {
+	return &protodef.Habit{}
 }
 
-func (c *AddHabitCommand) Execute(co *gin.Context, d protodef.DarylServiceClient, o interface{}) (interface{}, error) {
+func (c *addHabitCommand) Execute(co *gin.Context, d protodef.DarylServiceClient, o interface{}) (interface{}, error) {
 	i := co.MustGet("daryl_id").(string)
-	ah := protodef.AddHabitRequest{DarylIdentifier: i, Habit: &(o.(*AddHabitCommand).Habit)}
-
-	deadline, err := ptypes.TimestampProto(c.Deadline)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	ah.Habit.Deadline = deadline
-	ah.Habit.LastDone = ptypes.TimestampNow()
+	log.Info(o)
+	ah := protodef.AddHabitRequest{DarylIdentifier: i, Habit: (o.(*protodef.Habit))}
 	return d.AddHabit(context.Background(), &ah)
 }
 
-type StartWorkSessionCommand struct {
+type startWorkSessionCommand struct {
 }
 
-func (c *StartWorkSessionCommand) Name() string {
+func (c *startWorkSessionCommand) Name() string {
 	return "session"
 }
 
-func (c *StartWorkSessionCommand) Object() interface{} {
+func (c *startWorkSessionCommand) Object() interface{} {
 	return &protodef.SessionConfig{}
 }
 
-func (c *StartWorkSessionCommand) Execute(co *gin.Context, d protodef.DarylServiceClient, o interface{}) (interface{}, error) {
+func (c *startWorkSessionCommand) Execute(co *gin.Context, d protodef.DarylServiceClient, o interface{}) (interface{}, error) {
 	i := co.MustGet("daryl_id").(string)
 	r := protodef.StartWorkSessionRequest{DarylIdentifier: i, Config: o.(*protodef.SessionConfig)}
 	return d.StartWorkSession(context.Background(), &r)
 }
 
-type CancelWorkSessionCommand struct {
+type cancelWorkSessionCommand struct {
 }
 
-func (c *CancelWorkSessionCommand) Name() string {
+func (c *cancelWorkSessionCommand) Name() string {
 	return "cancel"
 }
 
-func (c *CancelWorkSessionCommand) Object() interface{} {
+func (c *cancelWorkSessionCommand) Object() interface{} {
 	return nil
 }
 
-func (c *CancelWorkSessionCommand) Execute(co *gin.Context, d protodef.DarylServiceClient, o interface{}) (interface{}, error) {
+func (c *cancelWorkSessionCommand) Execute(co *gin.Context, d protodef.DarylServiceClient, o interface{}) (interface{}, error) {
 	i := co.MustGet("daryl_id").(string)
 	r := protodef.CancelWorkSessionRequest{DarylIdentifier: i}
 	return d.CancelWorkSession(context.Background(), &r)
 }
 
-type RefuseSessionSliceCommand struct {
+type refuseSessionSliceCommand struct {
 }
 
-func (c *RefuseSessionSliceCommand) Name() string {
+func (c *refuseSessionSliceCommand) Name() string {
 	return "refuse"
 }
 
-func (c *RefuseSessionSliceCommand) Object() interface{} {
+func (c *refuseSessionSliceCommand) Object() interface{} {
 	return &protodef.SessionSliceIndex{}
 }
 
-func (c *RefuseSessionSliceCommand) Execute(co *gin.Context, d protodef.DarylServiceClient, o interface{}) (interface{}, error) {
+func (c *refuseSessionSliceCommand) Execute(co *gin.Context, d protodef.DarylServiceClient, o interface{}) (interface{}, error) {
 	i := co.MustGet("daryl_id").(string)
 	r := protodef.RefuseSessionSliceRequest{DarylIdentifier: i, Index: o.(*protodef.SessionSliceIndex)}
 	return d.RefuseSessionSlice(context.Background(), &r)
 }
 
-var cmds = map[string]DarylCommand{
-	"message": &UserMessageCommand{},
-	"habit":   &AddHabitCommand{},
-	"session": &StartWorkSessionCommand{},
-	"cancel":  &CancelWorkSessionCommand{},
-	"refuse":  &RefuseSessionSliceCommand{},
+var cmds = map[string]darylCommand{
+	"message": &userMessageCommand{},
+	"habit":   &addHabitCommand{},
+	"session": &startWorkSessionCommand{},
+	"cancel":  &cancelWorkSessionCommand{},
+	"refuse":  &refuseSessionSliceCommand{},
 }
 
 func handleHTTPCommand(c *gin.Context) {
@@ -167,30 +157,31 @@ func handleCreateDaryl(c *gin.Context) {
 		c.Abort()
 		return
 	}
-	err := daryl_db.Insert("daryl", d)
+
+	f := openFarmConnection("localhost:8043")
+	r, err := f.StartDaryl(context.Background(), &protodef.StartDarylRequest{Daryl: d})
 	if err != nil {
 		c.JSON(500, gin.H{"status": "error", "error": err})
 		c.Abort()
 		return
 	}
-	t, err := newTokenForDaryl(d)
+
+	t, err := newTokenForDaryl(r.Daryl)
 	if err != nil {
 		c.JSON(500, gin.H{"status": "error", "error": err})
 		c.Abort()
 		return
 	}
-	f := openFarmConnection("localhost:8081")
-	f.StartDaryl(context.Background(), &protodef.StartDarylRequest{DarylIdentifier: d.Id})
 	c.JSON(200, gin.H{
 		"status": "ok",
-		"daryl":  gin.H{"id": d.Id},
+		"daryl":  gin.H{"id": r.Daryl.Id},
 		"token":  gin.H{"hash": t.Hash},
 	})
 }
 
 func findDarylServer() func(string) (string, error) {
 	cli, err := clientv3.New(clientv3.Config{
-		Endpoints:   []string{"localhost:2379"},
+		Endpoints:   []string{config.AppContext.String("etcd-url")},
 		DialTimeout: 5 * time.Second,
 	})
 	if err != nil {

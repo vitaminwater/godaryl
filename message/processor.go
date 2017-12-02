@@ -1,29 +1,13 @@
 package message
 
 import (
-	"github.com/golang/protobuf/ptypes"
-	log "github.com/sirupsen/logrus"
 	"github.com/vitaminwater/daryl/daryl"
+	"github.com/vitaminwater/daryl/model"
 	"github.com/vitaminwater/daryl/protodef"
-	"time"
 )
 
-type message struct {
-	protodef.Message
-	At time.Time `db:"at"`
-}
-
-func newMessage(msg *protodef.Message) *message {
-	at, err := ptypes.Timestamp(msg.At)
-	if err != nil {
-		log.Warning(err)
-	}
-	m := &message{*msg, at}
-	return m
-}
-
 type messageTypeProcessor interface {
-	process(*message)
+	process(model.Message)
 }
 
 type messageProcessor struct {
@@ -36,7 +20,7 @@ func (mp *messageProcessor) SetDaryl(d *daryl.Daryl) {
 }
 
 func (mp *messageProcessor) UserMessage(r *protodef.UserMessageRequest) (*protodef.UserMessageResponse, error) {
-	m := newMessage(r.Message)
+	m := model.NewMessageFromProtodef(mp.d.D, r.Message)
 	mp.d.Pub(m, daryl.USER_MESSAGE_TOPIC)
 	for _, processor := range mp.processors {
 		processor.process(m)

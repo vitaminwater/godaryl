@@ -21,6 +21,9 @@ projects:
     build:
       status: false
     run: true
+  args:
+  - -b 0.0.0.0:8043
+  - -u 0.0.0.0:8043
   watcher:
     preview: false
     paths:
@@ -28,5 +31,7 @@ projects:
     - ../
     ignore_paths:
     - ../public
+    - ../db/migrations
+    - ../client
     exts:
     - .go

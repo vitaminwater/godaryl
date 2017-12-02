@@ -58,7 +58,7 @@ func processWS(conn *websocket.Conn, c *gin.Context) {
 func handleWS(c *gin.Context) {
 	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
-		log.Println(err)
+		log.Info(err)
 		return
 	}
 	log.Info("WS CONNECTED")

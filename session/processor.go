@@ -27,8 +27,11 @@ func (sp *sessionProcessor) StartWorkSession(r *protodef.StartWorkSessionRequest
 	sp.d.Pub(r, daryl.START_WORK_SESSION_TOPIC)
 	sp.sw = sw
 	sp.d.Pub(s, MAKEUP_WORK_SESSION_TOPIC)
-	se := s.GetSession()
-	return &protodef.StartWorkSessionResponse{Session: &se}, nil
+	se, err := s.ToProtodef()
+	if err != nil {
+		return nil, err
+	}
+	return &protodef.StartWorkSessionResponse{Session: se}, nil
 }
 
 func (sp *sessionProcessor) CancelWorkSession(r *protodef.CancelWorkSessionRequest) (*protodef.CancelWorkSessionResponse, error) {

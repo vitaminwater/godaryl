@@ -2,51 +2,12 @@ package session
 
 import (
 	"errors"
-	"sort"
 	"time"
 
-	"github.com/golang/protobuf/ptypes"
-	log "github.com/sirupsen/logrus"
 	"github.com/vitaminwater/daryl/daryl"
+	"github.com/vitaminwater/daryl/model"
 	"github.com/vitaminwater/daryl/protodef"
 )
-
-type session struct {
-	protodef.Session
-
-	slices []daryl.SessionSlice
-}
-
-func newSession(ps *protodef.Session) *session {
-	s := &session{
-		Session: *ps,
-		slices:  make([]daryl.SessionSlice, 0),
-	}
-	for _, ss := range ps.Slices {
-		s.slices = append(s.slices, newSessionSlice(ss))
-	}
-	return s
-}
-
-func (s *session) GetSession() protodef.Session {
-	return s.Session
-}
-
-func (s *session) GetSessionSlices() []daryl.SessionSlice {
-	return s.slices
-}
-
-type sessionSlice struct {
-	protodef.SessionSlice
-}
-
-func newSessionSlice(ss *protodef.SessionSlice) *sessionSlice {
-	return &sessionSlice{*ss}
-}
-
-func (ss *sessionSlice) GetSessionSlice() protodef.SessionSlice {
-	return ss.SessionSlice
-}
 
 type sessionWorkerCommand interface {
 	execute(*sessionWorker)
@@ -64,8 +25,8 @@ type sessionWorker struct {
 	r   *protodef.StartWorkSessionRequest
 	cmd chan sessionWorkerCommand
 
-	s   *session
-	due []daryl.Habit
+	s   model.Session
+	due []model.Habit
 }
 
 func (sw *sessionWorker) stop() {
@@ -76,52 +37,31 @@ func sessionWorkerProcess(sw *sessionWorker) {
 	}
 }
 
-type sortedHabits []daryl.Habit
-
-func (sh sortedHabits) Len() int {
-	return len(sh)
-}
-
-func (sh sortedHabits) Less(i, j int) bool {
-	return sh[i].GetWeight() < sh[j].GetWeight()
-}
-
-func (sh sortedHabits) Swap(i, j int) {
-	tmp := sh[j]
-	sh[j] = sh[i]
-	sh[i] = tmp
-}
-
-func newSessionWorker(d *daryl.Daryl, r *protodef.StartWorkSessionRequest) (*sessionWorker, daryl.Session, error) {
+func newSessionWorker(d *daryl.Daryl, r *protodef.StartWorkSessionRequest) (*sessionWorker, model.Session, error) {
 	_, err := time.ParseDuration(r.Config.Duration)
 	if err != nil {
-		log.Info(err)
+		return nil, model.Session{}, err
 	}
 
-	due := sortedHabits(d.HabitProcessor.GetDueHabits())
+	due := d.HabitProcessor.GetDueHabits()
 
 	if len(due) == 0 {
-		return nil, nil, errors.New("All good ! You're free !")
+		return nil, model.Session{}, errors.New("All good ! You're free !")
 	}
 
-	sort.Sort(due)
-
-	pss := make([]*protodef.SessionSlice, 0)
+	pss := []model.SessionSlice{}
 	for _, d := range due {
-		h := d.GetHabit()
-		pss = append(pss, &protodef.SessionSlice{
-			Start: ptypes.TimestampNow(),
-			End:   ptypes.TimestampNow(),
-			Habit: &h,
+		pss = append(pss, model.SessionSlice{
+			Start: time.Now(),
+			End:   time.Now(),
+			Habit: d,
 		})
 	}
-	ps := &protodef.Session{
-		Start:  ptypes.TimestampNow(),
-		End:    ptypes.TimestampNow(),
+	s := model.Session{
+		Start:  time.Now(),
+		End:    time.Now(),
 		Slices: pss,
 	}
-
-	s := newSession(ps)
 
 	sw := &sessionWorker{d, r, make(chan sessionWorkerCommand), s, due}
 	go sessionWorkerProcess(sw)

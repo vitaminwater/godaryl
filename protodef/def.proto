@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 import "ptypes/timestamp/timestamp.proto";
+import "ptypes/any/any.proto";
 
 package protodef;
 
@@ -14,7 +15,7 @@ service FarmService {
 // StartDaryl
 
 message StartDarylRequest {
-  string daryl_identifier = 1;
+  Daryl daryl = 1;
 }
 
 // HasDaryl
@@ -26,6 +27,7 @@ message HasDarylRequest {
 // Response
 
 message StartDarylResponse {
+  Daryl daryl = 1;
 }
 
 message HasDarylResponse {
@@ -43,11 +45,8 @@ service DarylService {
 }
 
 message Daryl {
-  // @inject_tag: db:"id" access:"s"
   string id = 1;
-  // @inject_tag: db:"name" access:"i,s"
   string name = 2;
-  // @inject_tag: db:"password" access:"i,u,s"
   string password = 3;
 }
 
@@ -58,23 +57,12 @@ message UserMessageRequest {
   Message message = 2;
 }
 
-message MessageLink {
-  // @inject_tag: db:"link" access:"i,u,s"
-  string link = 1;
-}
-
 message Message {
-  // @inject_tag: db:"id" access:"s"
   string id = 1;
-  // @inject_tag: db:"text" access:"i,u,s"
   string text = 2;
-  // @inject_tag: db:"at" access:"i,s"
-  google.protobuf.Timestamp at = 3;
-  // @inject_tag: db:"done" access:"i,u,s"
-  bool done = 4;
-  // @inject_tag: db:"todo" access:"i,u,s"
-  string todo = 5;
-  repeated MessageLink links = 6;
+  string habit_identifier = 3;
+  google.protobuf.Timestamp at = 4;
+  google.protobuf.Any attrs = 5; 
 }
 
 message UserMessageResponse {
@@ -83,25 +71,11 @@ message UserMessageResponse {
 
 // AddHabit
 
-message HabitStat {
-  // @inject_tag: db:"urgent" access:"i,u,s"
-  uint32 urgent = 1;
-  // @inject_tag: db:"nMissed" access:"i,u,s"
-  uint32 nMissed = 2;
-}
-
 message Habit {
-  // @inject_tag: db:"id"
   string id = 1;
-  // @inject_tag: db:"title" access:"i,u,s"
   string title = 2;
-  // @inject_tag: db:"duration" access:"i,u,s"
   string duration = 3;
-  google.protobuf.Timestamp deadline = 4;
-  // @inject_tag: db:"cron" access:"i,u,s"
   string cron = 6;
-  google.protobuf.Timestamp lastDone = 7;
-  HabitStat stats = 8;
 }
 
 message AddHabitRequest {
@@ -119,14 +93,12 @@ message AddHabitResponse {
 message SessionSlice {
   google.protobuf.Timestamp start = 1;
   google.protobuf.Timestamp end = 2;
-  // @inject_tag: db:"habit" access:"i,u,s"
   Habit habit = 3;
 }
 
 message Session {
   google.protobuf.Timestamp start = 1;
   google.protobuf.Timestamp end = 2;
-  // @inject_tag: db:"slices" access:"i,u,s"
   repeated SessionSlice slices = 3;
 }
 
