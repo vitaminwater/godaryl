@@ -10,9 +10,9 @@ import (
 )
 
 type Attributes struct {
-	Urgent   int        `json:"urgent"`
-	NMissed  uint       `json:"n_missed"`
-	LastDone *time.Time `json:"last_done"`
+	Urgent   int       `json:"urgent"`
+	NMissed  uint      `json:"n_missed"`
+	LastDone time.Time `json:"last_done"`
 }
 
 type workerCommand interface {
@@ -64,7 +64,7 @@ func (hw *habitWorker) GetHabit() workerCommandGetHabitResponse {
 
 func (hw *habitWorker) tick() {
 	if hw.a.NMissed > 0 {
-		p := float64(time.Since(*hw.a.LastDone)/time.Minute) * float64(hw.a.NMissed)
+		p := float64(time.Since(hw.a.LastDone)/time.Minute) * float64(hw.a.NMissed)
 		hw.a.Urgent += int(p)
 	}
 }
@@ -86,7 +86,7 @@ func habitWorkerProcess(hw *habitWorker) {
 func newHabitWorker(d *daryl.Daryl, h model.Habit) *habitWorker {
 	hw := &habitWorker{
 		d: d,
-		a: Attributes{},
+		a: Attributes{LastDone: time.Now()},
 		h: h,
 
 		cr:  cron.New(),
