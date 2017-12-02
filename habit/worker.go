@@ -86,6 +86,7 @@ func habitWorkerProcess(hw *habitWorker) {
 func newHabitWorker(d *daryl.Daryl, h model.Habit) *habitWorker {
 	hw := &habitWorker{
 		d: d,
+		a: Attributes{},
 		h: h,
 
 		cr:  cron.New(),

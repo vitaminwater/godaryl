@@ -2,7 +2,6 @@ package main
 
 import (
 	"os"
-	"time"
 
 	"github.com/golang/protobuf/ptypes"
 	log "github.com/sirupsen/logrus"
@@ -14,7 +13,12 @@ import (
 
 func startDaryl(client protodef.FarmServiceClient, c *cli.Context) {
 	log.Info("startDaryl")
-	request := &protodef.StartDarylRequest{DarylIdentifier: c.String("identifier")}
+	request := &protodef.StartDarylRequest{
+		Daryl: &protodef.Daryl{
+			Id:   c.String("identifier"),
+			Name: c.String("name"),
+		},
+	}
 	response, err := client.StartDaryl(context.Background(), request)
 	if err != nil {
 		log.Fatalf("fail to stuff: %v", err)
@@ -46,25 +50,13 @@ func userMessage(client protodef.DarylServiceClient, c *cli.Context) {
 
 func addHabit(client protodef.DarylServiceClient, c *cli.Context) {
 	log.Info("addHabit")
-	deadlinet := time.Time{}
-	err := deadlinet.UnmarshalText([]byte(c.String("deadline")))
-	if err != nil {
-		log.Fatal(err)
-	}
-	deadline, err := ptypes.TimestampProto(deadlinet)
-	if err != nil {
-		log.Fatal(err)
-	}
 
 	request := &protodef.AddHabitRequest{
 		DarylIdentifier: c.String("identifier"),
 		Habit: &protodef.Habit{
 			Title:    c.String("title"),
-			Deadline: deadline,
 			Cron:     c.String("cron"),
 			Duration: c.String("duration"),
-			LastDone: ptypes.TimestampNow(),
-			Stats:    &protodef.HabitStat{Urgent: 0, NMissed: 0},
 		},
 	}
 	response, err := client.AddHabit(context.Background(), request)
@@ -76,7 +68,7 @@ func addHabit(client protodef.DarylServiceClient, c *cli.Context) {
 
 func startWorkSession(client protodef.DarylServiceClient, c *cli.Context) {
 	log.Info("startWorkSession")
-	request := &protodef.StartWorkSessionRequest{DarylIdentifier: c.String("identifier")}
+	request := &protodef.StartWorkSessionRequest{DarylIdentifier: c.String("identifier"), Config: &protodef.SessionConfig{Duration: c.String("duration")}}
 	response, err := client.StartWorkSession(context.Background(), request)
 	if err != nil {
 		log.Fatalf("fail to stuff: %v", err)
@@ -105,7 +97,7 @@ func refuseWorkSession(client protodef.DarylServiceClient, c *cli.Context) {
 }
 
 func openConnection(c *cli.Context) (protodef.FarmServiceClient, protodef.DarylServiceClient) {
-	conn, err := grpc.Dial("localhost:8081", grpc.WithInsecure())
+	conn, err := grpc.Dial("localhost:8043", grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("fail to dial: %v", err)
 	}
@@ -129,6 +121,11 @@ func main() {
 				cli.StringFlag{
 					Name:  "identifier, i",
 					Usage: "Daryl's identifier",
+				},
+				cli.StringFlag{
+					Name:  "name, n",
+					Value: "Daryl",
+					Usage: "Daryl's name",
 				},
 			},
 			Action: func(c *cli.Context) error {
@@ -187,10 +184,6 @@ func main() {
 					Usage: "Title",
 				},
 				cli.StringFlag{
-					Name:  "deadline, d",
-					Usage: "Deadline date as RFC 3339.\nex: 2002-10-02T15:00:00Z",
-				},
-				cli.StringFlag{
 					Name:  "cron, c",
 					Usage: "Cron line\nex: */2 * * * * *\nex: @hourly\nex: @every 1h30m",
 				},
@@ -217,6 +210,10 @@ func main() {
 						cli.StringFlag{
 							Name:  "identifier, i",
 							Usage: "Daryl's identifier",
+						},
+						cli.StringFlag{
+							Name:  "duration, d",
+							Usage: "Work session duration",
 						},
 					},
 					Action: func(c *cli.Context) error {
