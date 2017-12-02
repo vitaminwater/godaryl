@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"sync"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/vitaminwater/daryl/daryl"
 	"github.com/vitaminwater/daryl/db"
 	"github.com/vitaminwater/daryl/habit"
@@ -45,7 +44,6 @@ func (f *farmServer) StartDaryl(c context.Context, r *protodef.StartDarylRequest
 }
 
 func (f *farmServer) HasDaryl(c context.Context, r *protodef.HasDarylRequest) (*protodef.HasDarylResponse, error) {
-	log.Println("HasDaryl")
 	_, ok := f.registry.Load(r.DarylIdentifier)
 	return &protodef.HasDarylResponse{ok}, nil
 }

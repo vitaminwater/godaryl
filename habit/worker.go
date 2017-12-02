@@ -70,6 +70,7 @@ func (hw *habitWorker) tick() {
 }
 
 func habitWorkerProcess(hw *habitWorker) {
+	log.Info("habitWorkerProcess")
 	for {
 		select {
 		case _ = <-hw.t:

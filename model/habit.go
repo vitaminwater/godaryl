@@ -45,6 +45,8 @@ func NewHabitFromProtodef(d Daryl, h *protodef.Habit) (Habit, error) {
 	}
 	return Habit{
 		Id:       h.Id,
+		Title:    h.Title,
+		Cron:     h.Cron,
 		DarylId:  d.Id,
 		Duration: duration,
 	}, nil
