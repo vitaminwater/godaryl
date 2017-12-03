@@ -55,7 +55,7 @@ func (d *Daryl) Sub(topics ...string) chan interface{} {
 }
 
 func (d *Daryl) Pub(msg interface{}, msgType string, topics ...string) {
-	m := TopicMessage{msgType, msg}
+	m := TopicMessage{ALL_TOPIC, msg}
 	j, err := json.Marshal(m)
 	if err != nil {
 		log.Info(err)
@@ -63,9 +63,11 @@ func (d *Daryl) Pub(msg interface{}, msgType string, topics ...string) {
 	c := kv.Pool.Get()
 
 	d.pubsub.Pub(m, ALL_TOPIC)
+	m.Topic = msgType
 	d.pubsub.Pub(m, msgType)
 	c.Do("PUBLISH", fmt.Sprintf("daryl.%s.%s", d.D.Id, msgType), string(j))
 	for _, topic := range topics {
+		m.Topic = topic
 		d.pubsub.Pub(m, topic)
 		c.Do("PUBLISH", fmt.Sprintf("daryl.%s.%s", d.D.Id, topic), string(j))
 	}
