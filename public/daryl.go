@@ -9,8 +9,6 @@ import (
 	"github.com/vitaminwater/daryl/protodef"
 )
 
-const AUTH_TOKEN_HEADER = "X-Daryl-Auth-Token"
-
 type darylCommand interface {
 	Name() string
 	Object() interface{}
@@ -129,7 +127,8 @@ func handleHTTPCommand(c *gin.Context) {
 			return
 		}
 	}
-	d := openDarylConnection(url)
+	d, cl := openDarylConnection(url)
+	defer cl()
 	resp, err := cmd.Execute(c, d, o)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"status": "error", "error": err})
@@ -150,7 +149,8 @@ func handleCreateDaryl(c *gin.Context) {
 		return
 	}
 
-	f := openFarmConnection("localhost:8043")
+	f, cl := openFarmConnection("localhost:8043")
+	defer cl()
 	r, err := f.StartDaryl(context.Background(), &protodef.StartDarylRequest{Daryl: d})
 	if err != nil {
 		c.JSON(500, gin.H{"status": "error", "error": err})

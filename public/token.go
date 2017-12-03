@@ -9,6 +9,8 @@ import (
 	"github.com/vitaminwater/daryl/protodef"
 )
 
+const AUTH_TOKEN_HEADER = "X-Daryl-Auth-Token"
+
 type token struct {
 	Hash  string          `json:"hash"`
 	Daryl *protodef.Daryl `json:"daryl"`

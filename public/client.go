@@ -1,38 +1,55 @@
 package main
 
 import (
-	"log"
+	"sync"
 
+	log "github.com/sirupsen/logrus"
 	"github.com/vitaminwater/daryl/protodef"
 	"google.golang.org/grpc"
 )
 
-var daryls map[string]protodef.DarylServiceClient = make(map[string]protodef.DarylServiceClient)
+var daryls = sync.Map{}
 
-func openDarylConnection(url string) protodef.DarylServiceClient {
-	if d, ok := daryls[url]; ok == true {
-		return d
+func openDarylConnection(url string) (protodef.DarylServiceClient, func()) {
+	if d, ok := daryls.Load(url); ok == true {
+		c := d.(*sync.Pool).Get().(protodef.DarylServiceClient)
+		return c, func() { d.(*sync.Pool).Put(c) }
 	}
-	conn, err := grpc.Dial(url, grpc.WithInsecure())
-	if err != nil {
-		log.Fatalf("fail to dial: %v", err)
+	d := &sync.Pool{
+		New: func() interface{} {
+			log.Info("openDarylConnection")
+			conn, err := grpc.Dial(url, grpc.WithInsecure())
+			if err != nil {
+				log.Fatalf("fail to dial: %v", err)
+			}
+			daryl := protodef.NewDarylServiceClient(conn)
+			return daryl
+		},
 	}
-	daryl := protodef.NewDarylServiceClient(conn)
-	daryls[url] = daryl
-	return daryl
+	daryls.Store(url, d)
+	c := d.Get().(protodef.DarylServiceClient)
+	return c, func() { d.Put(c) }
 }
 
-var farms map[string]protodef.FarmServiceClient = make(map[string]protodef.FarmServiceClient)
+var farms = sync.Map{}
 
-func openFarmConnection(url string) protodef.FarmServiceClient {
-	if d, ok := farms[url]; ok == true {
-		return d
+func openFarmConnection(url string) (protodef.FarmServiceClient, func()) {
+	if f, ok := farms.Load(url); ok == true {
+		c := f.(*sync.Pool).Get().(protodef.FarmServiceClient)
+		return c, func() { f.(*sync.Pool).Put(c) }
 	}
-	conn, err := grpc.Dial(url, grpc.WithInsecure())
-	if err != nil {
-		log.Fatalf("fail to dial: %v", err)
+	f := &sync.Pool{
+		New: func() interface{} {
+			log.Info("openFarmConnection")
+			conn, err := grpc.Dial(url, grpc.WithInsecure())
+			if err != nil {
+				log.Fatalf("fail to dial: %v", err)
+			}
+			farm := protodef.NewFarmServiceClient(conn)
+			return farm
+		},
 	}
-	farm := protodef.NewFarmServiceClient(conn)
-	farms[url] = farm
-	return farm
+	farms.Store(url, f)
+	c := f.Get().(protodef.FarmServiceClient)
+	return c, func() { f.Put(c) }
 }
