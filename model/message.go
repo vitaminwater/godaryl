@@ -12,7 +12,7 @@ type Message struct {
 	Id      string `json:"id" db:"id" access:"s"`
 	Text    string `json:"text" db:"text" access:"i,u,s"`
 	DarylId string `json:"darylId" db:"daryl_id" access:"i,s"`
-	HabitId string `json:"habit_id" db:"habit_id" access:"i,s"`
+	HabitId string `json:"habitId" db:"habit_id" access:"i,s"`
 
 	AttrsDB types.JSONText         `json:"-" db:"attrs" access:"i,u,s"`
 	Attrs   map[string]interface{} `json:"attrs" db:"-"`

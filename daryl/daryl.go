@@ -56,20 +56,36 @@ func (d *Daryl) Sub(topics ...string) chan interface{} {
 
 func (d *Daryl) Pub(msg interface{}, msgType string, topics ...string) {
 	m := TopicMessage{ALL_TOPIC, msg}
-	j, err := json.Marshal(m)
-	if err != nil {
-		log.Info(err)
-	}
 	c := kv.Pool.Get()
 
 	d.pubsub.Pub(m, ALL_TOPIC)
 	m.Topic = msgType
 	d.pubsub.Pub(m, msgType)
-	c.Do("PUBLISH", fmt.Sprintf("daryl.%s.%s", d.D.Id, msgType), string(j))
+
+	p, err := model.ToProtodef(msg)
+	if err != nil {
+		log.Info(err)
+	} else {
+		j, err := json.Marshal(TopicMessage{fmt.Sprintf("daryl.%s.%s", d.D.Id, msgType), p})
+		if err != nil {
+			log.Info(err)
+		}
+		c.Do("PUBLISH", fmt.Sprintf("daryl.%s.%s", d.D.Id, msgType), string(j))
+	}
 	for _, topic := range topics {
 		m.Topic = topic
 		d.pubsub.Pub(m, topic)
-		c.Do("PUBLISH", fmt.Sprintf("daryl.%s.%s", d.D.Id, topic), string(j))
+
+		p, err := model.ToProtodef(msg)
+		if err != nil {
+			log.Info(err)
+		} else {
+			j, err := json.Marshal(TopicMessage{fmt.Sprintf("daryl.%s.%s", d.D.Id, topic), p})
+			if err != nil {
+				log.Info(err)
+			}
+			c.Do("PUBLISH", fmt.Sprintf("daryl.%s.%s", d.D.Id, topic), string(j))
+		}
 	}
 }
 
