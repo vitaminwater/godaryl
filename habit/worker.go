@@ -1,6 +1,7 @@
 package habit
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/robfig/cron"
@@ -94,6 +95,7 @@ func newHabitWorker(d *daryl.Daryl, h model.Habit) *habitWorker {
 		cmd: make(chan workerCommand, 10),
 		sub: d.Sub(
 			daryl.ADD_HABIT_TOPIC,
+			fmt.Sprintf("%s.%s", daryl.USER_MESSAGE_TOPIC, h.Id),
 		),
 	}
 	hw.cr.AddFunc(h.Cron, func() { hw.cmd <- &workerCommandOnHabitTrigger{} })

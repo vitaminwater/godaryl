@@ -27,8 +27,6 @@ func (lmp *linkMessageProcessor) process(m model.Message) {
 	}
 
 	m.Attrs["link"] = l
-	log.Info(l)
-	log.Info(m.Attrs)
 	lmp.mp.d.Pub(m, LINK_LOG_TOPIC)
 	log.Info("linkMessageProcessor.process")
 }

@@ -32,10 +32,12 @@ type storeCommandAddHabit struct {
 }
 
 func (c *storeCommandAddHabit) execute(hs *habitStore) {
-	err := c.h.Insert()
-	if err != nil {
-		log.Info(err)
-		return
+	if c.h.Id == "" {
+		err := c.h.Insert()
+		if err != nil {
+			log.Info(err)
+			return
+		}
 	}
 	hw := newHabitWorker(hs.d, c.h)
 	hs.habitWorkers = append(hs.habitWorkers, hw)

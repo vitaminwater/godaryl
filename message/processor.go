@@ -1,6 +1,8 @@
 package message
 
 import (
+	"fmt"
+
 	"github.com/vitaminwater/daryl/daryl"
 	"github.com/vitaminwater/daryl/model"
 	"github.com/vitaminwater/daryl/protodef"
@@ -36,7 +38,7 @@ func (mp *messageProcessor) UserMessage(r *protodef.UserMessageRequest) (*protod
 		return nil, err
 	}
 
-	mp.d.Pub(m, daryl.USER_MESSAGE_TOPIC)
+	mp.d.Pub(m, daryl.USER_MESSAGE_TOPIC, fmt.Sprintf("%s.%s", daryl.USER_MESSAGE_TOPIC, m.HabitId))
 
 	mm, err := m.ToProtodef()
 	if err != nil {

@@ -61,6 +61,7 @@ func addHabit(client protodef.DarylServiceClient, c *cli.Context) {
 	request := &protodef.AddHabitRequest{
 		DarylIdentifier: c.String("identifier"),
 		Habit: &protodef.Habit{
+			Id:       c.String("id"),
 			Title:    c.String("title"),
 			Cron:     c.String("cron"),
 			Duration: c.String("duration"),
@@ -193,6 +194,10 @@ func main() {
 				cli.StringFlag{
 					Name:  "identifier, i",
 					Usage: "Daryl's identifier",
+				},
+				cli.StringFlag{
+					Name:  "id",
+					Usage: "Habit identifier",
 				},
 				cli.StringFlag{
 					Name:  "title, t",
