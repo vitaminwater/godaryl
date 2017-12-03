@@ -64,14 +64,11 @@ func (d *Daryl) Pub(msg interface{}, msgType string, topics ...string) {
 
 	d.pubsub.Pub(m, ALL_TOPIC)
 	d.pubsub.Pub(m, msgType)
-	if len(j) != 0 {
-		c.Do("PUBLISH", fmt.Sprintf("daryl.%s.%s", d.D.Id, msgType), string(j))
-	}
+	log.Info("Pub ", fmt.Sprintf("daryl.%s.%s", d.D.Id, msgType), " ", j)
+	c.Do("PUBLISH", fmt.Sprintf("daryl.%s.%s", d.D.Id, msgType), string(j))
 	for _, topic := range topics {
 		d.pubsub.Pub(m, topic)
-		if len(j) != 0 {
-			c.Do("PUBLISH", fmt.Sprintf("daryl.%s.%s", d.D.Id, topic), string(j))
-		}
+		c.Do("PUBLISH", fmt.Sprintf("daryl.%s.%s", d.D.Id, topic), string(j))
 	}
 }
 

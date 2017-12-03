@@ -11,10 +11,11 @@ type linkMessageProcessor struct {
 	mp *messageProcessor
 }
 
-var linkRegexp = regexp.MustCompile(`(https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*))`)
+var linkRegexp = regexp.MustCompile(`(https?:\/\/(((www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6})|localhost)\b([-a-zA-Z0-9@:%_\+.~#?&//=]*))`)
 
 func (lmp *linkMessageProcessor) process(m model.Message) {
-	matches := linkRegexp.FindAllStringSubmatch(m.Text, 10)
+	log.Info(m.Text)
+	matches := linkRegexp.FindAllStringSubmatch(m.Text, -1)
 
 	if len(matches) == 0 {
 		return
@@ -26,6 +27,8 @@ func (lmp *linkMessageProcessor) process(m model.Message) {
 	}
 
 	m.Attrs["link"] = l
+	log.Info(l)
+	log.Info(m.Attrs)
 	lmp.mp.d.Pub(m, LINK_LOG_TOPIC)
 	log.Info("linkMessageProcessor.process")
 }

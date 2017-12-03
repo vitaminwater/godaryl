@@ -32,6 +32,7 @@ projects:
     - ../distributed
     - ../protodef
     - ../kv
+    - ../model
     ignore_paths:
     - ../db/migrations
     exts:

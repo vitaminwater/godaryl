@@ -7,10 +7,19 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+func GetQuery(t, match string, s interface{}) (string, error) {
+	_, dbFields, _ := ListField(s, "s")
+	q := sq.Select(dbFields...).From(t).Where(fmt.Sprintf("%[1]s = :%[1]s", match))
+	qg, _, err := q.ToSql()
+	if err != nil {
+		return "", err
+	}
+	return qg, nil
+}
+
 func InsertQuery(t string, s interface{}) (string, error) {
-	fields, _ := ListField(s, "", "i")
-	dbNames := DBNames(fields)
-	qi, _, err := sq.Insert(t).Columns(dbNames...).Values(ToExpr(fields...)...).Suffix("RETURNING id").ToSql()
+	fields, dbFields, _ := ListField(s, "i")
+	qi, _, err := sq.Insert(t).Columns(dbFields...).Values(ToExpr(fields...)...).Suffix("RETURNING id").ToSql()
 	if err != nil {
 		return "", err
 	}
@@ -19,11 +28,10 @@ func InsertQuery(t string, s interface{}) (string, error) {
 }
 
 func UpdateQuery(t, idf string, s interface{}) (string, error) {
-	fields, _ := ListField(s, "", "u")
-	dbNames := DBNames(fields)
+	fields, dbFields, _ := ListField(s, "u")
 	ub := sq.Update(t)
 	for i, field := range fields {
-		ub = ub.Set(dbNames[i], sq.Expr(fmt.Sprintf(":%s", field)))
+		ub = ub.Set(dbFields[i], sq.Expr(fmt.Sprintf(":%s", field)))
 	}
 	qu, _, err := ub.Where(fmt.Sprintf("%[1]s = :%[1]s", idf)).ToSql()
 	if err != nil {

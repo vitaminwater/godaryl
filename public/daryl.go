@@ -2,15 +2,10 @@ package main
 
 import (
 	"context"
-	"errors"
-	"fmt"
 	"net/http"
-	"time"
 
-	"github.com/coreos/etcd/clientv3"
 	"github.com/gin-gonic/gin"
-	log "github.com/sirupsen/logrus"
-	"github.com/vitaminwater/daryl/config"
+	"github.com/vitaminwater/daryl/model"
 	"github.com/vitaminwater/daryl/protodef"
 )
 
@@ -52,7 +47,6 @@ func (c *addHabitCommand) Object() interface{} {
 
 func (c *addHabitCommand) Execute(co *gin.Context, d protodef.DarylServiceClient, o interface{}) (interface{}, error) {
 	i := co.MustGet("daryl_id").(string)
-	log.Info(o)
 	ah := protodef.AddHabitRequest{DarylIdentifier: i, Habit: (o.(*protodef.Habit))}
 	return d.AddHabit(context.Background(), &ah)
 }
@@ -130,7 +124,6 @@ func handleHTTPCommand(c *gin.Context) {
 	o := cmd.Object()
 	if o != nil {
 		if err := c.BindJSON(&o); err != nil {
-			log.Info(err)
 			c.JSON(http.StatusBadRequest, gin.H{"status": "error", "error": err})
 			c.Abort()
 			return
@@ -139,7 +132,6 @@ func handleHTTPCommand(c *gin.Context) {
 	d := openDarylConnection(url)
 	resp, err := cmd.Execute(c, d, o)
 	if err != nil {
-		log.Info(err)
 		c.JSON(http.StatusBadRequest, gin.H{"status": "error", "error": err})
 		c.Abort()
 		return
@@ -179,55 +171,41 @@ func handleCreateDaryl(c *gin.Context) {
 	})
 }
 
-func findDarylServer() func(string) (string, error) {
-	cli, err := clientv3.New(clientv3.Config{
-		Endpoints:   []string{config.AppContext.String("etcd-url")},
-		DialTimeout: 5 * time.Second,
-	})
+func handleCreateDarylToken(c *gin.Context) {
+	d := &protodef.Daryl{}
+	if err := c.Bind(d); err != nil {
+		c.JSON(500, gin.H{"status": "error", "error": err})
+		c.Abort()
+		return
+	}
+
+	da, err := model.NewDarylFromProtodef(d)
 	if err != nil {
-		log.Fatal(err)
+		c.JSON(500, gin.H{"status": "error", "error": err})
+		c.Abort()
+		return
 	}
-	//defer cli.Close()
 
-	return func(identifier string) (string, error) {
-		resp, err := cli.Get(context.Background(), fmt.Sprintf("daryl_%s", identifier))
-		if err != nil {
-			return "", err
-		}
-		if len(resp.Kvs) != 0 {
-			url := string(resp.Kvs[0].Value)
-			return url, nil
-		}
-		return "", errors.New("Daryl not found")
+	if err := da.GetFromNameAndPassword(); err != nil {
+		c.JSON(500, gin.H{"status": "error", "error": err})
+		c.Abort()
+		return
 	}
-}
 
-func setDarylServer() func(*gin.Context) {
-	fds := findDarylServer()
-	return func(c *gin.Context) {
-		h := c.GetHeader(AUTH_TOKEN_HEADER)
-		if h == "" {
-			h = c.Param("token")
-		}
-		if h == "" {
-			c.JSON(http.StatusServiceUnavailable, gin.H{"status": "error", "error": errors.New("Access denied")})
-			c.Abort()
-			return
-		}
-		t, err := newTokenFromToken(h)
-		if err != nil {
-			c.JSON(http.StatusServiceUnavailable, gin.H{"status": "error", "error": err})
-			c.Abort()
-			return
-		}
-		url, err := fds(t.Daryl.Id)
-		if err != nil {
-			c.JSON(http.StatusServiceUnavailable, gin.H{"status": "error", "error": err})
-			c.Abort()
-			return
-		}
-		log.Infof("Daryl at %s", url)
-		c.Set("daryl_url", url)
-		c.Set("daryl_id", t.Daryl.Id)
+	d, err = da.ToProtodef()
+	if err != nil {
+		c.JSON(500, gin.H{"status": "error", "error": err})
+		c.Abort()
+		return
 	}
+	t, err := newTokenForDaryl(d)
+	if err != nil {
+		c.JSON(500, gin.H{"status": "error", "error": err})
+		c.Abort()
+		return
+	}
+	c.JSON(200, gin.H{
+		"status": "ok",
+		"token":  gin.H{"hash": t.Hash},
+	})
 }

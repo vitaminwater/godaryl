@@ -1,8 +1,19 @@
 package daryl_db
 
-import (
-	"database/sql"
-)
+func Get(t, match string, dest, src interface{}) error {
+	q, err := GetQuery(t, match, dest)
+	if err != nil {
+		return err
+	}
+	if stmt, err := db.PrepareNamed(q); err != nil {
+		return err
+	} else {
+		if err := stmt.Get(dest, src); err != nil {
+			return err
+		}
+		return nil
+	}
+}
 
 func Insert(t string, s interface{}) error {
 	q, err := InsertQuery(t, s)
@@ -20,10 +31,14 @@ func Insert(t string, s interface{}) error {
 	}
 }
 
-func Update(t, idf string, s interface{}) (sql.Result, error) {
+func Update(t, idf string, s interface{}) error {
 	q, err := UpdateQuery(t, idf, s)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	return db.NamedExec(q, s)
+	_, err = db.NamedExec(q, s)
+	if err != nil {
+		return err
+	}
+	return nil
 }

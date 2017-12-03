@@ -24,10 +24,18 @@ func subscribeRedis(conn *websocket.Conn, c *gin.Context) {
 	id := c.MustGet("daryl_id")
 	k := kv.Pool.Get()
 	pkv := redis.PubSubConn{Conn: k}
-	pkv.Subscribe(fmt.Sprintf("daryl.%s", id))
+	pkv.PSubscribe(fmt.Sprintf("daryl.%s.*", id))
 	for {
 		switch v := pkv.Receive().(type) {
 		case redis.Message:
+			var m interface{}
+			err := json.Unmarshal(v.Data, &m)
+			if err != nil {
+				log.Info(err)
+			} else {
+				conn.WriteJSON(m)
+			}
+		case redis.PMessage:
 			var m interface{}
 			err := json.Unmarshal(v.Data, &m)
 			if err != nil {

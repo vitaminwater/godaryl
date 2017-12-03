@@ -15,6 +15,7 @@ func startServer() {
 	router := gin.Default()
 	pr := router.Group("/public")
 	{
+		pr.POST("/daryl/token", handleCreateDarylToken)
 		pr.POST("/daryl", handleCreateDaryl)
 	}
 	dr := router.Group("/daryl")

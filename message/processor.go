@@ -21,11 +21,28 @@ func (mp *messageProcessor) SetDaryl(d *daryl.Daryl) {
 
 func (mp *messageProcessor) UserMessage(r *protodef.UserMessageRequest) (*protodef.UserMessageResponse, error) {
 	m := model.NewMessageFromProtodef(mp.d.D, r.Message)
-	mp.d.Pub(m, daryl.USER_MESSAGE_TOPIC)
+
+	err := m.Insert()
+	if err != nil {
+		return nil, err
+	}
+
 	for _, processor := range mp.processors {
 		processor.process(m)
 	}
-	return &protodef.UserMessageResponse{}, nil
+
+	err = m.Update()
+	if err != nil {
+		return nil, err
+	}
+
+	mp.d.Pub(m, daryl.USER_MESSAGE_TOPIC)
+
+	mm, err := m.ToProtodef()
+	if err != nil {
+		return nil, err
+	}
+	return &protodef.UserMessageResponse{Message: mm}, nil
 }
 
 func NewMessageProcessor() *messageProcessor {

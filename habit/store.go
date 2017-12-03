@@ -28,6 +28,7 @@ func (c *storeCommandGetAttrs) execute(hs *habitStore) {
 
 type storeCommandAddHabit struct {
 	h model.Habit
+	r chan model.Habit
 }
 
 func (c *storeCommandAddHabit) execute(hs *habitStore) {
@@ -38,6 +39,7 @@ func (c *storeCommandAddHabit) execute(hs *habitStore) {
 	}
 	hw := newHabitWorker(hs.d, c.h)
 	hs.habitWorkers = append(hs.habitWorkers, hw)
+	c.r <- c.h
 }
 
 type storeCommandGetDueHabits struct {
@@ -77,8 +79,12 @@ func (s *habitStore) getAttributes(h model.Habit) Attributes {
 	return a
 }
 
-func (hs *habitStore) addHabit(h model.Habit) {
-	hs.c <- &storeCommandAddHabit{h}
+func (hs *habitStore) addHabit(h model.Habit) model.Habit {
+	r := make(chan model.Habit)
+	hs.c <- &storeCommandAddHabit{h: h, r: r}
+	h = <-r
+	close(r)
+	return h
 }
 
 func habitStoreProcess(hs *habitStore) {

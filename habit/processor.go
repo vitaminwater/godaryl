@@ -21,9 +21,13 @@ func (hp *habitProcessor) AddHabit(r *protodef.AddHabitRequest) (*protodef.AddHa
 	if err != nil {
 		return nil, err
 	}
-	hp.store.addHabit(h)
+	h = hp.store.addHabit(h)
 	hp.d.Pub(h, daryl.ADD_HABIT_TOPIC)
-	return &protodef.AddHabitResponse{Habit: r.Habit}, nil
+	hh, err := h.ToProtodef()
+	if err != nil {
+		return nil, err
+	}
+	return &protodef.AddHabitResponse{Habit: hh}, nil
 }
 
 func (hp *habitProcessor) GetDueHabits() []model.Habit {

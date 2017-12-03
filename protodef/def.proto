@@ -62,7 +62,7 @@ message Message {
   string text = 2;
   string habit_identifier = 3;
   google.protobuf.Timestamp at = 4;
-  google.protobuf.Any attrs = 5; 
+  bytes attrs = 5; 
 }
 
 message UserMessageResponse {

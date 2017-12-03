@@ -15,8 +15,9 @@ func startDaryl(client protodef.FarmServiceClient, c *cli.Context) {
 	log.Info("startDaryl")
 	request := &protodef.StartDarylRequest{
 		Daryl: &protodef.Daryl{
-			Id:   c.String("identifier"),
-			Name: c.String("name"),
+			Id:       c.String("identifier"),
+			Name:     c.String("name"),
+			Password: c.String("password"),
 		},
 	}
 	response, err := client.StartDaryl(context.Background(), request)
@@ -40,7 +41,13 @@ func userMessage(client protodef.DarylServiceClient, c *cli.Context) {
 	log.Info("userMessage")
 	request := &protodef.UserMessageRequest{
 		DarylIdentifier: c.String("identifier"),
-		Message:         &protodef.Message{Text: c.String("message"), At: ptypes.TimestampNow()}}
+		Message: &protodef.Message{
+			Text:            c.String("message"),
+			HabitIdentifier: c.String("habit"),
+			At:              ptypes.TimestampNow(),
+			Attrs:           []byte("{}"),
+		},
+	}
 	response, err := client.UserMessage(context.Background(), request)
 	if err != nil {
 		log.Fatalf("fail to stuff: %v", err)
@@ -127,6 +134,10 @@ func main() {
 					Value: "Daryl",
 					Usage: "Daryl's name",
 				},
+				cli.StringFlag{
+					Name:  "password, p",
+					Usage: "Daryl's password",
+				},
 			},
 			Action: func(c *cli.Context) error {
 				farm, _ := openConnection(c)
@@ -152,12 +163,16 @@ func main() {
 		},
 		{
 			Name:    "message",
-			Aliases: []string{"hd"},
+			Aliases: []string{"m"},
 			Usage:   "Sends a message to a daryl",
 			Flags: []cli.Flag{
 				cli.StringFlag{
 					Name:  "identifier, i",
 					Usage: "Daryl's identifier",
+				},
+				cli.StringFlag{
+					Name:  "habit, ha",
+					Usage: "Daryl's habit identifier",
 				},
 				cli.StringFlag{
 					Name:  "message, m",

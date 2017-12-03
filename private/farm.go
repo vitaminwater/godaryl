@@ -6,7 +6,6 @@ import (
 	"sync"
 
 	"github.com/vitaminwater/daryl/daryl"
-	"github.com/vitaminwater/daryl/db"
 	"github.com/vitaminwater/daryl/habit"
 	"github.com/vitaminwater/daryl/message"
 	"github.com/vitaminwater/daryl/model"
@@ -25,7 +24,7 @@ func (f *farmServer) StartDaryl(c context.Context, r *protodef.StartDarylRequest
 		return nil, err
 	}
 	if da.Id == "" {
-		err := daryl_db.Insert("daryl", &da)
+		err := da.Insert()
 		if err != nil {
 			return nil, err
 		}
