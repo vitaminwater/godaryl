@@ -38,6 +38,16 @@ func (h Habit) ToProtodef() (*protodef.Habit, error) {
 	}, nil
 }
 
+func HabitsForDaryl(d Daryl) ([]Habit, error) {
+	result := []Habit{}
+	err := daryl_db.Select("habit", "daryl_id", &result, Habit{DarylId: d.Id})
+	if err != nil {
+		return result, err
+	}
+
+	return result, nil
+}
+
 func NewHabitFromProtodef(d Daryl, h *protodef.Habit) (Habit, error) {
 	duration, err := time.ParseDuration(h.Duration)
 	if err != nil {

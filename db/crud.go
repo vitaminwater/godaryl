@@ -15,6 +15,21 @@ func Get(t, match string, dest, src interface{}) error {
 	}
 }
 
+func Select(t, match string, dest, src interface{}) error {
+	q, err := GetQuery(t, match, src)
+	if err != nil {
+		return err
+	}
+	if stmt, err := db.PrepareNamed(q); err != nil {
+		return err
+	} else {
+		if err := stmt.Select(dest, src); err != nil {
+			return err
+		}
+		return nil
+	}
+}
+
 func Insert(t string, s interface{}) error {
 	q, err := InsertQuery(t, s)
 	if err != nil {

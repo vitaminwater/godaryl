@@ -44,7 +44,7 @@ func (f *farmServer) StartDaryl(c context.Context, r *protodef.StartDarylRequest
 
 func (f *farmServer) HasDaryl(c context.Context, r *protodef.HasDarylRequest) (*protodef.HasDarylResponse, error) {
 	_, ok := f.registry.Load(r.DarylIdentifier)
-	return &protodef.HasDarylResponse{ok}, nil
+	return &protodef.HasDarylResponse{Response: ok}, nil
 }
 
 func NewFarmServer(registry *sync.Map) *farmServer {

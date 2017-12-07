@@ -42,6 +42,8 @@ func (c *storeCommandAddHabit) execute(hs *habitStore) {
 	hw := newHabitWorker(hs.d, c.h)
 	hs.habitWorkers = append(hs.habitWorkers, hw)
 	c.r <- c.h
+
+	//hs.d.Pub(c.h, daryl.LOAD_HABIT_TOPIC)
 }
 
 type storeCommandGetDueHabits struct {
@@ -95,12 +97,26 @@ func habitStoreProcess(hs *habitStore) {
 	}
 }
 
+func (hs *habitStore) loadHabits() error {
+	habits, err := model.HabitsForDaryl(hs.d.D)
+	if err != nil {
+		return err
+	}
+	for _, h := range habits {
+		hs.addHabit(h)
+	}
+	return nil
+}
+
 func newHabitStore(d *daryl.Daryl) *habitStore {
 	hs := &habitStore{
-		d,
-		make(chan storeCommand, 10),
-		make([]*habitWorker, 0, 10),
+		d:            d,
+		c:            make(chan storeCommand, 10),
+		habitWorkers: make([]*habitWorker, 0, 10),
 	}
 	go habitStoreProcess(hs)
+	if err := hs.loadHabits(); err != nil {
+		log.Warning(err)
+	}
 	return hs
 }
