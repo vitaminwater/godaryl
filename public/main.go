@@ -35,7 +35,7 @@ func main() {
 	app.Action = func(c *cli.Context) error {
 		config.AppContext = c
 		distributed.Init()
-		daryl_db.Init()
+		daryl_db.Init(false)
 		kv.Init()
 		startServer()
 		return nil

@@ -127,7 +127,7 @@ func handleHTTPCommand(c *gin.Context) {
 			return
 		}
 	}
-	d, cl := openDarylConnection(url)
+	d, cl := protodef.OpenDarylConnection(url)
 	defer cl()
 	resp, err := cmd.Execute(c, d, o)
 	if err != nil {
@@ -149,7 +149,7 @@ func handleCreateDaryl(c *gin.Context) {
 		return
 	}
 
-	f, cl := openFarmConnection("localhost:8043")
+	f, cl := protodef.OpenFarmConnection("localhost:8043")
 	defer cl()
 	r, err := f.StartDaryl(context.Background(), &protodef.StartDarylRequest{Daryl: d})
 	if err != nil {

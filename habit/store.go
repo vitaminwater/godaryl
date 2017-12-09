@@ -42,8 +42,6 @@ func (c *storeCommandAddHabit) execute(hs *habitStore) {
 	hw := newHabitWorker(hs.d, c.h)
 	hs.habitWorkers = append(hs.habitWorkers, hw)
 	c.r <- c.h
-
-	//hs.d.Pub(c.h, daryl.LOAD_HABIT_TOPIC)
 }
 
 type storeCommandGetDueHabits struct {

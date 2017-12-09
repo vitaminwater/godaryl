@@ -50,11 +50,13 @@ func migration(db *sql.DB) {
 	}
 }
 
-func Init() {
+func Init(migrate bool) {
 	d, err := sqlx.Connect("postgres", config.AppContext.String("postgres-url"))
 	if err != nil {
 		log.Fatal(err)
 	}
 	db = d
-	migration(db.DB)
+	if migrate {
+		migration(db.DB)
+	}
 }

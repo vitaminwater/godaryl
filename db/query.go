@@ -9,7 +9,10 @@ import (
 
 func GetQuery(t, match string, s interface{}) (string, error) {
 	_, dbFields, _ := ListField(s, "s")
-	q := sq.Select(dbFields...).From(t).Where(fmt.Sprintf("%[1]s = :%[1]s", match))
+	q := sq.Select(dbFields...).From(t)
+	if match != "" {
+		q = q.Where(fmt.Sprintf("%[1]s = :%[1]s", match))
+	}
 	qg, _, err := q.ToSql()
 	if err != nil {
 		return "", err

@@ -1,18 +1,17 @@
-package main
+package protodef
 
 import (
 	"sync"
 
 	log "github.com/sirupsen/logrus"
-	"github.com/vitaminwater/daryl/protodef"
 	"google.golang.org/grpc"
 )
 
 var daryls = sync.Map{}
 
-func openDarylConnection(url string) (protodef.DarylServiceClient, func()) {
+func OpenDarylConnection(url string) (DarylServiceClient, func()) {
 	if d, ok := daryls.Load(url); ok == true {
-		c := d.(*sync.Pool).Get().(protodef.DarylServiceClient)
+		c := d.(*sync.Pool).Get().(DarylServiceClient)
 		return c, func() { d.(*sync.Pool).Put(c) }
 	}
 	d := &sync.Pool{
@@ -22,20 +21,20 @@ func openDarylConnection(url string) (protodef.DarylServiceClient, func()) {
 			if err != nil {
 				log.Fatalf("fail to dial: %v", err)
 			}
-			daryl := protodef.NewDarylServiceClient(conn)
+			daryl := NewDarylServiceClient(conn)
 			return daryl
 		},
 	}
 	daryls.Store(url, d)
-	c := d.Get().(protodef.DarylServiceClient)
+	c := d.Get().(DarylServiceClient)
 	return c, func() { d.Put(c) }
 }
 
 var farms = sync.Map{}
 
-func openFarmConnection(url string) (protodef.FarmServiceClient, func()) {
+func OpenFarmConnection(url string) (FarmServiceClient, func()) {
 	if f, ok := farms.Load(url); ok == true {
-		c := f.(*sync.Pool).Get().(protodef.FarmServiceClient)
+		c := f.(*sync.Pool).Get().(FarmServiceClient)
 		return c, func() { f.(*sync.Pool).Put(c) }
 	}
 	f := &sync.Pool{
@@ -45,11 +44,11 @@ func openFarmConnection(url string) (protodef.FarmServiceClient, func()) {
 			if err != nil {
 				log.Fatalf("fail to dial: %v", err)
 			}
-			farm := protodef.NewFarmServiceClient(conn)
+			farm := NewFarmServiceClient(conn)
 			return farm
 		},
 	}
 	farms.Store(url, f)
-	c := f.Get().(protodef.FarmServiceClient)
+	c := f.Get().(FarmServiceClient)
 	return c, func() { f.Put(c) }
 }
