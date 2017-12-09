@@ -2,6 +2,9 @@ package habit
 
 import (
 	//log "github.com/sirupsen/logrus"
+	"math/rand"
+	"time"
+
 	log "github.com/sirupsen/logrus"
 	"github.com/vitaminwater/daryl/daryl"
 	"github.com/vitaminwater/daryl/model"
@@ -90,6 +93,14 @@ func (hs *habitStore) addHabit(h model.Habit) model.Habit {
 }
 
 func habitStoreProcess(hs *habitStore) {
+	defer func() {
+		if err := recover(); err != nil {
+			log.Warn(err)
+			time.Sleep(time.Duration(int64(rand.Intn(3)+1)) * time.Second)
+			go habitStoreProcess(hs)
+		}
+	}()
+
 	for cmd := range hs.c {
 		cmd.execute(hs)
 	}

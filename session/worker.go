@@ -2,8 +2,10 @@ package session
 
 import (
 	"errors"
+	"math/rand"
 	"time"
 
+	"github.com/labstack/gommon/log"
 	"github.com/vitaminwater/daryl/daryl"
 	"github.com/vitaminwater/daryl/model"
 	"github.com/vitaminwater/daryl/protodef"
@@ -33,6 +35,14 @@ func (sw *sessionWorker) stop() {
 }
 
 func sessionWorkerProcess(sw *sessionWorker) {
+	defer func() {
+		if err := recover(); err != nil {
+			log.Warn(err)
+			time.Sleep(time.Duration(int64(rand.Intn(3)+1)) * time.Second)
+			go sessionWorkerProcess(sw)
+		}
+	}()
+
 	for range sw.cmd {
 	}
 }

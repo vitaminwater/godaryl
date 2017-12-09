@@ -21,10 +21,17 @@ var upgrader = websocket.Upgrader{
 }
 
 func subscribeRedis(conn *websocket.Conn, c *gin.Context) {
+	defer func() {
+		if err := recover(); err != nil {
+			log.Warn(err)
+		}
+	}()
+
 	id := c.MustGet("daryl_id")
 	k := kv.Pool.Get()
 	pkv := redis.PubSubConn{Conn: k}
 	pkv.PSubscribe(fmt.Sprintf("daryl.%s.*", id))
+	defer pkv.Close()
 	for {
 		switch v := pkv.Receive().(type) {
 		case redis.Message:
@@ -51,6 +58,12 @@ func subscribeRedis(conn *websocket.Conn, c *gin.Context) {
 }
 
 func processWS(conn *websocket.Conn, c *gin.Context) {
+	defer func() {
+		if err := recover(); err != nil {
+			log.Warn(err)
+		}
+	}()
+
 	id := c.MustGet("daryl_id")
 	conn.WriteJSON(gin.H{"daryl": id})
 	for {
