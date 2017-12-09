@@ -2,6 +2,7 @@ package habit
 
 import (
 	"fmt"
+	"math/rand"
 	"time"
 
 	"github.com/robfig/cron"
@@ -71,6 +72,13 @@ func (hw *habitWorker) tick() {
 }
 
 func habitWorkerProcess(hw *habitWorker) {
+	defer func() {
+		if err := recover(); err != nil {
+			log.Warn(err)
+			time.Sleep(time.Duration(int64(rand.Intn(3)+1)) * time.Second)
+			newHabitWorker(hw.d, hw.h)
+		}
+	}()
 	for {
 		select {
 		case _ = <-hw.t:

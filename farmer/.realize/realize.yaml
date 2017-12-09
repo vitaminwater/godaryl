@@ -3,14 +3,9 @@ settings:
     outputs: outputs.log
     logs: logs.log
     errors: errors.log
-  server:
-    status: true
-    open: false
-    host: localhost
-    port: 8080
 projects:
-- name: private
-  path: /Users/stant/Documents/perso/daryl/backend/src/github.com/vitaminwater/daryl/private
+- name: farmer
+  path: /Users/stant/Documents/perso/daryl/backend/src/github.com/vitaminwater/daryl/farmer
   commands:
     vet: true
     fmt: true
@@ -21,18 +16,15 @@ projects:
     build:
       status: false
     run: true
-  args:
-  - -b 0.0.0.0:8043
-  - -u 0.0.0.0:8043
   watcher:
     preview: false
     paths:
     - ./
-    - ../
+    - ../db
+    - ../distributed
     ignore_paths:
     - ../public
     - ../db/migrations
     - ../client
-    - ../farmer
     exts:
     - .go
