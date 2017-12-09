@@ -82,7 +82,6 @@ func newHabitWorker(d *daryl.Daryl, h model.Habit) *habitWorker {
 			fmt.Sprintf("%s.%s", daryl.USER_MESSAGE_TOPIC, h.Id),
 		),
 	}
-	//hw.cr.AddFunc(h.Cron, func() { hw.cmd <- &workerCommandOnHabitTrigger{} })
 	hw.cr.AddFunc("0 */10 * * * *", func() { hw.cmd <- &workerCommandTick{} })
 	go habitWorkerProcess(hw)
 	hw.cr.Start()
