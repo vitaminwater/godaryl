@@ -80,6 +80,7 @@ func NewDaryl(da model.Daryl, messageProcessor MessageProcessor, habitProcessor 
 	}
 	messageProcessor.SetDaryl(d)
 	habitProcessor.SetDaryl(d)
+	triggerProcessor.SetDaryl(d)
 	sessionProcessor.SetDaryl(d)
 	go distributed.Beacon(fmt.Sprintf("daryl_%s", d.D.Id), config.AppContext.String("advertized-url"))
 	return d

@@ -9,19 +9,19 @@ create table daryl (
 create unique index daryl_name_index on daryl (name);
 create index daryl_password_index on daryl (password);
 
-create table habit_trigger (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  habit_id UUID references daryl,
-  name varchar(100) not null,
-  engine varchar(100) not null,
-  params jsonb not null default '{}'::jsonb
-);
-
 create table habit (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   daryl_id UUID references daryl,
   title varchar(100) not null,
   duration varchar(100) not null
+);
+
+create table habit_trigger (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  habit_id UUID references habit,
+  name varchar(100) not null,
+  engine varchar(100) not null,
+  params jsonb not null default '{}'::jsonb
 );
 
 create table message (

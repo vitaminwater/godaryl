@@ -36,6 +36,7 @@ func (hw *habitWorker) GetHabit() model.Habit {
 }
 
 func (hw *habitWorker) Trigger(t daryl.Trigger) {
+	hw.cmd <- &workerCommandOnHabitTrigger{t: t}
 }
 
 func (hw *habitWorker) GetWeight() int {

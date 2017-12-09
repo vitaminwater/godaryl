@@ -1,10 +1,17 @@
 package trigger
 
 import (
+	"sync"
+
+	log "github.com/sirupsen/logrus"
+
 	"github.com/vitaminwater/daryl/daryl"
+	"github.com/vitaminwater/daryl/db"
 	"github.com/vitaminwater/daryl/model"
 	"github.com/vitaminwater/daryl/protodef"
 )
+
+var triggers sync.Map = sync.Map{}
 
 type triggerProcessor struct {
 	d *daryl.Daryl
@@ -23,6 +30,22 @@ func (hp *triggerProcessor) AddTrigger(r *protodef.AddTriggerRequest) (*protodef
 	t, err := model.NewTriggerFromProtodef(h.GetHabit(), r.Trigger)
 	if err != nil {
 		return nil, err
+	}
+
+	err = daryl_db.Insert("habit_trigger", &t)
+	if err != nil {
+		return nil, err
+	}
+
+	switch r.Trigger.Engine {
+	case "cron":
+		ct, err := newCronTrigger(hp.d, t)
+		if err != nil {
+			return nil, err
+		}
+		triggers.Store(t.Id, ct)
+	default:
+		log.Warningf("Trigger %s not found", t.Name)
 	}
 
 	tp, err := t.ToProtodef()

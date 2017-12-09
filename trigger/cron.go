@@ -25,7 +25,7 @@ func newCronTrigger(d *daryl.Daryl, t model.Trigger) (cronTrigger, error) {
 		return cronTrigger{}, err
 	}
 
-	ct := cronTrigger{params: cronTriggerParams{}}
+	ct := cronTrigger{habit: h, params: cronTriggerParams{}, t: t}
 	mapstructure.Decode(t.Params, &ct.params)
 
 	ct.cron = cron.New()

@@ -44,10 +44,11 @@ func (t Trigger) ToProtodef() (*protodef.Trigger, error) {
 	}
 
 	return &protodef.Trigger{
-		Id:     t.Id,
-		Name:   t.Name,
-		Engine: t.Engine,
-		Params: p,
+		Id:              t.Id,
+		HabitIdentifier: t.HabitId,
+		Name:            t.Name,
+		Engine:          t.Engine,
+		Params:          p,
 	}, nil
 }
 
@@ -59,9 +60,10 @@ func NewTriggerFromProtodef(h Habit, t *protodef.Trigger) (Trigger, error) {
 	}
 
 	return Trigger{
-		Id:     t.Id,
-		Name:   t.Name,
-		Engine: t.Engine,
-		Params: params,
+		Id:      t.Id,
+		HabitId: t.HabitIdentifier,
+		Name:    t.Name,
+		Engine:  t.Engine,
+		Params:  params,
 	}, nil
 }

@@ -3,7 +3,8 @@ package habit
 import (
 	"time"
 
-	"github.com/labstack/gommon/log"
+	log "github.com/sirupsen/logrus"
+	"github.com/vitaminwater/daryl/daryl"
 	"github.com/vitaminwater/daryl/model"
 )
 
@@ -11,7 +12,9 @@ type workerCommand interface {
 	execute(worker *habitWorker)
 }
 
-type workerCommandOnHabitTrigger struct{}
+type workerCommandOnHabitTrigger struct {
+	t daryl.Trigger
+}
 
 func (oht *workerCommandOnHabitTrigger) execute(w *habitWorker) {
 	w.a.NMissed++
