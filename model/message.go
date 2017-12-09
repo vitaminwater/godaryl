@@ -48,13 +48,19 @@ func (m Message) ToProtodef() (*protodef.Message, error) {
 	}, nil
 }
 
-func NewMessageFromProtodef(d Daryl, msg *protodef.Message) Message {
+func NewMessageFromProtodef(d Daryl, msg *protodef.Message) (Message, error) {
+	attrs := map[string]interface{}{}
+	err := json.Unmarshal(msg.Attrs, &attrs)
+	if err != nil {
+		return Message{}, err
+	}
+
 	m := Message{
 		Id:      msg.Id,
 		Text:    msg.Text,
 		DarylId: d.Id,
 		HabitId: msg.HabitIdentifier,
-		Attrs:   make(map[string]interface{}),
+		Attrs:   attrs,
 	}
-	return m
+	return m, nil
 }

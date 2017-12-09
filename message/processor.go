@@ -22,9 +22,12 @@ func (mp *messageProcessor) SetDaryl(d *daryl.Daryl) {
 }
 
 func (mp *messageProcessor) UserMessage(r *protodef.UserMessageRequest) (*protodef.UserMessageResponse, error) {
-	m := model.NewMessageFromProtodef(mp.d.D, r.Message)
+	m, err := model.NewMessageFromProtodef(mp.d.D, r.Message)
+	if err != nil {
+		return nil, err
+	}
 
-	err := m.Insert()
+	err = m.Insert()
 	if err != nil {
 		return nil, err
 	}

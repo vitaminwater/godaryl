@@ -26,6 +26,7 @@ type HabitProcessor interface {
 
 	/* RPC */
 	AddHabit(*protodef.AddHabitRequest) (*protodef.AddHabitResponse, error)
+	AddTrigger(*protodef.AddTriggerRequest) (*protodef.AddTriggerResponse, error)
 
 	/* API */
 	GetDueHabits() []model.Habit

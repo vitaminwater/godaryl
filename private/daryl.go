@@ -35,6 +35,17 @@ func (s *darylServer) AddHabit(c context.Context, r *protodef.AddHabitRequest) (
 	return resp, err
 }
 
+func (s *darylServer) AddTrigger(c context.Context, r *protodef.AddTriggerRequest) (*protodef.AddTriggerResponse, error) {
+	log.Info("AddHabit")
+	d, ok := s.registry.Load(r.DarylIdentifier)
+	if ok != true {
+		return nil, fmt.Errorf("Unknown Daryl %s", r.DarylIdentifier)
+	}
+
+	resp, err := d.(*daryl.Daryl).HabitProcessor.AddTrigger(r)
+	return resp, err
+}
+
 func (s *darylServer) StartWorkSession(c context.Context, r *protodef.StartWorkSessionRequest) (*protodef.StartWorkSessionResponse, error) {
 	log.Info("StartWorkSession")
 	d, ok := s.registry.Load(r.DarylIdentifier)

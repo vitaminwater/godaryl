@@ -63,7 +63,6 @@ func addHabit(client protodef.DarylServiceClient, c *cli.Context) {
 		Habit: &protodef.Habit{
 			Id:       c.String("id"),
 			Title:    c.String("title"),
-			Cron:     c.String("cron"),
 			Duration: c.String("duration"),
 		},
 	}

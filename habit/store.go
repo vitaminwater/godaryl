@@ -10,62 +10,10 @@ import (
 	"github.com/vitaminwater/daryl/model"
 )
 
-type storeCommand interface {
-	execute(hs *habitStore)
-}
-
-type storeCommandGetAttrs struct {
-	h model.Habit
-	r chan Attributes
-}
-
-func (c *storeCommandGetAttrs) execute(hs *habitStore) {
-	for _, w := range hs.habitWorkers {
-		h := w.GetHabit()
-		if h.h.Id == c.h.Id {
-			c.r <- h.a
-			return
-		}
-	}
-}
-
-type storeCommandAddHabit struct {
-	h model.Habit
-	r chan model.Habit
-}
-
-func (c *storeCommandAddHabit) execute(hs *habitStore) {
-	if c.h.Id == "" {
-		err := c.h.Insert()
-		if err != nil {
-			log.Info(err)
-			return
-		}
-	}
-	hw := newHabitWorker(hs.d, c.h)
-	hs.habitWorkers = append(hs.habitWorkers, hw)
-	c.r <- c.h
-}
-
-type storeCommandGetDueHabits struct {
-	r chan []model.Habit
-}
-
-func (d *storeCommandGetDueHabits) execute(hs *habitStore) {
-	habits := make([]model.Habit, 0, 10)
-	for _, w := range hs.habitWorkers {
-		h := w.GetHabit()
-		if h.a.NMissed > 0 {
-			habits = append(habits, h.h)
-		}
-	}
-	d.r <- habits
-}
-
 type habitStore struct {
 	d            *daryl.Daryl
 	c            chan storeCommand
-	habitWorkers []*habitWorker
+	habitWorkers map[string]*habitWorker
 }
 
 func (s *habitStore) getDueHabits() []model.Habit {
@@ -74,6 +22,14 @@ func (s *habitStore) getDueHabits() []model.Habit {
 	hs := <-r
 	close(r)
 	return hs
+}
+
+func (s *habitStore) getHabit(id string) (model.Habit, error) {
+	r := make(chan storeCommandGetHabitResponse)
+	s.c <- &storeCommandGetHabit{id: id, r: r}
+	hs := <-r
+	close(r)
+	return hs.h, hs.err
 }
 
 func (s *habitStore) getAttributes(h model.Habit) Attributes {
@@ -121,7 +77,7 @@ func newHabitStore(d *daryl.Daryl) *habitStore {
 	hs := &habitStore{
 		d:            d,
 		c:            make(chan storeCommand, 10),
-		habitWorkers: make([]*habitWorker, 0, 10),
+		habitWorkers: make(map[string]*habitWorker),
 	}
 	go habitStoreProcess(hs)
 	if err := hs.loadHabits(); err != nil {

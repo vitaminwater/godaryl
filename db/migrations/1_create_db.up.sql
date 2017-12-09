@@ -3,7 +3,7 @@ create extension pgcrypto;
 create table daryl (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name varchar(50) not null,
-  password varchar(100),
+  password varchar(100)
 );
 
 create unique index daryl_name_index on daryl (name);
@@ -14,15 +14,14 @@ create table habit_trigger (
   habit_id UUID references daryl,
   name varchar(100) not null,
   engine varchar(100) not null,
-  params jsonb not null default '{}'::jsonb,
+  params jsonb not null default '{}'::jsonb
 );
 
 create table habit (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   daryl_id UUID references daryl,
   title varchar(100) not null,
-  duration varchar(100) not null,
-  cron varchar(100) not null,
+  duration varchar(100) not null
 );
 
 create table message (

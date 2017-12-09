@@ -37,6 +37,7 @@ service DarylService {
 
   rpc UserMessage(UserMessageRequest) returns (UserMessageResponse);
   rpc AddHabit(AddHabitRequest) returns (AddHabitResponse);
+  rpc AddTrigger(AddTriggerRequest) returns (AddTriggerResponse);
   rpc StartWorkSession(StartWorkSessionRequest) returns (StartWorkSessionResponse);
   rpc CancelWorkSession(CancelWorkSessionRequest) returns (CancelWorkSessionResponse);
   rpc RefuseSessionSlice(RefuseSessionSliceRequest) returns (RefuseSessionSliceResponse);
@@ -72,9 +73,10 @@ message UserMessageResponse {
 
 message Trigger {
   string id = 1;
-  string name = 2;
-  string engine = 3;
-  bytes params = 4;
+  string habit_identifier = 2;
+  string name = 3;
+  string engine = 4;
+  bytes params = 5;
 }
 
 message Habit {
@@ -82,6 +84,16 @@ message Habit {
   string title = 2;
   string duration = 3;
   repeated Trigger triggers = 4;
+}
+
+message AddTriggerRequest {
+  string daryl_identifier = 1;
+
+  Trigger trigger = 3;
+}
+
+message AddTriggerResponse {
+  Trigger trigger = 1;
 }
 
 message AddHabitRequest {

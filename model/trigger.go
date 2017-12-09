@@ -18,10 +18,22 @@ type Trigger struct {
 }
 
 func (t *Trigger) Insert() error {
+	a, err := json.Marshal(t.Params)
+	if err != nil {
+		return err
+	}
+	t.ParamsDB = a
+
 	return daryl_db.Insert("habit_trigger", t)
 }
 
-func (h Trigger) Update() error {
+func (t Trigger) Update() error {
+	a, err := json.Marshal(t.Params)
+	if err != nil {
+		return err
+	}
+	t.ParamsDB = a
+
 	return nil
 }
 
@@ -36,5 +48,20 @@ func (t Trigger) ToProtodef() (*protodef.Trigger, error) {
 		Name:   t.Name,
 		Engine: t.Engine,
 		Params: p,
+	}, nil
+}
+
+func NewTriggerFromProtodef(h Habit, t *protodef.Trigger) (Trigger, error) {
+	params := map[string]interface{}{}
+	err := json.Unmarshal(t.Params, &params)
+	if err != nil {
+		return Trigger{}, err
+	}
+
+	return Trigger{
+		Id:     t.Id,
+		Name:   t.Name,
+		Engine: t.Engine,
+		Params: params,
 	}, nil
 }
