@@ -45,13 +45,23 @@ func (gh *workerCommandGetHabit) execute(w *habitWorker) {
 	}
 }
 
+type workerCommandTick struct {
+}
+
+func (c *workerCommandTick) execute(w *habitWorker) {
+	log.Info("tick")
+	if w.a.NMissed > 0 {
+		p := float64(time.Since(w.a.LastDone)/time.Minute) * float64(w.a.NMissed)
+		w.a.Urgent += int(p)
+	}
+}
+
 type habitWorker struct {
 	d *daryl.Daryl
 	a Attributes
 	h model.Habit
 
 	cr  *cron.Cron
-	t   <-chan time.Time
 	cmd chan workerCommand
 	sub chan interface{}
 }
@@ -64,13 +74,6 @@ func (hw *habitWorker) GetHabit() workerCommandGetHabitResponse {
 	return h
 }
 
-func (hw *habitWorker) tick() {
-	if hw.a.NMissed > 0 {
-		p := float64(time.Since(hw.a.LastDone)/time.Minute) * float64(hw.a.NMissed)
-		hw.a.Urgent += int(p)
-	}
-}
-
 func habitWorkerProcess(hw *habitWorker) {
 	defer func() {
 		if err := recover(); err != nil {
@@ -81,8 +84,6 @@ func habitWorkerProcess(hw *habitWorker) {
 	}()
 	for {
 		select {
-		case _ = <-hw.t:
-			hw.tick()
 		case cmd := <-hw.cmd:
 			cmd.execute(hw)
 		case msg := <-hw.sub:
@@ -98,14 +99,14 @@ func newHabitWorker(d *daryl.Daryl, h model.Habit) *habitWorker {
 		h: h,
 
 		cr:  cron.New(),
-		t:   time.Tick(time.Duration(10) * time.Minute),
 		cmd: make(chan workerCommand, 10),
 		sub: d.Sub(
 			daryl.ADD_HABIT_TOPIC,
 			fmt.Sprintf("%s.%s", daryl.USER_MESSAGE_TOPIC, h.Id),
 		),
 	}
-	hw.cr.AddFunc(h.Cron, func() { hw.cmd <- &workerCommandOnHabitTrigger{} })
+	//hw.cr.AddFunc(h.Cron, func() { hw.cmd <- &workerCommandOnHabitTrigger{} })
+	hw.cr.AddFunc("0 */10 * * * *", func() { hw.cmd <- &workerCommandTick{} })
 	go habitWorkerProcess(hw)
 	hw.cr.Start()
 	return hw

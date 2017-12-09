@@ -1,7 +1,6 @@
 syntax = "proto3";
 
 import "ptypes/timestamp/timestamp.proto";
-import "ptypes/any/any.proto";
 
 package protodef;
 
@@ -71,11 +70,18 @@ message UserMessageResponse {
 
 // AddHabit
 
+message Trigger {
+  string id = 1;
+  string name = 2;
+  string engine = 3;
+  bytes params = 4;
+}
+
 message Habit {
   string id = 1;
   string title = 2;
   string duration = 3;
-  string cron = 6;
+  repeated Trigger triggers = 4;
 }
 
 message AddHabitRequest {

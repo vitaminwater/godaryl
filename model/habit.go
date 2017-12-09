@@ -10,9 +10,9 @@ import (
 type Habit struct {
 	Id       string        `json:"id" db:"id" access:"s"`
 	Title    string        `json:"title" db:"title" access:"i,u,s"`
-	Cron     string        `json:"cron" db:"cron" access:"i,u,s"`
 	Duration time.Duration `json:"duration" db:"duration"`
 	DarylId  string        `json:"darylId" db:"daryl_id" access:"i,s"`
+	Triggers []Trigger     `json:"triggers"`
 }
 
 func (h *Habit) Insert() error {
@@ -23,17 +23,10 @@ func (h Habit) Update() error {
 	return nil
 }
 
-func (h Habit) Save() {
-}
-
-func (h *Habit) Load() {
-}
-
 func (h Habit) ToProtodef() (*protodef.Habit, error) {
 	return &protodef.Habit{
 		Id:       h.Id,
 		Title:    h.Title,
-		Cron:     h.Cron,
 		Duration: h.Duration.String(),
 	}, nil
 }
@@ -56,7 +49,6 @@ func NewHabitFromProtodef(d Daryl, h *protodef.Habit) (Habit, error) {
 	return Habit{
 		Id:       h.Id,
 		Title:    h.Title,
-		Cron:     h.Cron,
 		DarylId:  d.Id,
 		Duration: duration,
 	}, nil
