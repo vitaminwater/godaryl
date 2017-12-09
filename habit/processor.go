@@ -30,23 +30,8 @@ func (hp *habitProcessor) AddHabit(r *protodef.AddHabitRequest) (*protodef.AddHa
 	return &protodef.AddHabitResponse{Habit: hh}, nil
 }
 
-func (hp *habitProcessor) AddTrigger(r *protodef.AddTriggerRequest) (*protodef.AddTriggerResponse, error) {
-	h, err := hp.store.getHabit(r.Trigger.HabitIdentifier)
-	if err != nil {
-		return nil, err
-	}
-
-	t, err := model.NewTriggerFromProtodef(h, r.Trigger)
-	if err != nil {
-		return nil, err
-	}
-
-	tp, err := t.ToProtodef()
-	if err != nil {
-		return nil, err
-	}
-
-	return &protodef.AddTriggerResponse{Trigger: tp}, nil
+func (hp *habitProcessor) GetHabit(id string) (model.Habit, error) {
+	return hp.store.getHabit(id)
 }
 
 func (hp *habitProcessor) GetDueHabits() []model.Habit {

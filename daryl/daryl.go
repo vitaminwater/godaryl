@@ -11,36 +11,7 @@ import (
 	"github.com/vitaminwater/daryl/distributed"
 	"github.com/vitaminwater/daryl/kv"
 	"github.com/vitaminwater/daryl/model"
-	"github.com/vitaminwater/daryl/protodef"
 )
-
-type MessageProcessor interface {
-	SetDaryl(*Daryl)
-
-	/* RPC */
-	UserMessage(*protodef.UserMessageRequest) (*protodef.UserMessageResponse, error)
-}
-
-type HabitProcessor interface {
-	SetDaryl(*Daryl)
-
-	/* RPC */
-	AddHabit(*protodef.AddHabitRequest) (*protodef.AddHabitResponse, error)
-	AddTrigger(*protodef.AddTriggerRequest) (*protodef.AddTriggerResponse, error)
-
-	/* API */
-	GetDueHabits() []model.Habit
-	GetWeight(model.Habit) int
-}
-
-type SessionProcessor interface {
-	SetDaryl(*Daryl)
-
-	/* RPC */
-	StartWorkSession(*protodef.StartWorkSessionRequest) (*protodef.StartWorkSessionResponse, error)
-	CancelWorkSession(*protodef.CancelWorkSessionRequest) (*protodef.CancelWorkSessionResponse, error)
-	RefuseSessionSlice(*protodef.RefuseSessionSliceRequest) (*protodef.RefuseSessionSliceResponse, error)
-}
 
 type Daryl struct {
 	D      model.Daryl
@@ -48,6 +19,7 @@ type Daryl struct {
 
 	MessageProcessor MessageProcessor
 	HabitProcessor   HabitProcessor
+	TriggerProcessor TriggerProcessor
 	SessionProcessor SessionProcessor
 }
 
@@ -97,12 +69,13 @@ func getEnv(key, fallback string) string {
 	return fallback
 }
 
-func NewDaryl(da model.Daryl, messageProcessor MessageProcessor, habitProcessor HabitProcessor, sessionProcessor SessionProcessor) *Daryl {
+func NewDaryl(da model.Daryl, messageProcessor MessageProcessor, habitProcessor HabitProcessor, triggerProcessor TriggerProcessor, sessionProcessor SessionProcessor) *Daryl {
 	d := &Daryl{
 		D:                da,
 		pubsub:           pubsub.New(10),
 		MessageProcessor: messageProcessor,
 		HabitProcessor:   habitProcessor,
+		TriggerProcessor: triggerProcessor,
 		SessionProcessor: sessionProcessor,
 	}
 	messageProcessor.SetDaryl(d)

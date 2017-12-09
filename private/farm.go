@@ -11,6 +11,7 @@ import (
 	"github.com/vitaminwater/daryl/model"
 	"github.com/vitaminwater/daryl/protodef"
 	"github.com/vitaminwater/daryl/session"
+	"github.com/vitaminwater/daryl/trigger"
 	context "golang.org/x/net/context"
 )
 
@@ -33,7 +34,7 @@ func (f *farmServer) StartDaryl(c context.Context, r *protodef.StartDarylRequest
 			return nil, errors.New(fmt.Sprintf("%s already registered", r.Daryl.Id))
 		}
 	}
-	d := daryl.NewDaryl(da, message.NewMessageProcessor(), habit.NewHabitProcessor(), session.NewSessionProcessor())
+	d := daryl.NewDaryl(da, message.NewMessageProcessor(), habit.NewHabitProcessor(), trigger.NewTriggerProcessor(), session.NewSessionProcessor())
 	f.registry.Store(da.Id, d)
 	p, err := da.ToProtodef()
 	if err != nil {

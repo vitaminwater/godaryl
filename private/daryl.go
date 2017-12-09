@@ -42,7 +42,7 @@ func (s *darylServer) AddTrigger(c context.Context, r *protodef.AddTriggerReques
 		return nil, fmt.Errorf("Unknown Daryl %s", r.DarylIdentifier)
 	}
 
-	resp, err := d.(*daryl.Daryl).HabitProcessor.AddTrigger(r)
+	resp, err := d.(*daryl.Daryl).TriggerProcessor.AddTrigger(r)
 	return resp, err
 }
 
