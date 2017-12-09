@@ -27,12 +27,28 @@ type habitWorker struct {
 	sub chan interface{}
 }
 
-func (hw *habitWorker) GetHabit() workerCommandGetHabitResponse {
-	r := make(chan workerCommandGetHabitResponse)
+func (hw *habitWorker) GetHabit() model.Habit {
+	r := make(chan model.Habit)
 	hw.cmd <- &workerCommandGetHabit{r}
 	h := <-r
 	close(r)
 	return h
+}
+
+func (hw *habitWorker) Trigger(t daryl.Trigger) {
+}
+
+func (hw *habitWorker) GetWeight() int {
+	a := hw.getAttributes()
+	return a.Urgent
+}
+
+func (hw *habitWorker) getAttributes() Attributes {
+	r := make(chan Attributes)
+	hw.cmd <- &workerCommandGetAttribute{r}
+	a := <-r
+	close(r)
+	return a
 }
 
 func habitWorkerProcess(hw *habitWorker) {

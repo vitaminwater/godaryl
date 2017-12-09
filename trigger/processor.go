@@ -20,7 +20,7 @@ func (hp *triggerProcessor) AddTrigger(r *protodef.AddTriggerRequest) (*protodef
 		return nil, err
 	}
 
-	t, err := model.NewTriggerFromProtodef(h, r.Trigger)
+	t, err := model.NewTriggerFromProtodef(h.GetHabit(), r.Trigger)
 	if err != nil {
 		return nil, err
 	}

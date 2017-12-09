@@ -16,20 +16,20 @@ type habitStore struct {
 	habitWorkers map[string]*habitWorker
 }
 
-func (s *habitStore) getDueHabits() []model.Habit {
-	r := make(chan []model.Habit)
+func (s *habitStore) getDueHabits() []daryl.Habit {
+	r := make(chan []daryl.Habit)
 	s.c <- &storeCommandGetDueHabits{r}
 	hs := <-r
 	close(r)
 	return hs
 }
 
-func (s *habitStore) getHabit(id string) (model.Habit, error) {
-	r := make(chan storeCommandGetHabitResponse)
-	s.c <- &storeCommandGetHabit{id: id, r: r}
+func (s *habitStore) getHabit(id string) (daryl.Habit, error) {
+	r := make(chan storeCommandGetHabitWorkerResponse)
+	s.c <- &storeCommandGetHabitWorker{id: id, r: r}
 	hs := <-r
 	close(r)
-	return hs.h, hs.err
+	return hs.hw, hs.err
 }
 
 func (s *habitStore) getAttributes(h model.Habit) Attributes {

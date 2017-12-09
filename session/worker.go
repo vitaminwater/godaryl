@@ -28,7 +28,7 @@ type sessionWorker struct {
 	cmd chan sessionWorkerCommand
 
 	s   model.Session
-	due []model.Habit
+	due []daryl.Habit
 }
 
 func (sw *sessionWorker) stop() {
@@ -64,7 +64,7 @@ func newSessionWorker(d *daryl.Daryl, r *protodef.StartWorkSessionRequest) (*ses
 		pss = append(pss, model.SessionSlice{
 			Start: time.Now(),
 			End:   time.Now(),
-			Habit: d,
+			Habit: d.GetHabit(),
 		})
 	}
 	s := model.Session{

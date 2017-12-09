@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/labstack/gommon/log"
+	"github.com/vitaminwater/daryl/daryl"
 	"github.com/vitaminwater/daryl/model"
 )
 
@@ -17,13 +18,8 @@ type storeCommandGetAttrs struct {
 }
 
 func (c *storeCommandGetAttrs) execute(hs *habitStore) {
-	for _, w := range hs.habitWorkers {
-		h := w.GetHabit()
-		if h.h.Id == c.h.Id {
-			c.r <- h.a
-			return
-		}
-	}
+	w := hs.habitWorkers[c.h.Id]
+	c.r <- w.getAttributes()
 }
 
 type storeCommandAddHabit struct {
@@ -45,15 +41,15 @@ func (c *storeCommandAddHabit) execute(hs *habitStore) {
 }
 
 type storeCommandGetDueHabits struct {
-	r chan []model.Habit
+	r chan []daryl.Habit
 }
 
 func (d *storeCommandGetDueHabits) execute(hs *habitStore) {
-	habits := make([]model.Habit, 0, 10)
+	habits := make([]daryl.Habit, 0, 10)
 	for _, w := range hs.habitWorkers {
-		h := w.GetHabit()
-		if h.a.NMissed > 0 {
-			habits = append(habits, h.h)
+		a := w.getAttributes()
+		if a.NMissed > 0 {
+			habits = append(habits, w)
 		}
 	}
 	d.r <- habits
@@ -76,5 +72,24 @@ func (c *storeCommandGetHabit) execute(hs *habitStore) {
 		return
 	}
 	h := hw.GetHabit()
-	c.r <- storeCommandGetHabitResponse{h: h.h, err: nil}
+	c.r <- storeCommandGetHabitResponse{h: h, err: nil}
+}
+
+type storeCommandGetHabitWorkerResponse struct {
+	hw  *habitWorker
+	err error
+}
+
+type storeCommandGetHabitWorker struct {
+	id string
+	r  chan storeCommandGetHabitWorkerResponse
+}
+
+func (c *storeCommandGetHabitWorker) execute(hs *habitStore) {
+	hw, ok := hs.habitWorkers[c.id]
+	if ok == false {
+		c.r <- storeCommandGetHabitWorkerResponse{err: errors.New("Habit not found")}
+		return
+	}
+	c.r <- storeCommandGetHabitWorkerResponse{hw: hw, err: nil}
 }

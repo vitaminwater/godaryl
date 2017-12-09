@@ -5,8 +5,13 @@ import (
 	"github.com/vitaminwater/daryl/protodef"
 )
 
+type Trigger interface {
+}
+
 type Habit interface {
 	GetHabit() model.Habit
+	Trigger(Trigger)
+	GetWeight() int
 }
 
 type MessageProcessor interface {
@@ -23,9 +28,8 @@ type HabitProcessor interface {
 	AddHabit(*protodef.AddHabitRequest) (*protodef.AddHabitResponse, error)
 
 	/* API */
-	GetHabit(string) (model.Habit, error)
-	GetDueHabits() []model.Habit
-	GetWeight(model.Habit) int
+	GetHabit(string) (Habit, error)
+	GetDueHabits() []Habit
 }
 
 type TriggerProcessor interface {

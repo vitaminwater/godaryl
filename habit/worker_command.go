@@ -25,14 +25,19 @@ type workerCommandGetHabitResponse struct {
 }
 
 type workerCommandGetHabit struct {
-	r chan workerCommandGetHabitResponse
+	r chan model.Habit
 }
 
 func (gh *workerCommandGetHabit) execute(w *habitWorker) {
-	gh.r <- workerCommandGetHabitResponse{
-		h: w.h,
-		a: w.a,
-	}
+	gh.r <- w.h
+}
+
+type workerCommandGetAttribute struct {
+	r chan Attributes
+}
+
+func (gh *workerCommandGetAttribute) execute(w *habitWorker) {
+	gh.r <- w.a
 }
 
 type workerCommandTick struct {
