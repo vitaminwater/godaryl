@@ -12,7 +12,6 @@ type Habit struct {
 	Title    string        `json:"title" db:"title" access:"i,u,s"`
 	Duration time.Duration `json:"duration" db:"duration"`
 	DarylId  string        `json:"darylId" db:"daryl_id" access:"i,s"`
-	Triggers []Trigger     `json:"triggers"`
 }
 
 func (h *Habit) Insert() error {

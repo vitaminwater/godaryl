@@ -46,10 +46,9 @@ func startDaryls(c *cli.Context) {
 		for _, d := range daryls {
 			_, err := distributed.FindDarylServer(d.Id)
 			if err != nil {
-				if err.Error() == "Daryl not found" {
+				if err.Error() == "Key not found" {
 					startDaryl(servers, d)
 				} else {
-					log.Info("pouet")
 					log.Fatal(err)
 				}
 				continue

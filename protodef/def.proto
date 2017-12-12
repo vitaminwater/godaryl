@@ -77,7 +77,6 @@ message Habit {
   string id = 1;
   string title = 2;
   string duration = 3;
-  repeated Trigger triggers = 4;
 }
 
 message AddHabitRequest {

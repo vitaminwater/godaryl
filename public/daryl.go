@@ -15,6 +15,10 @@ type darylCommand interface {
 	Execute(*gin.Context, protodef.DarylServiceClient, interface{}) (interface{}, error)
 }
 
+/**
+ * Message
+ */
+
 type userMessageCommand struct {
 }
 
@@ -31,6 +35,10 @@ func (c *userMessageCommand) Execute(co *gin.Context, d protodef.DarylServiceCli
 	um := protodef.UserMessageRequest{DarylIdentifier: i, Message: o.(*protodef.Message)}
 	return d.UserMessage(context.Background(), &um)
 }
+
+/**
+ * Habit
+ */
 
 type addHabitCommand struct {
 }
@@ -49,6 +57,31 @@ func (c *addHabitCommand) Execute(co *gin.Context, d protodef.DarylServiceClient
 	return d.AddHabit(context.Background(), &ah)
 }
 
+/**
+ * Trigger
+ */
+
+type addTriggerCommand struct {
+}
+
+func (c *addTriggerCommand) Name() string {
+	return "trigger"
+}
+
+func (c *addTriggerCommand) Object() interface{} {
+	return &protodef.Trigger{}
+}
+
+func (c *addTriggerCommand) Execute(co *gin.Context, d protodef.DarylServiceClient, o interface{}) (interface{}, error) {
+	i := co.MustGet("daryl_id").(string)
+	at := protodef.AddTriggerRequest{DarylIdentifier: i, Trigger: (o.(*protodef.Trigger))}
+	return d.AddTrigger(context.Background(), &at)
+}
+
+/**
+ * Work session
+ */
+
 type startWorkSessionCommand struct {
 }
 
@@ -65,6 +98,10 @@ func (c *startWorkSessionCommand) Execute(co *gin.Context, d protodef.DarylServi
 	r := protodef.StartWorkSessionRequest{DarylIdentifier: i, Config: o.(*protodef.SessionConfig)}
 	return d.StartWorkSession(context.Background(), &r)
 }
+
+/**
+ * Cancel work session
+ */
 
 type cancelWorkSessionCommand struct {
 }
@@ -83,6 +120,10 @@ func (c *cancelWorkSessionCommand) Execute(co *gin.Context, d protodef.DarylServ
 	return d.CancelWorkSession(context.Background(), &r)
 }
 
+/**
+ * Refuse session slice
+ */
+
 type refuseSessionSliceCommand struct {
 }
 
@@ -100,9 +141,14 @@ func (c *refuseSessionSliceCommand) Execute(co *gin.Context, d protodef.DarylSer
 	return d.RefuseSessionSlice(context.Background(), &r)
 }
 
+/**
+ * handleHTTPCommand
+ */
+
 var cmds = map[string]darylCommand{
 	"message": &userMessageCommand{},
 	"habit":   &addHabitCommand{},
+	"trigger": &addTriggerCommand{},
 	"session": &startWorkSessionCommand{},
 	"cancel":  &cancelWorkSessionCommand{},
 	"refuse":  &refuseSessionSliceCommand{},
