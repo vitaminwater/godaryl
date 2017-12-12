@@ -3,7 +3,6 @@ package habit
 import (
 	"time"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/vitaminwater/daryl/daryl"
 	"github.com/vitaminwater/daryl/model"
 )
@@ -21,7 +20,6 @@ type workerCommandOnHabitTrigger struct {
 }
 
 func (oht *workerCommandOnHabitTrigger) execute(w *habitWorker) {
-	log.Info("trigger")
 	w.a.NMissed++
 	w.a.Urgent *= 2
 	w.d.Pub(w.h, HABIT_SCHEDULED_TOPIC)
