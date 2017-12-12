@@ -6,7 +6,6 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"github.com/vitaminwater/daryl/daryl"
-	"github.com/vitaminwater/daryl/db"
 	"github.com/vitaminwater/daryl/model"
 	"github.com/vitaminwater/daryl/protodef"
 )
@@ -32,9 +31,11 @@ func (hp *triggerProcessor) AddTrigger(r *protodef.AddTriggerRequest) (*protodef
 		return nil, err
 	}
 
-	err = daryl_db.Insert("habit_trigger", &t)
-	if err != nil {
-		return nil, err
+	if t.Id == "" {
+		err = t.Insert()
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	switch r.Trigger.Engine {

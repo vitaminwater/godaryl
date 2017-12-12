@@ -2,7 +2,9 @@ package habit
 
 import (
 	//log "github.com/sirupsen/logrus"
+	"errors"
 	"math/rand"
+	"sync"
 	"time"
 
 	log "github.com/sirupsen/logrus"
@@ -13,7 +15,7 @@ import (
 type habitStore struct {
 	d            *daryl.Daryl
 	c            chan storeCommand
-	habitWorkers map[string]*habitWorker
+	habitWorkers sync.Map
 }
 
 func (s *habitStore) getDueHabits() []daryl.Habit {
@@ -25,19 +27,19 @@ func (s *habitStore) getDueHabits() []daryl.Habit {
 }
 
 func (s *habitStore) getHabit(id string) (daryl.Habit, error) {
-	r := make(chan storeCommandGetHabitWorkerResponse)
-	s.c <- &storeCommandGetHabitWorker{id: id, r: r}
-	hs := <-r
-	close(r)
-	return hs.hw, hs.err
+	hw, ok := s.habitWorkers.Load(id)
+	if ok == false {
+		return nil, errors.New("Habit not found")
+	}
+	return hw.(*habitWorker), nil
 }
 
-func (s *habitStore) getAttributes(h model.Habit) Attributes {
-	r := make(chan Attributes)
-	s.c <- &storeCommandGetAttrs{h, r}
-	a := <-r
-	close(r)
-	return a
+func (s *habitStore) getAttributes(id string) (Attributes, error) {
+	hw, ok := s.habitWorkers.Load(id)
+	if ok == false {
+		return Attributes{}, errors.New("Habit not found")
+	}
+	return hw.(*habitWorker).getAttributes(), nil
 }
 
 func (hs *habitStore) addHabit(h model.Habit) model.Habit {
@@ -77,7 +79,7 @@ func newHabitStore(d *daryl.Daryl) *habitStore {
 	hs := &habitStore{
 		d:            d,
 		c:            make(chan storeCommand, 10),
-		habitWorkers: make(map[string]*habitWorker),
+		habitWorkers: sync.Map{},
 	}
 	go habitStoreProcess(hs)
 	if err := hs.loadHabits(); err != nil {

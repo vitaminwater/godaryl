@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/jmoiron/sqlx/types"
+	"github.com/labstack/gommon/log"
 	"github.com/vitaminwater/daryl/db"
 	"github.com/vitaminwater/daryl/protodef"
 )
@@ -23,6 +24,7 @@ func (t *Trigger) Insert() error {
 		return err
 	}
 	t.ParamsDB = a
+	log.Info(string(t.ParamsDB))
 
 	return daryl_db.Insert("habit_trigger", t)
 }
@@ -34,7 +36,7 @@ func (t Trigger) Update() error {
 	}
 	t.ParamsDB = a
 
-	return nil
+	return daryl_db.Update("habit_trigger", "id", t)
 }
 
 func (t Trigger) ToProtodef() (*protodef.Trigger, error) {

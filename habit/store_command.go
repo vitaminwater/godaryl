@@ -1,8 +1,6 @@
 package habit
 
 import (
-	"errors"
-
 	"github.com/labstack/gommon/log"
 	"github.com/vitaminwater/daryl/daryl"
 	"github.com/vitaminwater/daryl/model"
@@ -10,16 +8,6 @@ import (
 
 type storeCommand interface {
 	execute(hs *habitStore)
-}
-
-type storeCommandGetAttrs struct {
-	h model.Habit
-	r chan Attributes
-}
-
-func (c *storeCommandGetAttrs) execute(hs *habitStore) {
-	w := hs.habitWorkers[c.h.Id]
-	c.r <- w.getAttributes()
 }
 
 type storeCommandAddHabit struct {
@@ -36,7 +24,7 @@ func (c *storeCommandAddHabit) execute(hs *habitStore) {
 		}
 	}
 	hw := newHabitWorker(hs.d, c.h)
-	hs.habitWorkers[c.h.Id] = hw
+	hs.habitWorkers.Store(c.h.Id, hw)
 	c.r <- c.h
 }
 
@@ -46,50 +34,12 @@ type storeCommandGetDueHabits struct {
 
 func (d *storeCommandGetDueHabits) execute(hs *habitStore) {
 	habits := make([]daryl.Habit, 0, 10)
-	for _, w := range hs.habitWorkers {
-		a := w.getAttributes()
+	hs.habitWorkers.Range(func(k, w interface{}) bool {
+		a := w.(*habitWorker).getAttributes()
 		if a.NMissed > 0 {
-			habits = append(habits, w)
+			habits = append(habits, w.(*habitWorker))
 		}
-	}
+		return true
+	})
 	d.r <- habits
-}
-
-type storeCommandGetHabitResponse struct {
-	h   model.Habit
-	err error
-}
-
-type storeCommandGetHabit struct {
-	id string
-	r  chan storeCommandGetHabitResponse
-}
-
-func (c *storeCommandGetHabit) execute(hs *habitStore) {
-	hw, ok := hs.habitWorkers[c.id]
-	if ok == false {
-		c.r <- storeCommandGetHabitResponse{err: errors.New("Habit not found")}
-		return
-	}
-	h := hw.GetHabit()
-	c.r <- storeCommandGetHabitResponse{h: h, err: nil}
-}
-
-type storeCommandGetHabitWorkerResponse struct {
-	hw  *habitWorker
-	err error
-}
-
-type storeCommandGetHabitWorker struct {
-	id string
-	r  chan storeCommandGetHabitWorkerResponse
-}
-
-func (c *storeCommandGetHabitWorker) execute(hs *habitStore) {
-	hw, ok := hs.habitWorkers[c.id]
-	if ok == false {
-		c.r <- storeCommandGetHabitWorkerResponse{err: errors.New("Habit not found")}
-		return
-	}
-	c.r <- storeCommandGetHabitWorkerResponse{hw: hw, err: nil}
 }
