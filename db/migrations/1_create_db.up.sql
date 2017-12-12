@@ -19,6 +19,7 @@ create table habit (
 create table habit_trigger (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   habit_id UUID references habit,
+  daryl_id UUID references daryl,
   name varchar(100) not null,
   engine varchar(100) not null,
   params jsonb not null default '{}'::jsonb

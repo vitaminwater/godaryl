@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/vitaminwater/daryl/model"
 	"github.com/vitaminwater/daryl/protodef"
 )
 
@@ -213,45 +212,6 @@ func handleCreateDaryl(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"status": "ok",
 		"daryl":  gin.H{"id": r.Daryl.Id},
-		"token":  gin.H{"hash": t.Hash},
-	})
-}
-
-func handleCreateDarylToken(c *gin.Context) {
-	d := &protodef.Daryl{}
-	if err := c.Bind(d); err != nil {
-		c.JSON(500, gin.H{"status": "error", "error": err})
-		c.Abort()
-		return
-	}
-
-	da, err := model.NewDarylFromProtodef(d)
-	if err != nil {
-		c.JSON(500, gin.H{"status": "error", "error": err})
-		c.Abort()
-		return
-	}
-
-	if err := da.GetFromNameAndPassword(); err != nil {
-		c.JSON(500, gin.H{"status": "error", "error": err})
-		c.Abort()
-		return
-	}
-
-	d, err = da.ToProtodef()
-	if err != nil {
-		c.JSON(500, gin.H{"status": "error", "error": err})
-		c.Abort()
-		return
-	}
-	t, err := newTokenForDaryl(d)
-	if err != nil {
-		c.JSON(500, gin.H{"status": "error", "error": err})
-		c.Abort()
-		return
-	}
-	c.JSON(200, gin.H{
-		"status": "ok",
 		"token":  gin.H{"hash": t.Hash},
 	})
 }

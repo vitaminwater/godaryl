@@ -1,6 +1,7 @@
 package model
 
 import (
+	"github.com/labstack/gommon/log"
 	"github.com/vitaminwater/daryl/db"
 	"github.com/vitaminwater/daryl/protodef"
 	"golang.org/x/crypto/bcrypt"
@@ -27,6 +28,7 @@ func (d *Daryl) Insert() error {
 
 func (d *Daryl) GetFromNameAndPassword() error {
 	p := d.Password
+	log.Info(d)
 	err := daryl_db.Get("daryl", "name", d, d)
 	if err != nil {
 		return err

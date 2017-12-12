@@ -3,39 +3,24 @@ package model
 import (
 	"encoding/json"
 
-	"github.com/jmoiron/sqlx/types"
-	"github.com/labstack/gommon/log"
 	"github.com/vitaminwater/daryl/db"
 	"github.com/vitaminwater/daryl/protodef"
 )
 
 type Trigger struct {
-	Id       string                 `json:"id" db:"id" access:"s"`
-	HabitId  string                 `json:"habitId" db:"habit_id" access:"i,s"`
-	Name     string                 `json:"name" db:"name" access:"i,s"`
-	Engine   string                 `json:"engine" db:"engine" access:"i,s"`
-	ParamsDB types.JSONText         `json:"-" db:"params" access:"i,u,s"`
-	Params   map[string]interface{} `json:"params" db:"-"`
+	Id      string               `json:"id" db:"id" access:"s"`
+	HabitId string               `json:"habitId" db:"habit_id" access:"i,s"`
+	DarylId string               `json:"darylId" db:"daryl_id" access:"i,s"`
+	Name    string               `json:"name" db:"name" access:"i,s"`
+	Engine  string               `json:"engine" db:"engine" access:"i,s"`
+	Params  daryl_db.PropertyMap `json:"params" db:"params" access:"i,u,s"`
 }
 
 func (t *Trigger) Insert() error {
-	a, err := json.Marshal(t.Params)
-	if err != nil {
-		return err
-	}
-	t.ParamsDB = a
-	log.Info(string(t.ParamsDB))
-
 	return daryl_db.Insert("habit_trigger", t)
 }
 
 func (t Trigger) Update() error {
-	a, err := json.Marshal(t.Params)
-	if err != nil {
-		return err
-	}
-	t.ParamsDB = a
-
 	return daryl_db.Update("habit_trigger", "id", t)
 }
 
@@ -54,6 +39,16 @@ func (t Trigger) ToProtodef() (*protodef.Trigger, error) {
 	}, nil
 }
 
+func TriggersForDaryl(d Daryl) ([]Trigger, error) {
+	result := []Trigger{}
+	err := daryl_db.Select("habit_trigger", "daryl_id", &result, Trigger{DarylId: d.Id})
+	if err != nil {
+		return result, err
+	}
+
+	return result, nil
+}
+
 func NewTriggerFromProtodef(h Habit, t *protodef.Trigger) (Trigger, error) {
 	params := map[string]interface{}{}
 	err := json.Unmarshal(t.Params, &params)
@@ -64,6 +59,7 @@ func NewTriggerFromProtodef(h Habit, t *protodef.Trigger) (Trigger, error) {
 	return Trigger{
 		Id:      t.Id,
 		HabitId: t.HabitIdentifier,
+		DarylId: h.DarylId,
 		Name:    t.Name,
 		Engine:  t.Engine,
 		Params:  params,

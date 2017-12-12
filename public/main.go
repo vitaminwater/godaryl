@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/urfave/cli"
 	"github.com/vitaminwater/daryl/config"
+	"github.com/vitaminwater/daryl/db"
 	"github.com/vitaminwater/daryl/distributed"
 	"github.com/vitaminwater/daryl/kv"
 )
@@ -35,6 +36,7 @@ func main() {
 		config.AppContext = c
 		distributed.Init()
 		kv.Init()
+		daryl_db.Init(false)
 		startServer()
 		return nil
 	}

@@ -9,6 +9,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 	"github.com/vitaminwater/daryl/config"
+	"github.com/vitaminwater/daryl/db"
 	"github.com/vitaminwater/daryl/distributed"
 	"github.com/vitaminwater/daryl/kv"
 	"github.com/vitaminwater/daryl/protodef"
@@ -40,6 +41,7 @@ func main() {
 		config.AppContext = c
 		distributed.Init()
 		kv.Init()
+		daryl_db.Init(true)
 		startServer()
 		return nil
 	}

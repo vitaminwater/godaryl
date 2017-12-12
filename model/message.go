@@ -3,7 +3,6 @@ package model
 import (
 	"encoding/json"
 
-	"github.com/jmoiron/sqlx/types"
 	"github.com/vitaminwater/daryl/db"
 	"github.com/vitaminwater/daryl/protodef"
 )
@@ -14,25 +13,14 @@ type Message struct {
 	DarylId string `json:"darylId" db:"daryl_id" access:"i,s"`
 	HabitId string `json:"habitId" db:"habit_id" access:"i,s"`
 
-	AttrsDB types.JSONText         `json:"-" db:"attrs" access:"i,u,s"`
-	Attrs   map[string]interface{} `json:"attrs" db:"-"`
+	Attrs daryl_db.PropertyMap `json:"attrs" db:"attrs" access:"i,u,s"`
 }
 
 func (m *Message) Insert() error {
-	a, err := json.Marshal(m.Attrs)
-	if err != nil {
-		return err
-	}
-	m.AttrsDB = a
 	return daryl_db.Insert("message", m)
 }
 
 func (m Message) Update() error {
-	a, err := json.Marshal(m.Attrs)
-	if err != nil {
-		return err
-	}
-	m.AttrsDB = a
 	return daryl_db.Update("message", "id", m)
 }
 

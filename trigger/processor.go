@@ -18,10 +18,21 @@ type triggerProcessor struct {
 
 func (tp *triggerProcessor) SetDaryl(d *daryl.Daryl) {
 	tp.d = d
+
+	ts, err := model.TriggersForDaryl(d.D)
+	if err != nil {
+		log.Warning(err)
+	}
+	for _, t := range ts {
+		err := tp.addTrigger(t)
+		if err != nil {
+			log.Warning(err)
+		}
+	}
 }
 
-func (hp *triggerProcessor) AddTrigger(r *protodef.AddTriggerRequest) (*protodef.AddTriggerResponse, error) {
-	h, err := hp.d.HabitProcessor.GetHabit(r.Trigger.HabitIdentifier)
+func (tp *triggerProcessor) AddTrigger(r *protodef.AddTriggerRequest) (*protodef.AddTriggerResponse, error) {
+	h, err := tp.d.HabitProcessor.GetHabit(r.Trigger.HabitIdentifier)
 	if err != nil {
 		return nil, err
 	}
@@ -38,27 +49,35 @@ func (hp *triggerProcessor) AddTrigger(r *protodef.AddTriggerRequest) (*protodef
 		}
 	}
 
-	switch r.Trigger.Engine {
-	case "cron":
-		ct, err := newCronTrigger(hp.d, t)
-		if err != nil {
-			return nil, err
-		}
-		triggers.Store(t.Id, ct)
-	default:
-		log.Warningf("Trigger %s not found", t.Name)
-	}
-
-	tp, err := t.ToProtodef()
+	err = tp.addTrigger(t)
 	if err != nil {
 		return nil, err
 	}
 
-	return &protodef.AddTriggerResponse{Trigger: tp}, nil
+	tpr, err := t.ToProtodef()
+	if err != nil {
+		return nil, err
+	}
+
+	return &protodef.AddTriggerResponse{Trigger: tpr}, nil
 }
 
-func (hp *triggerProcessor) IncomingMessage(m *protodef.IncomingTriggerMessageRequest) (*protodef.IncomingTriggerMessageResponse, error) {
+func (tp *triggerProcessor) IncomingMessage(m *protodef.IncomingTriggerMessageRequest) (*protodef.IncomingTriggerMessageResponse, error) {
 	return nil, nil
+}
+
+func (tp *triggerProcessor) addTrigger(t model.Trigger) error {
+	switch t.Engine {
+	case "cron":
+		ct, err := newCronTrigger(tp.d, t)
+		if err != nil {
+			return err
+		}
+		triggers.Store(t.Id, ct)
+	default:
+		log.Warningf("Trigger engine %s not found", t.Engine)
+	}
+	return nil
 }
 
 func NewTriggerProcessor() daryl.TriggerProcessor {
