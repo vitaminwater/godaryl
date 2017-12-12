@@ -56,6 +56,10 @@ func (hp *triggerProcessor) AddTrigger(r *protodef.AddTriggerRequest) (*protodef
 	return &protodef.AddTriggerResponse{Trigger: tp}, nil
 }
 
+func (hp *triggerProcessor) IncomingMessage(m *protodef.IncomingTriggerMessageRequest) (*protodef.IncomingTriggerMessageResponse, error) {
+	return nil, nil
+}
+
 func NewTriggerProcessor() daryl.TriggerProcessor {
 	return &triggerProcessor{}
 }

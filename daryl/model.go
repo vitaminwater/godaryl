@@ -37,6 +37,7 @@ type TriggerProcessor interface {
 
 	/* RPC */
 	AddTrigger(*protodef.AddTriggerRequest) (*protodef.AddTriggerResponse, error)
+	IncomingMessage(m *protodef.IncomingTriggerMessageRequest) (*protodef.IncomingTriggerMessageResponse, error)
 }
 
 type SessionProcessor interface {

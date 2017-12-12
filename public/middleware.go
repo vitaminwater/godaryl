@@ -10,7 +10,6 @@ import (
 )
 
 func setDarylServer() func(*gin.Context) {
-	findDarylServer := distributed.FindDarylServer()
 	return func(c *gin.Context) {
 		h := c.GetHeader(AUTH_TOKEN_HEADER)
 		if h == "" {
@@ -27,7 +26,7 @@ func setDarylServer() func(*gin.Context) {
 			c.Abort()
 			return
 		}
-		url, err := findDarylServer(t.Daryl.Id)
+		url, err := distributed.FindDarylServer(t.Daryl.Id)
 		if err != nil {
 			c.JSON(http.StatusServiceUnavailable, gin.H{"status": "error", "error": err})
 			c.Abort()

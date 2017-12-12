@@ -3,9 +3,8 @@ package main
 import (
 	"fmt"
 
-	"github.com/garyburd/redigo/redis"
 	uuid "github.com/satori/go.uuid"
-	"github.com/vitaminwater/daryl/kv"
+	"github.com/vitaminwater/daryl/distributed"
 	"github.com/vitaminwater/daryl/protodef"
 )
 
@@ -17,25 +16,20 @@ type token struct {
 }
 
 func (t *token) save() error {
-	conn := kv.Pool.Get()
-	defer conn.Close()
-
-	conn.Send("HSET", t.Hash, "hash", t.Hash)
-	conn.Send("HSET", t.Hash, "daryl", t.Daryl.Id)
-	conn.Flush()
+	err := distributed.SetKey(t.Hash, t.Daryl.Id)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
 func (t *token) load() error {
-	conn := kv.Pool.Get()
-	defer conn.Close()
-
-	resp, err := redis.String(conn.Do("HGET", t.Hash, "daryl"))
+	id, err := distributed.GetKey(t.Hash)
 	if err != nil {
 		return err
 	}
 
-	t.Daryl.Id = resp
+	t.Daryl.Id = id
 	return nil
 }
 

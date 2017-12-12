@@ -79,6 +79,17 @@ func (s *darylServer) RefuseSessionSlice(ctx context.Context, in *protodef.Refus
 	return resp, err
 }
 
+func (s *darylServer) IncomingTriggerMessage(ctx context.Context, in *protodef.IncomingTriggerMessageRequest) (*protodef.IncomingTriggerMessageResponse, error) {
+	log.Info("IncomingTriggerMessage")
+	d, ok := s.registry.Load(in.DarylIdentifier)
+	if ok != true {
+		return nil, fmt.Errorf("Unknown Daryl %s", in.DarylIdentifier)
+	}
+
+	resp, err := d.(*daryl.Daryl).TriggerProcessor.IncomingMessage(in)
+	return resp, err
+}
+
 func NewDarylServer(registry *sync.Map) *darylServer {
 	s := &darylServer{registry}
 	return s

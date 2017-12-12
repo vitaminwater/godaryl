@@ -28,15 +28,13 @@ func startDaryl(servers []string, d model.Daryl) {
 
 func startDaryls(c *cli.Context) {
 	log.Info("startDaryl")
-	findDarylServer := distributed.FindDarylServer()
-	listDarylServers := distributed.ListDarylServers()
 	for {
 		daryls := []model.Daryl{}
 		if err := daryl_db.Select("daryl", "", &daryls, model.Daryl{}); err != nil {
 			log.Fatal(err)
 		}
 
-		servers, err := listDarylServers()
+		servers, err := distributed.ListDarylServers()
 		if err != nil {
 			if err.Error() == "No daryl servers" {
 				time.Sleep(10 * time.Second)
@@ -46,7 +44,7 @@ func startDaryls(c *cli.Context) {
 			}
 		}
 		for _, d := range daryls {
-			_, err := findDarylServer(d.Id)
+			_, err := distributed.FindDarylServer(d.Id)
 			if err != nil {
 				if err.Error() == "Daryl not found" {
 					startDaryl(servers, d)
