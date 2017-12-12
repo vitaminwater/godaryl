@@ -3,7 +3,6 @@ package trigger
 import (
 	"github.com/mitchellh/mapstructure"
 	"github.com/robfig/cron"
-	log "github.com/sirupsen/logrus"
 	"github.com/vitaminwater/daryl/daryl"
 	"github.com/vitaminwater/daryl/model"
 )
@@ -27,11 +26,8 @@ func newCronTrigger(d *daryl.Daryl, t model.Trigger) (cronTrigger, error) {
 	}
 
 	ct := cronTrigger{habit: h, params: cronTriggerParams{}, t: t}
-	log.Info(t.Params)
 	mapstructure.Decode(t.Params, &ct.params)
-	log.Info(ct.params)
 
-	log.Info(ct.params)
 	ct.cron = cron.New()
 	ct.cron.AddFunc(ct.params.Cron, func() { h.Trigger(ct) })
 	ct.cron.Start()
