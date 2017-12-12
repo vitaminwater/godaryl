@@ -29,7 +29,10 @@ func newCronTrigger(d *daryl.Daryl, t model.Trigger) (cronTrigger, error) {
 	mapstructure.Decode(t.Params, &ct.params)
 
 	ct.cron = cron.New()
-	ct.cron.AddFunc(ct.params.Cron, func() { h.Trigger(ct) })
+	ct.cron.AddFunc(ct.params.Cron, func() {
+		d.Pub(t, CRON_TRIGGERED_TOPIC)
+		h.Trigger(ct)
+	})
 	ct.cron.Start()
 	return ct, err
 }

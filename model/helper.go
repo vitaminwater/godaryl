@@ -6,6 +6,8 @@ func ToProtodef(m interface{}) (interface{}, error) {
 	switch msg := m.(type) {
 	case Habit:
 		return msg.ToProtodef()
+	case Trigger:
+		return msg.ToProtodef()
 	case Message:
 		return msg.ToProtodef()
 	case Session:

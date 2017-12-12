@@ -37,7 +37,7 @@ func startDaryls(c *cli.Context) {
 		servers, err := distributed.ListDarylServers()
 		if err != nil {
 			if err.Error() == "No daryl servers" {
-				time.Sleep(10 * time.Second)
+				time.Sleep(3 * time.Second)
 				continue
 			} else {
 				log.Fatal(err)

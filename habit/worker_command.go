@@ -22,7 +22,7 @@ type workerCommandOnHabitTrigger struct {
 func (oht *workerCommandOnHabitTrigger) execute(w *habitWorker) {
 	w.a.NMissed++
 	w.a.Urgent *= 2
-	w.d.Pub(w.h, HABIT_SCHEDULED_TOPIC)
+	w.d.Pub(w.h, HABIT_TRIGGERED_TOPIC)
 }
 
 type workerCommandGetHabitResponse struct {
