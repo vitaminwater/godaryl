@@ -34,6 +34,10 @@ func (hp *habitProcessor) GetHabit(id string) (daryl.Habit, error) {
 	return hp.store.getHabit(id)
 }
 
+func (hp *habitProcessor) GetHabits() ([]daryl.Habit, error) {
+	return hp.store.getHabits()
+}
+
 func (hp *habitProcessor) GetDueHabits() []daryl.Habit {
 	return hp.store.getDueHabits()
 }

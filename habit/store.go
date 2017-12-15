@@ -34,6 +34,15 @@ func (s *habitStore) getHabit(id string) (daryl.Habit, error) {
 	return hw.(*habitWorker), nil
 }
 
+func (s *habitStore) getHabits() ([]daryl.Habit, error) {
+	res := []daryl.Habit{}
+	s.habitWorkers.Range(func(k, h interface{}) bool {
+		res = append(res, h.(*habitWorker))
+		return true
+	})
+	return res, nil
+}
+
 func (s *habitStore) getAttributes(id string) (Attributes, error) {
 	hw, ok := s.habitWorkers.Load(id)
 	if ok == false {

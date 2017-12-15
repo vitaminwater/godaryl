@@ -10,10 +10,14 @@ type thread struct {
 	id string
 	d  *daryl.Daryl
 	cs []conversation
-	c  *conversation
+	c  conversation
 
 	cmd chan threadCommand
 }
+
+/**
+ * Commands wrappers
+ */
 
 func (t thread) stopCurrentConversation() {
 	t.cmd <- stopCurrentConversationCommand{}
@@ -27,6 +31,21 @@ func (t thread) pushUserMessage(m model.Message) {
 	t.cmd <- pushUserMessageCommand{m: m}
 }
 
+/**
+ * internals
+ */
+
+func (t *thread) updateCurrentConversation() {
+	var newCurrent = t.c
+	for _, c := range t.cs {
+		if newCurrent == nil || (c.isReady() && newCurrent.priority() < c.priority()) {
+			log.Info("$$$$$$$$$$$$$$$$$$$$$$")
+			newCurrent = c
+		}
+	}
+	t.c = newCurrent
+}
+
 func threadProcess(t thread) {
 	for {
 		select {
@@ -38,9 +57,10 @@ func threadProcess(t thread) {
 	}
 }
 
-func newThread(id string, d *daryl.Daryl) (thread, error) {
-	t := thread{id: id, d: d, cs: []conversation{}}
+func newThread(id string, d *daryl.Daryl, cs []conversation) (thread, error) {
+	t := thread{id: id, d: d, cs: cs, c: nil, cmd: make(chan threadCommand, 10)}
 
+	t.updateCurrentConversation()
 	go threadProcess(t)
 	return t, nil
 }

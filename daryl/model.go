@@ -29,6 +29,7 @@ type HabitProcessor interface {
 
 	/* API */
 	GetHabit(string) (Habit, error)
+	GetHabits() ([]Habit, error)
 	GetDueHabits() []Habit
 }
 

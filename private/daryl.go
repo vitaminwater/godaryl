@@ -18,6 +18,7 @@ func (s *darylServer) UserMessage(c context.Context, r *protodef.UserMessageRequ
 	log.Info("UserMessage")
 	d, ok := s.registry.Load(r.DarylIdentifier)
 	if ok != true {
+		log.Info(r)
 		return nil, fmt.Errorf("Unknown Daryl %s", r.DarylIdentifier)
 	}
 	resp, err := d.(*daryl.Daryl).MessageProcessor.UserMessage(r)

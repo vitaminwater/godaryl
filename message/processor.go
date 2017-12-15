@@ -2,7 +2,9 @@ package message
 
 import (
 	"fmt"
+	"sync"
 
+	log "github.com/sirupsen/logrus"
 	"github.com/vitaminwater/daryl/daryl"
 	"github.com/vitaminwater/daryl/model"
 	"github.com/vitaminwater/daryl/protodef"
@@ -15,11 +17,30 @@ type messageTypeProcessor interface {
 type messageProcessor struct {
 	d          *daryl.Daryl
 	processors []messageTypeProcessor
-	threads    []thread
+	threads    sync.Map
 }
 
 func (mp *messageProcessor) SetDaryl(d *daryl.Daryl) {
 	mp.d = d
+	hs, err := d.HabitProcessor.GetHabits()
+	if err != nil {
+		log.Warning(err)
+	}
+	for _, h := range hs {
+		id := fmt.Sprintf("habit_%s", h.GetHabit().Id)
+		t, err := newThread(id, mp.d, []conversation{habitConversation{h: h}})
+		if err != nil {
+			log.Warning(err)
+		}
+		mp.threads.Store(id, t)
+	}
+
+	id := fmt.Sprintf("daryl_%s", d.D.Id)
+	t, err := newThread(id, mp.d, []conversation{darylConversation{d: d}})
+	if err != nil {
+		log.Warning(err)
+	}
+	mp.threads.Store(id, t)
 }
 
 func (mp *messageProcessor) UserMessage(r *protodef.UserMessageRequest) (*protodef.UserMessageResponse, error) {
@@ -44,9 +65,17 @@ func (mp *messageProcessor) UserMessage(r *protodef.UserMessageRequest) (*protod
 
 	mp.d.Pub(m, daryl.USER_MESSAGE_TOPIC, fmt.Sprintf("%s.%s", daryl.USER_MESSAGE_TOPIC, m.HabitId.String))
 
-	for _, t := range mp.threads {
-		t.pushUserMessage(m)
+	id := fmt.Sprintf("daryl_%s", mp.d.D.Id)
+	if r.Message.HabitIdentifier != "" {
+		id = fmt.Sprintf("habit_%s", r.Message.HabitIdentifier)
 	}
+	mp.threads.Range(func(k, t interface{}) bool {
+		if k.(string) == id {
+			t.(thread).pushUserMessage(m)
+			return false
+		}
+		return true
+	})
 
 	mm, err := m.ToProtodef()
 	if err != nil {
