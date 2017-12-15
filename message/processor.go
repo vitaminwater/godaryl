@@ -15,6 +15,7 @@ type messageTypeProcessor interface {
 type messageProcessor struct {
 	d          *daryl.Daryl
 	processors []messageTypeProcessor
+	threads    []thread
 }
 
 func (mp *messageProcessor) SetDaryl(d *daryl.Daryl) {
@@ -41,7 +42,11 @@ func (mp *messageProcessor) UserMessage(r *protodef.UserMessageRequest) (*protod
 		return nil, err
 	}
 
-	mp.d.Pub(m, daryl.USER_MESSAGE_TOPIC, fmt.Sprintf("%s.%s", daryl.USER_MESSAGE_TOPIC, m.HabitId))
+	mp.d.Pub(m, daryl.USER_MESSAGE_TOPIC, fmt.Sprintf("%s.%s", daryl.USER_MESSAGE_TOPIC, m.HabitId.String))
+
+	for _, t := range mp.threads {
+		t.pushUserMessage(m)
+	}
 
 	mm, err := m.ToProtodef()
 	if err != nil {

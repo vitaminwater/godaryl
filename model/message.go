@@ -1,6 +1,7 @@
 package model
 
 import (
+	"database/sql"
 	"encoding/json"
 
 	"github.com/vitaminwater/daryl/db"
@@ -8,10 +9,10 @@ import (
 )
 
 type Message struct {
-	Id      string `json:"id" db:"id" access:"s"`
-	Text    string `json:"text" db:"text" access:"i,u,s"`
-	DarylId string `json:"darylId" db:"daryl_id" access:"i,s"`
-	HabitId string `json:"habitId" db:"habit_id" access:"i,s"`
+	Id      string         `json:"id" db:"id" access:"s"`
+	Text    string         `json:"text" db:"text" access:"i,u,s"`
+	DarylId string         `json:"darylId" db:"daryl_id" access:"i,s"`
+	HabitId sql.NullString `json:"habitId" db:"habit_id" access:"i,s"`
 
 	Attrs daryl_db.PropertyMap `json:"attrs" db:"attrs" access:"i,u,s"`
 }
@@ -43,11 +44,16 @@ func NewMessageFromProtodef(d Daryl, msg *protodef.Message) (Message, error) {
 		return Message{}, err
 	}
 
+	var habitId sql.NullString
+	if msg.HabitIdentifier != "" {
+		habitId.Scan(msg.HabitIdentifier)
+	}
+
 	m := Message{
 		Id:      msg.Id,
 		Text:    msg.Text,
 		DarylId: d.Id,
-		HabitId: msg.HabitIdentifier,
+		HabitId: habitId,
 		Attrs:   attrs,
 	}
 	return m, nil
