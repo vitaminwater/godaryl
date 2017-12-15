@@ -39,7 +39,6 @@ func (t *thread) updateCurrentConversation() {
 	var newCurrent = t.c
 	for _, c := range t.cs {
 		if newCurrent == nil || (c.isReady() && newCurrent.priority() < c.priority()) {
-			log.Info("$$$$$$$$$$$$$$$$$$$$$$")
 			newCurrent = c
 		}
 	}
