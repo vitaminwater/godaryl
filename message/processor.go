@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/golang/protobuf/ptypes"
 	log "github.com/sirupsen/logrus"
 	"github.com/vitaminwater/daryl/daryl"
 	"github.com/vitaminwater/daryl/model"
@@ -44,6 +45,7 @@ func (mp *messageProcessor) SetDaryl(d *daryl.Daryl) {
 }
 
 func (mp *messageProcessor) UserMessage(r *protodef.UserMessageRequest) (*protodef.UserMessageResponse, error) {
+	r.Message.At = ptypes.TimestampNow()
 	m, err := model.NewMessageFromProtodef(mp.d.D, r.Message)
 	if err != nil {
 		return nil, err
@@ -69,13 +71,11 @@ func (mp *messageProcessor) UserMessage(r *protodef.UserMessageRequest) (*protod
 	if r.Message.HabitIdentifier != "" {
 		id = fmt.Sprintf("habit_%s", r.Message.HabitIdentifier)
 	}
-	mp.threads.Range(func(k, t interface{}) bool {
-		if k.(string) == id {
-			t.(thread).pushUserMessage(m)
-			return false
-		}
-		return true
-	})
+
+	t, ok := mp.threads.Load(id)
+	if ok == true {
+		t.(thread).pushUserMessage(m)
+	}
 
 	mm, err := m.ToProtodef()
 	if err != nil {

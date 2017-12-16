@@ -3,7 +3,9 @@ package model
 import (
 	"database/sql"
 	"encoding/json"
+	"time"
 
+	"github.com/golang/protobuf/ptypes"
 	"github.com/vitaminwater/daryl/db"
 	"github.com/vitaminwater/daryl/protodef"
 )
@@ -11,6 +13,7 @@ import (
 type Message struct {
 	Id      string         `json:"id" db:"id" access:"s"`
 	Text    string         `json:"text" db:"text" access:"i,u,s"`
+	At      time.Time      `json:"at" db:"at"`
 	DarylId string         `json:"darylId" db:"daryl_id" access:"i,s"`
 	HabitId sql.NullString `json:"habitId" db:"habit_id" access:"i,s"`
 
@@ -30,9 +33,15 @@ func (m Message) ToProtodef() (*protodef.Message, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	at, err := ptypes.TimestampProto(m.At)
+	if err != nil {
+		return nil, err
+	}
 	return &protodef.Message{
 		Id:    m.Id,
 		Text:  m.Text,
+		At:    at,
 		Attrs: a,
 	}, nil
 }
@@ -49,9 +58,15 @@ func NewMessageFromProtodef(d Daryl, msg *protodef.Message) (Message, error) {
 		habitId.Scan(msg.HabitIdentifier)
 	}
 
+	at, err := ptypes.Timestamp(msg.At)
+	if err != nil {
+		return Message{}, err
+	}
+
 	m := Message{
 		Id:      msg.Id,
 		Text:    msg.Text,
+		At:      at,
 		DarylId: d.Id,
 		HabitId: habitId,
 		Attrs:   attrs,

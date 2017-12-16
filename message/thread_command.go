@@ -36,12 +36,12 @@ func (c pushUserMessageCommand) execute(t *thread) error {
 		return nil
 	}
 	keep, err := t.c.pushUserMessage(c.m)
-	if err != nil {
-		return err
-	}
 	if !keep {
 		t.c = nil
 		t.updateCurrentConversation()
+	}
+	if err != nil {
+		return err
 	}
 	return nil
 }
