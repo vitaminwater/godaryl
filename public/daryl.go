@@ -141,6 +141,27 @@ func (c *refuseSessionSliceCommand) Execute(co *gin.Context, d protodef.DarylSer
 }
 
 /**
+ * Get
+ */
+
+type getCommand struct {
+}
+
+func (c *getCommand) Name() string {
+	return "get"
+}
+
+func (c *getCommand) Object() interface{} {
+	return nil
+}
+
+func (c *getCommand) Execute(co *gin.Context, d protodef.DarylServiceClient, o interface{}) (interface{}, error) {
+	i := co.MustGet("daryl_id").(string)
+	r := protodef.GetRequest{DarylIdentifier: i}
+	return d.Get(context.Background(), &r)
+}
+
+/**
  * handleHTTPCommand
  */
 
@@ -151,6 +172,7 @@ var cmds = map[string]darylCommand{
 	"session": &startWorkSessionCommand{},
 	"cancel":  &cancelWorkSessionCommand{},
 	"refuse":  &refuseSessionSliceCommand{},
+	"get":     &getCommand{},
 }
 
 func handleHTTPCommand(c *gin.Context) {

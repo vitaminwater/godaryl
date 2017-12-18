@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	log "github.com/sirupsen/logrus"
 	"github.com/vitaminwater/daryl/distributed"
 )
 
@@ -32,7 +31,6 @@ func setDarylServer() func(*gin.Context) {
 			c.Abort()
 			return
 		}
-		log.Infof("Daryl at %s", url)
 		c.Set("daryl_url", url)
 		c.Set("daryl_id", t.Daryl.Id)
 	}

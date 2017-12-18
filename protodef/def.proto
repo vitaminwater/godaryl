@@ -41,6 +41,7 @@ service DarylService {
   rpc StartWorkSession(StartWorkSessionRequest) returns (StartWorkSessionResponse);
   rpc CancelWorkSession(CancelWorkSessionRequest) returns (CancelWorkSessionResponse);
   rpc RefuseSessionSlice(RefuseSessionSliceRequest) returns (RefuseSessionSliceResponse);
+  rpc Get(GetRequest) returns (GetResponse);
 
   rpc IncomingTriggerMessage(IncomingTriggerMessageRequest) returns (IncomingTriggerMessageResponse);
 
@@ -153,6 +154,14 @@ message RefuseSessionSliceRequest {
 }
 
 message RefuseSessionSliceResponse {
+}
+
+message GetRequest {
+  string daryl_identifier = 1;
+}
+
+message GetResponse {
+  Daryl daryl = 2;
 }
 
 // IncomingTriggerMessage
