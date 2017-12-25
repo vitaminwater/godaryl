@@ -81,9 +81,12 @@ message UserMessageResponse {
 
 message GetUserMessagesRequest {
   string daryl_identifier = 1;
+  string habit_identifier = 2;
+  Pagination pagination = 3;
 }
 
 message GetUserMessagesResponse {
+  Pagination pagination = 1;
   repeated Message messages = 2;
 }
 
@@ -204,4 +207,11 @@ message IncomingTriggerMessageRequest {
 }
 
 message IncomingTriggerMessageResponse {
+}
+
+//Utils
+
+message Pagination {
+  int32 from = 1;
+  int32 to = 2;
 }

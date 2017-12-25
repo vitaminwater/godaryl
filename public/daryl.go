@@ -31,8 +31,30 @@ func (c *userMessageCommand) Object() interface{} {
 
 func (c *userMessageCommand) Execute(co *gin.Context, d protodef.DarylServiceClient, o interface{}) (interface{}, error) {
 	i := co.MustGet("daryl_id").(string)
-	um := protodef.UserMessageRequest{DarylIdentifier: i, Message: o.(*protodef.Message)}
-	return d.UserMessage(context.Background(), &um)
+	r := protodef.UserMessageRequest{DarylIdentifier: i, Message: o.(*protodef.Message)}
+	return d.UserMessage(context.Background(), &r)
+}
+
+/**
+ * GetMessages
+ */
+
+type getUserMessagesCommand struct {
+}
+
+func (c *getUserMessagesCommand) Name() string {
+	return "getmessages"
+}
+
+func (c *getUserMessagesCommand) Object() interface{} {
+	return &protodef.GetUserMessagesRequest{}
+}
+
+func (c *getUserMessagesCommand) Execute(co *gin.Context, d protodef.DarylServiceClient, o interface{}) (interface{}, error) {
+	i := co.MustGet("daryl_id").(string)
+	r := o.(*protodef.GetUserMessagesRequest)
+	r.DarylIdentifier = i
+	return d.GetUserMessages(context.Background(), r)
 }
 
 /**
@@ -52,8 +74,30 @@ func (c *addHabitCommand) Object() interface{} {
 
 func (c *addHabitCommand) Execute(co *gin.Context, d protodef.DarylServiceClient, o interface{}) (interface{}, error) {
 	i := co.MustGet("daryl_id").(string)
-	ah := protodef.AddHabitRequest{DarylIdentifier: i, Habit: (o.(*protodef.Habit))}
-	return d.AddHabit(context.Background(), &ah)
+	r := protodef.AddHabitRequest{DarylIdentifier: i, Habit: (o.(*protodef.Habit))}
+	return d.AddHabit(context.Background(), &r)
+}
+
+/**
+ * GetHabit
+ */
+
+type getHabitsCommand struct {
+}
+
+func (c *getHabitsCommand) Name() string {
+	return "habit"
+}
+
+func (c *getHabitsCommand) Object() interface{} {
+	return &protodef.GetHabitsRequest{}
+}
+
+func (c *getHabitsCommand) Execute(co *gin.Context, d protodef.DarylServiceClient, o interface{}) (interface{}, error) {
+	i := co.MustGet("daryl_id").(string)
+	r := o.(*protodef.GetHabitsRequest)
+	r.DarylIdentifier = i
+	return d.GetHabits(context.Background(), r)
 }
 
 /**
@@ -73,8 +117,8 @@ func (c *addTriggerCommand) Object() interface{} {
 
 func (c *addTriggerCommand) Execute(co *gin.Context, d protodef.DarylServiceClient, o interface{}) (interface{}, error) {
 	i := co.MustGet("daryl_id").(string)
-	at := protodef.AddTriggerRequest{DarylIdentifier: i, Trigger: (o.(*protodef.Trigger))}
-	return d.AddTrigger(context.Background(), &at)
+	r := protodef.AddTriggerRequest{DarylIdentifier: i, Trigger: (o.(*protodef.Trigger))}
+	return d.AddTrigger(context.Background(), &r)
 }
 
 /**
@@ -96,6 +140,28 @@ func (c *startWorkSessionCommand) Execute(co *gin.Context, d protodef.DarylServi
 	i := co.MustGet("daryl_id").(string)
 	r := protodef.StartWorkSessionRequest{DarylIdentifier: i, Config: o.(*protodef.SessionConfig)}
 	return d.StartWorkSession(context.Background(), &r)
+}
+
+/**
+ * Get Work session
+ */
+
+type getWorkSessionCommand struct {
+}
+
+func (c *getWorkSessionCommand) Name() string {
+	return "session"
+}
+
+func (c *getWorkSessionCommand) Object() interface{} {
+	return &protodef.GetWorkSessionRequest{}
+}
+
+func (c *getWorkSessionCommand) Execute(co *gin.Context, d protodef.DarylServiceClient, o interface{}) (interface{}, error) {
+	i := co.MustGet("daryl_id").(string)
+	r := o.(*protodef.GetWorkSessionRequest)
+	r.DarylIdentifier = i
+	return d.GetWorkSession(context.Background(), r)
 }
 
 /**
@@ -165,14 +231,17 @@ func (c *getCommand) Execute(co *gin.Context, d protodef.DarylServiceClient, o i
  * handleHTTPCommand
  */
 
+// TODO split GET/POST
 var cmds = map[string]darylCommand{
-	"message": &userMessageCommand{},
-	"habit":   &addHabitCommand{},
-	"trigger": &addTriggerCommand{},
-	"session": &startWorkSessionCommand{},
-	"cancel":  &cancelWorkSessionCommand{},
-	"refuse":  &refuseSessionSliceCommand{},
-	"get":     &getCommand{},
+	"message":     &userMessageCommand{},
+	"getmessages": &getUserMessagesCommand{},
+	"habit":       &addHabitCommand{},
+	"trigger":     &addTriggerCommand{},
+	"session":     &startWorkSessionCommand{},
+	"getsession":  &getWorkSessionCommand{},
+	"cancel":      &cancelWorkSessionCommand{},
+	"refuse":      &refuseSessionSliceCommand{},
+	"get":         &getCommand{},
 }
 
 func handleHTTPCommand(c *gin.Context) {
