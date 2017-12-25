@@ -19,6 +19,7 @@ type MessageProcessor interface {
 
 	/* RPC */
 	UserMessage(*protodef.UserMessageRequest) (*protodef.UserMessageResponse, error)
+	GetUserMessages(*protodef.GetUserMessagesRequest) (*protodef.GetUserMessagesResponse, error)
 }
 
 type HabitProcessor interface {
@@ -26,10 +27,11 @@ type HabitProcessor interface {
 
 	/* RPC */
 	AddHabit(*protodef.AddHabitRequest) (*protodef.AddHabitResponse, error)
+	GetHabits(*protodef.GetHabitsRequest) (*protodef.GetHabitsResponse, error)
 
 	/* API */
 	GetHabit(string) (Habit, error)
-	GetHabits() ([]Habit, error)
+	GetAllHabits() ([]Habit, error)
 	GetDueHabits() []Habit
 }
 
@@ -48,4 +50,5 @@ type SessionProcessor interface {
 	StartWorkSession(*protodef.StartWorkSessionRequest) (*protodef.StartWorkSessionResponse, error)
 	CancelWorkSession(*protodef.CancelWorkSessionRequest) (*protodef.CancelWorkSessionResponse, error)
 	RefuseSessionSlice(*protodef.RefuseSessionSliceRequest) (*protodef.RefuseSessionSliceResponse, error)
+	GetWorkSession(r *protodef.GetWorkSessionRequest) (*protodef.GetWorkSessionResponse, error)
 }

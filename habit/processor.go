@@ -30,11 +30,15 @@ func (hp *habitProcessor) AddHabit(r *protodef.AddHabitRequest) (*protodef.AddHa
 	return &protodef.AddHabitResponse{Habit: hh}, nil
 }
 
+func (hp *habitProcessor) GetHabits(*protodef.GetHabitsRequest) (*protodef.GetHabitsResponse, error) {
+	return &protodef.GetHabitsResponse{}, nil
+}
+
 func (hp *habitProcessor) GetHabit(id string) (daryl.Habit, error) {
 	return hp.store.getHabit(id)
 }
 
-func (hp *habitProcessor) GetHabits() ([]daryl.Habit, error) {
+func (hp *habitProcessor) GetAllHabits() ([]daryl.Habit, error) {
 	return hp.store.getHabits()
 }
 

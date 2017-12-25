@@ -34,6 +34,10 @@ func (sp *sessionProcessor) StartWorkSession(r *protodef.StartWorkSessionRequest
 	return &protodef.StartWorkSessionResponse{Session: se}, nil
 }
 
+func (sp *sessionProcessor) GetWorkSession(r *protodef.GetWorkSessionRequest) (*protodef.GetWorkSessionResponse, error) {
+	return &protodef.GetWorkSessionResponse{}, nil
+}
+
 func (sp *sessionProcessor) CancelWorkSession(r *protodef.CancelWorkSessionRequest) (*protodef.CancelWorkSessionResponse, error) {
 	sp.sw.stop()
 	sp.sw = nil

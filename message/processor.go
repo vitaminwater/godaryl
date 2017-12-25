@@ -23,7 +23,7 @@ type messageProcessor struct {
 
 func (mp *messageProcessor) SetDaryl(d *daryl.Daryl) {
 	mp.d = d
-	hs, err := d.HabitProcessor.GetHabits()
+	hs, err := d.HabitProcessor.GetAllHabits()
 	if err != nil {
 		log.Warning(err)
 	}
@@ -82,6 +82,10 @@ func (mp *messageProcessor) UserMessage(r *protodef.UserMessageRequest) (*protod
 		return nil, err
 	}
 	return &protodef.UserMessageResponse{Message: mm}, nil
+}
+
+func (mp *messageProcessor) GetUserMessages(*protodef.GetUserMessagesRequest) (*protodef.GetUserMessagesResponse, error) {
+	return &protodef.GetUserMessagesResponse{}, nil
 }
 
 func NewMessageProcessor() *messageProcessor {

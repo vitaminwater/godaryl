@@ -36,6 +36,7 @@ message HasDarylResponse {
 service DarylService {
 
   rpc UserMessage(UserMessageRequest) returns (UserMessageResponse);
+  rpc GetUserMessages(GetUserMessagesRequest) returns (GetUserMessagesResponse);
 
   rpc AddHabit(AddHabitRequest) returns (AddHabitResponse);
   rpc AddTrigger(AddTriggerRequest) returns (AddTriggerResponse);
@@ -61,11 +62,6 @@ message Daryl {
 
 // UserMessage
 
-message UserMessageRequest {
-  string daryl_identifier = 1;
-  Message message = 2;
-}
-
 message Message {
   string id = 1;
   string text = 2;
@@ -74,8 +70,21 @@ message Message {
   bytes attrs = 5; 
 }
 
-message UserMessageResponse {
+message UserMessageRequest {
+  string daryl_identifier = 1;
   Message message = 2;
+}
+
+message UserMessageResponse {
+  Message message = 1;
+}
+
+message GetUserMessagesRequest {
+  string daryl_identifier = 1;
+}
+
+message GetUserMessagesResponse {
+  repeated Message messages = 2;
 }
 
 // AddHabit
@@ -93,7 +102,15 @@ message AddHabitRequest {
 }
 
 message AddHabitResponse {
-  Habit habit = 2;
+  Habit habit = 1;
+}
+
+message GetHabitsRequest {
+  string daryl_identifier = 1;
+}
+
+message GetHabitsResponse {
+  repeated Habit habit = 1;
 }
 
 // AddTrigger
@@ -109,7 +126,7 @@ message Trigger {
 message AddTriggerRequest {
   string daryl_identifier = 1;
 
-  Trigger trigger = 3;
+  Trigger trigger = 2;
 }
 
 message AddTriggerResponse {
@@ -140,7 +157,15 @@ message StartWorkSessionRequest {
 }
 
 message StartWorkSessionResponse {
-  Session session = 2;
+  Session session = 1;
+}
+
+message GetWorkSessionRequest {
+  string daryl_identifier = 1;
+}
+
+message GetWorkSessionResponse {
+  Session session = 1;
 }
 
 message CancelWorkSessionRequest {
@@ -167,7 +192,7 @@ message GetRequest {
 }
 
 message GetResponse {
-  Daryl daryl = 2;
+  Daryl daryl = 1;
 }
 
 // IncomingTriggerMessage

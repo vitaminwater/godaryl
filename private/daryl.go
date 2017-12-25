@@ -25,6 +25,17 @@ func (s *darylServer) UserMessage(c context.Context, r *protodef.UserMessageRequ
 	return resp, err
 }
 
+func (s *darylServer) GetUserMessages(c context.Context, r *protodef.GetUserMessagesRequest) (*protodef.GetUserMessagesResponse, error) {
+	log.Info("UserMessage")
+	d, ok := s.registry.Load(r.DarylIdentifier)
+	if ok != true {
+		log.Info(r)
+		return nil, fmt.Errorf("Unknown Daryl %s", r.DarylIdentifier)
+	}
+	resp, err := d.(*daryl.Daryl).MessageProcessor.GetUserMessages(r)
+	return resp, err
+}
+
 func (s *darylServer) AddHabit(c context.Context, r *protodef.AddHabitRequest) (*protodef.AddHabitResponse, error) {
 	log.Info("AddHabit")
 	d, ok := s.registry.Load(r.DarylIdentifier)
@@ -33,6 +44,17 @@ func (s *darylServer) AddHabit(c context.Context, r *protodef.AddHabitRequest) (
 	}
 
 	resp, err := d.(*daryl.Daryl).HabitProcessor.AddHabit(r)
+	return resp, err
+}
+
+func (s *darylServer) GetHabits(c context.Context, r *protodef.GetHabitsRequest) (*protodef.GetHabitsResponse, error) {
+	log.Info("GetHabits")
+	d, ok := s.registry.Load(r.DarylIdentifier)
+	if ok != true {
+		return nil, fmt.Errorf("Unknown Daryl %s", r.DarylIdentifier)
+	}
+
+	resp, err := d.(*daryl.Daryl).HabitProcessor.GetHabits(r)
 	return resp, err
 }
 
@@ -55,6 +77,17 @@ func (s *darylServer) StartWorkSession(c context.Context, r *protodef.StartWorkS
 	}
 
 	resp, err := d.(*daryl.Daryl).SessionProcessor.StartWorkSession(r)
+	return resp, err
+}
+
+func (s *darylServer) GetWorkSession(c context.Context, r *protodef.GetWorkSessionRequest) (*protodef.GetWorkSessionResponse, error) {
+	log.Info("GetWorkSession")
+	d, ok := s.registry.Load(r.DarylIdentifier)
+	if ok != true {
+		return nil, fmt.Errorf("Unknown Daryl %s", r.DarylIdentifier)
+	}
+
+	resp, err := d.(*daryl.Daryl).SessionProcessor.GetWorkSession(r)
 	return resp, err
 }
 
