@@ -36,11 +36,16 @@ message HasDarylResponse {
 service DarylService {
 
   rpc UserMessage(UserMessageRequest) returns (UserMessageResponse);
+
   rpc AddHabit(AddHabitRequest) returns (AddHabitResponse);
   rpc AddTrigger(AddTriggerRequest) returns (AddTriggerResponse);
+  rpc GetHabits(GetHabitsRequest) returns (GetHabitsResponse);
+
   rpc StartWorkSession(StartWorkSessionRequest) returns (StartWorkSessionResponse);
   rpc CancelWorkSession(CancelWorkSessionRequest) returns (CancelWorkSessionResponse);
   rpc RefuseSessionSlice(RefuseSessionSliceRequest) returns (RefuseSessionSliceResponse);
+  rpc GetWorkSession(GetWorkSessionRequest) returns (GetWorkSessionResponse);
+
   rpc Get(GetRequest) returns (GetResponse);
 
   rpc IncomingTriggerMessage(IncomingTriggerMessageRequest) returns (IncomingTriggerMessageResponse);
@@ -50,7 +55,8 @@ service DarylService {
 message Daryl {
   string id = 1;
   string name = 2;
-  string password = 3;
+  string email = 3;
+  string password = 4;
 }
 
 // UserMessage

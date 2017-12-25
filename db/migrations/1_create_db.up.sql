@@ -2,11 +2,12 @@ create extension pgcrypto;
 
 create table daryl (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  email varchar(50) not null,
   name varchar(50) not null,
   password varchar(100)
 );
 
-create unique index daryl_name_index on daryl (name);
+create unique index daryl_email_index on daryl (email);
 create index daryl_password_index on daryl (password);
 
 create table habit (

@@ -69,7 +69,7 @@ func handleCreateDarylToken(c *gin.Context) {
 		return
 	}
 
-	if err := da.GetFromNameAndPassword(); err != nil {
+	if err := da.GetFromEmailAndPassword(); err != nil {
 		c.JSON(500, gin.H{"status": "error", "error": err})
 		c.Abort()
 		return

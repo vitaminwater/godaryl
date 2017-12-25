@@ -10,6 +10,7 @@ import (
 type Daryl struct {
 	Id       string `json:"id" db:"id" access:"s"`
 	Name     string `json:"name" db:"name" access:"i,s"`
+	Email    string `json:"email" db:"email" access:"i,s"`
 	Password string `json:"password" db:"password" access:"i,u,s"`
 }
 
@@ -26,10 +27,10 @@ func (d *Daryl) Insert() error {
 	return nil
 }
 
-func (d *Daryl) GetFromNameAndPassword() error {
+func (d *Daryl) GetFromEmailAndPassword() error {
 	p := d.Password
 	log.Info(d)
-	err := daryl_db.Get("daryl", "name", d, d)
+	err := daryl_db.Get("daryl", "email", d, d)
 	if err != nil {
 		return err
 	}
@@ -42,8 +43,9 @@ func (d *Daryl) GetFromNameAndPassword() error {
 
 func (d Daryl) ToProtodef() (*protodef.Daryl, error) {
 	return &protodef.Daryl{
-		Id:   d.Id,
-		Name: d.Name,
+		Id:    d.Id,
+		Name:  d.Name,
+		Email: d.Email,
 	}, nil
 }
 
@@ -51,6 +53,7 @@ func NewDarylFromProtodef(d *protodef.Daryl) (Daryl, error) {
 	return Daryl{
 		Id:       d.Id,
 		Name:     d.Name,
+		Email:    d.Email,
 		Password: d.Password,
 	}, nil
 }
