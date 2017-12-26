@@ -26,7 +26,7 @@ func (s *darylServer) UserMessage(c context.Context, r *protodef.UserMessageRequ
 }
 
 func (s *darylServer) GetUserMessages(c context.Context, r *protodef.GetUserMessagesRequest) (*protodef.GetUserMessagesResponse, error) {
-	log.Info("UserMessage")
+	log.Info("GetUserMessages")
 	d, ok := s.registry.Load(r.DarylIdentifier)
 	if ok != true {
 		log.Info(r)

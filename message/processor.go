@@ -84,8 +84,27 @@ func (mp *messageProcessor) UserMessage(r *protodef.UserMessageRequest) (*protod
 	return &protodef.UserMessageResponse{Message: mm}, nil
 }
 
-func (mp *messageProcessor) GetUserMessages(*protodef.GetUserMessagesRequest) (*protodef.GetUserMessagesResponse, error) {
-	return &protodef.GetUserMessagesResponse{}, nil
+func (mp *messageProcessor) GetUserMessages(r *protodef.GetUserMessagesRequest) (*protodef.GetUserMessagesResponse, error) {
+	id := fmt.Sprintf("daryl_%s", mp.d.D.Id)
+	if r.HabitIdentifier != "" {
+		id = fmt.Sprintf("habit_%s", r.HabitIdentifier)
+	}
+
+	var m []*protodef.Message
+	t, ok := mp.threads.Load(id)
+	if ok == true {
+		msgs := t.(thread).getUserMessages(r.Pagination.From, r.Pagination.To)
+		for _, msg := range msgs {
+			mp, err := msg.ToProtodef()
+			if err != nil {
+				log.Warning(err)
+				continue
+			}
+			m = append(m, mp)
+		}
+	}
+
+	return &protodef.GetUserMessagesResponse{r.Pagination, m}, nil
 }
 
 func NewMessageProcessor() *messageProcessor {

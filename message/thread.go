@@ -31,6 +31,13 @@ func (t thread) pushUserMessage(m model.Message) {
 	t.cmd <- pushUserMessageCommand{m: m}
 }
 
+func (t thread) getUserMessages(from, to int32) []model.Message {
+	r := make(chan []model.Message)
+	t.cmd <- getUserMessagesCommand{from, to, r}
+	res := <-r
+	return res
+}
+
 /**
  * internals
  */

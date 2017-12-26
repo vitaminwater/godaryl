@@ -231,50 +231,56 @@ func (c *getCommand) Execute(co *gin.Context, d protodef.DarylServiceClient, o i
  * handleHTTPCommand
  */
 
-// TODO split GET/POST
-var cmds = map[string]darylCommand{
-	"message":     &userMessageCommand{},
-	"getmessages": &getUserMessagesCommand{},
-	"habit":       &addHabitCommand{},
-	"trigger":     &addTriggerCommand{},
-	"session":     &startWorkSessionCommand{},
-	"getsession":  &getWorkSessionCommand{},
-	"cancel":      &cancelWorkSessionCommand{},
-	"refuse":      &refuseSessionSliceCommand{},
-	"get":         &getCommand{},
+var posts = map[string]darylCommand{
+	"message": &userMessageCommand{},
+	"habit":   &addHabitCommand{},
+	"trigger": &addTriggerCommand{},
+	"session": &startWorkSessionCommand{},
+	"cancel":  &cancelWorkSessionCommand{},
+	"refuse":  &refuseSessionSliceCommand{},
+	"get":     &getCommand{},
 }
 
-func handleHTTPCommand(c *gin.Context) {
-	cmdName := c.Param("command")
-	cmd, ok := cmds[cmdName]
-	if ok == false {
-		c.JSON(400, gin.H{
-			"status": "error", "error": "not found cmd",
-		})
-		c.Abort()
-		return
-	}
-	url := c.MustGet("daryl_url").(string)
-	o := cmd.Object()
-	if o != nil {
-		if err := c.BindJSON(&o); err != nil {
+var gets = map[string]darylCommand{
+	"message": &getUserMessagesCommand{},
+	"habit":   &getHabitsCommand{},
+	"session": &getWorkSessionCommand{},
+	"get":     &getCommand{},
+}
+
+func handleHTTPCommand(cmds map[string]darylCommand) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		cmdName := c.Param("command")
+		cmd, ok := cmds[cmdName]
+		if ok == false {
+			c.JSON(400, gin.H{
+				"status": "error", "error": "not found cmd",
+			})
+			c.Abort()
+			return
+		}
+		url := c.MustGet("daryl_url").(string)
+		o := cmd.Object()
+		if o != nil {
+			if err := c.BindJSON(&o); err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"status": "error", "error": err})
+				c.Abort()
+				return
+			}
+		}
+		d, cl := protodef.OpenDarylConnection(url)
+		defer cl()
+		resp, err := cmd.Execute(c, d, o)
+		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"status": "error", "error": err})
 			c.Abort()
 			return
 		}
+		c.JSON(200, gin.H{
+			"status": "ok",
+			"resp":   resp,
+		})
 	}
-	d, cl := protodef.OpenDarylConnection(url)
-	defer cl()
-	resp, err := cmd.Execute(c, d, o)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"status": "error", "error": err})
-		c.Abort()
-		return
-	}
-	c.JSON(200, gin.H{
-		"status": "ok",
-		"resp":   resp,
-	})
 }
 
 func handleCreateDaryl(c *gin.Context) {

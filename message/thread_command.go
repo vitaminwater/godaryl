@@ -8,6 +8,10 @@ type threadCommand interface {
 	execute(t *thread) error
 }
 
+/**
+ * Add conversation
+ */
+
 type addConversationCommand struct {
 	c conversation
 }
@@ -18,6 +22,10 @@ func (c addConversationCommand) execute(t *thread) error {
 	return nil
 }
 
+/**
+ * Stop current conversation
+ */
+
 type stopCurrentConversationCommand struct {
 }
 
@@ -26,6 +34,10 @@ func (c stopCurrentConversationCommand) execute(t *thread) error {
 	t.updateCurrentConversation()
 	return nil
 }
+
+/**
+ * Push user message
+ */
 
 type pushUserMessageCommand struct {
 	m model.Message
@@ -43,5 +55,20 @@ func (c pushUserMessageCommand) execute(t *thread) error {
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+/**
+ * Push user message
+ */
+
+type getUserMessagesCommand struct {
+	from int32
+	to   int32
+	r    chan []model.Message
+}
+
+func (c getUserMessagesCommand) execute(t *thread) error {
+	c.r <- []model.Message{}
 	return nil
 }

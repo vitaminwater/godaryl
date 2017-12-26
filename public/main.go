@@ -33,8 +33,8 @@ func startServer() {
 	dr := router.Group("/daryl")
 	{
 		dr.Use(setDarylServer())
-		dr.POST("/cmd/:command", handleHTTPCommand)
-		dr.GET("/cmd/:command", handleHTTPCommand)
+		dr.POST("/cmd/:command", handleHTTPCommand(posts))
+		dr.GET("/cmd/:command", handleHTTPCommand(gets))
 		dr.GET("/stream/:token", handleWS)
 	}
 	router.Run(config.AppContext.String("bind-string"))
