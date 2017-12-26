@@ -113,7 +113,7 @@ message GetHabitsRequest {
 }
 
 message GetHabitsResponse {
-  repeated Habit habit = 1;
+  repeated Habit habits = 1;
 }
 
 // AddTrigger

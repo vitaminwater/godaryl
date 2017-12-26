@@ -35,7 +35,15 @@ func (sp *sessionProcessor) StartWorkSession(r *protodef.StartWorkSessionRequest
 }
 
 func (sp *sessionProcessor) GetWorkSession(r *protodef.GetWorkSessionRequest) (*protodef.GetWorkSessionResponse, error) {
-	return &protodef.GetWorkSessionResponse{}, nil
+	s, err := sp.sw.getSession()
+	if err != nil {
+		return nil, err
+	}
+	spp, err := s.ToProtodef()
+	if err != nil {
+		return nil, err
+	}
+	return &protodef.GetWorkSessionResponse{spp}, nil
 }
 
 func (sp *sessionProcessor) CancelWorkSession(r *protodef.CancelWorkSessionRequest) (*protodef.CancelWorkSessionResponse, error) {

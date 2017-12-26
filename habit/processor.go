@@ -1,6 +1,7 @@
 package habit
 
 import (
+	log "github.com/sirupsen/logrus"
 	"github.com/vitaminwater/daryl/daryl"
 	"github.com/vitaminwater/daryl/model"
 	"github.com/vitaminwater/daryl/protodef"
@@ -31,7 +32,20 @@ func (hp *habitProcessor) AddHabit(r *protodef.AddHabitRequest) (*protodef.AddHa
 }
 
 func (hp *habitProcessor) GetHabits(*protodef.GetHabitsRequest) (*protodef.GetHabitsResponse, error) {
-	return &protodef.GetHabitsResponse{}, nil
+	habits, err := hp.GetAllHabits()
+	if err != nil {
+		return nil, err
+	}
+	var hps []*protodef.Habit
+	for _, h := range habits {
+		hpp, err := h.GetHabit().ToProtodef()
+		if err != nil {
+			log.Warning(err)
+			continue
+		}
+		hps = append(hps, hpp)
+	}
+	return &protodef.GetHabitsResponse{hps}, nil
 }
 
 func (hp *habitProcessor) GetHabit(id string) (daryl.Habit, error) {

@@ -11,17 +11,6 @@ import (
 	"github.com/vitaminwater/daryl/protodef"
 )
 
-type sessionWorkerCommand interface {
-	execute(*sessionWorker)
-}
-
-type sessionWorkerCommandStop struct {
-}
-
-func (sws *sessionWorkerCommandStop) execute(sw *sessionWorker) {
-	close(sw.cmd)
-}
-
 type sessionWorker struct {
 	d   *daryl.Daryl
 	r   *protodef.StartWorkSessionRequest
@@ -32,6 +21,15 @@ type sessionWorker struct {
 }
 
 func (sw *sessionWorker) stop() {
+	sw.cmd <- &sessionWorkerCommandStop{}
+}
+
+func (sw *sessionWorker) getSession() (model.Session, error) {
+	r := make(chan model.Session)
+	sw.cmd <- &getSessionCommand{r}
+	m := <-r
+	close(r)
+	return m, nil
 }
 
 func sessionWorkerProcess(sw *sessionWorker) {
@@ -43,7 +41,8 @@ func sessionWorkerProcess(sw *sessionWorker) {
 		}
 	}()
 
-	for range sw.cmd {
+	for cmd := range sw.cmd {
+		cmd.execute(sw)
 	}
 }
 
