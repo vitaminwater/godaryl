@@ -43,7 +43,7 @@ type getUserMessagesCommand struct {
 }
 
 func (c *getUserMessagesCommand) Name() string {
-	return "getmessages"
+	return "message"
 }
 
 func (c *getUserMessagesCommand) Object() interface{} {
@@ -90,12 +90,12 @@ func (c *getHabitsCommand) Name() string {
 }
 
 func (c *getHabitsCommand) Object() interface{} {
-	return &protodef.GetHabitsRequest{}
+	return nil
 }
 
 func (c *getHabitsCommand) Execute(co *gin.Context, d protodef.DarylServiceClient, o interface{}) (interface{}, error) {
 	i := co.MustGet("daryl_id").(string)
-	r := o.(*protodef.GetHabitsRequest)
+	r := &protodef.GetHabitsRequest{}
 	r.DarylIdentifier = i
 	return d.GetHabits(context.Background(), r)
 }
@@ -154,12 +154,12 @@ func (c *getWorkSessionCommand) Name() string {
 }
 
 func (c *getWorkSessionCommand) Object() interface{} {
-	return &protodef.GetWorkSessionRequest{}
+	return nil
 }
 
 func (c *getWorkSessionCommand) Execute(co *gin.Context, d protodef.DarylServiceClient, o interface{}) (interface{}, error) {
 	i := co.MustGet("daryl_id").(string)
-	r := o.(*protodef.GetWorkSessionRequest)
+	r := &protodef.GetWorkSessionRequest{}
 	r.DarylIdentifier = i
 	return d.GetWorkSession(context.Background(), r)
 }
