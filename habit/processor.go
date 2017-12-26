@@ -45,7 +45,7 @@ func (hp *habitProcessor) GetHabits(*protodef.GetHabitsRequest) (*protodef.GetHa
 		}
 		hps = append(hps, hpp)
 	}
-	return &protodef.GetHabitsResponse{hps}, nil
+	return &protodef.GetHabitsResponse{Habits: hps}, nil
 }
 
 func (hp *habitProcessor) GetHabit(id string) (daryl.Habit, error) {

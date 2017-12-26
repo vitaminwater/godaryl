@@ -63,7 +63,7 @@ func habitCommand() cli.Command {
 					},
 					//	Usage: "Cron line\nex: */2 * * * * *\nex: @hourly\nex: @every 1h30m",
 					cli.StringFlag{
-						Name:  "duration, l",
+						Name:  "duration, d",
 						Usage: "Duration\nex: 2h45m",
 					},
 				},

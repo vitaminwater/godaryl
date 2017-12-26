@@ -49,6 +49,11 @@ func darylCommand() cli.Command {
 						Usage: "Daryl's identifier",
 					},
 					cli.StringFlag{
+						Name:  "email, e",
+						Value: "test@daryl.com",
+						Usage: "Daryl's owner email",
+					},
+					cli.StringFlag{
 						Name:  "name, n",
 						Value: "Daryl",
 						Usage: "Daryl's name",

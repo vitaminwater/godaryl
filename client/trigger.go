@@ -28,7 +28,7 @@ func addTrigger(client protodef.DarylServiceClient, c *cli.Context) {
 	log.Println(response)
 }
 
-func triggerCommand() []cli.Command {
+func triggerCommand() cli.Command {
 	return cli.Command{
 		Name:    "trigger",
 		Aliases: []string{"t"},
