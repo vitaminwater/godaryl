@@ -54,6 +54,9 @@ func (c *getUserMessagesCommand) Execute(co *gin.Context, d protodef.DarylServic
 	i := co.MustGet("daryl_id").(string)
 	r := o.(*protodef.GetUserMessagesRequest)
 	r.DarylIdentifier = i
+	if r.Pagination == nil {
+		r.Pagination = &protodef.Pagination{From: 0, To: 50}
+	}
 	return d.GetUserMessages(context.Background(), r)
 }
 

@@ -90,7 +90,7 @@ func (mp *messageProcessor) GetUserMessages(r *protodef.GetUserMessagesRequest) 
 		id = fmt.Sprintf("habit_%s", r.HabitIdentifier)
 	}
 
-	var m []*protodef.Message
+	m := []*protodef.Message{}
 	t, ok := mp.threads.Load(id)
 	if ok == true {
 		msgs := t.(thread).getUserMessages(r.Pagination.From, r.Pagination.To)

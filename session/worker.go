@@ -35,7 +35,7 @@ func (sw *sessionWorker) getSession() (model.Session, error) {
 func sessionWorkerProcess(sw *sessionWorker) {
 	defer func() {
 		if err := recover(); err != nil {
-			log.Warn(err.Error())
+			log.Warn(err)
 			time.Sleep(time.Duration(int64(rand.Intn(3)+1)) * time.Second)
 			go sessionWorkerProcess(sw)
 		}
