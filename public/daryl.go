@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -264,10 +265,19 @@ func handleHTTPCommand(cmds map[string]darylCommand) func(c *gin.Context) {
 		}
 		o := cmd.Object()
 		if o != nil {
-			if err := c.BindJSON(o); err != nil {
-				c.JSON(http.StatusBadRequest, gin.H{"status": "error", "error": err.Error()})
-				c.Abort()
-				return
+			qBody := c.Request.URL.Query().Get("b")
+			if qBody != "" {
+				if err := json.Unmarshal([]byte(qBody), o); err != nil {
+					c.JSON(http.StatusBadRequest, gin.H{"status": "error", "error": err.Error()})
+					c.Abort()
+					return
+				}
+			} else if c.Request.ContentLength > 0 {
+				if err := c.BindJSON(o); err != nil {
+					c.JSON(http.StatusBadRequest, gin.H{"status": "error", "error": err.Error()})
+					c.Abort()
+					return
+				}
 			}
 		}
 		url := c.MustGet("daryl_url").(string)
@@ -294,7 +304,7 @@ func handleCreateDaryl(c *gin.Context) {
 		return
 	}
 
-	f, cl := protodef.OpenFarmConnection("localhost:8043")
+	f, cl := protodef.OpenFarmConnection("localhost:8043") // TODO
 	defer cl()
 	r, err := f.StartDaryl(context.Background(), &protodef.StartDarylRequest{Daryl: d})
 	if err != nil {

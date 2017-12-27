@@ -35,6 +35,9 @@ func (sp *sessionProcessor) StartWorkSession(r *protodef.StartWorkSessionRequest
 }
 
 func (sp *sessionProcessor) GetWorkSession(r *protodef.GetWorkSessionRequest) (*protodef.GetWorkSessionResponse, error) {
+	if sp.sw == nil {
+		return nil, errors.New("No current session")
+	}
 	s, err := sp.sw.getSession()
 	if err != nil {
 		return nil, err
