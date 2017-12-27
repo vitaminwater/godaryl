@@ -21,13 +21,13 @@ func setDarylServer() func(*gin.Context) {
 		}
 		t, err := newTokenFromToken(h)
 		if err != nil {
-			c.JSON(http.StatusServiceUnavailable, gin.H{"status": "error", "error": err})
+			c.JSON(http.StatusServiceUnavailable, gin.H{"status": "error", "error": err.Error()})
 			c.Abort()
 			return
 		}
 		url, err := distributed.FindDarylServer(t.Daryl.Id)
 		if err != nil {
-			c.JSON(http.StatusServiceUnavailable, gin.H{"status": "error", "error": err})
+			c.JSON(http.StatusServiceUnavailable, gin.H{"status": "error", "error": err.Error()})
 			c.Abort()
 			return
 		}

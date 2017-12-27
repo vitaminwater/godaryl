@@ -259,20 +259,20 @@ func handleHTTPCommand(cmds map[string]darylCommand) func(c *gin.Context) {
 			c.Abort()
 			return
 		}
-		url := c.MustGet("daryl_url").(string)
 		o := cmd.Object()
 		if o != nil {
-			if err := c.BindJSON(&o); err != nil {
-				c.JSON(http.StatusBadRequest, gin.H{"status": "error", "error": err})
+			if err := c.BindJSON(o); err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"status": "error", "error": err.Error()})
 				c.Abort()
 				return
 			}
 		}
+		url := c.MustGet("daryl_url").(string)
 		d, cl := protodef.OpenDarylConnection(url)
 		defer cl()
 		resp, err := cmd.Execute(c, d, o)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"status": "error", "error": err})
+			c.JSON(http.StatusBadRequest, gin.H{"status": "error", "error": err.Error()})
 			c.Abort()
 			return
 		}
@@ -286,7 +286,7 @@ func handleHTTPCommand(cmds map[string]darylCommand) func(c *gin.Context) {
 func handleCreateDaryl(c *gin.Context) {
 	d := &protodef.Daryl{}
 	if err := c.Bind(d); err != nil {
-		c.JSON(500, gin.H{"status": "error", "error": err})
+		c.JSON(500, gin.H{"status": "error", "error": err.Error()})
 		c.Abort()
 		return
 	}
@@ -295,14 +295,14 @@ func handleCreateDaryl(c *gin.Context) {
 	defer cl()
 	r, err := f.StartDaryl(context.Background(), &protodef.StartDarylRequest{Daryl: d})
 	if err != nil {
-		c.JSON(500, gin.H{"status": "error", "error": err})
+		c.JSON(500, gin.H{"status": "error", "error": err.Error()})
 		c.Abort()
 		return
 	}
 
 	t, err := newTokenForDaryl(r.Daryl)
 	if err != nil {
-		c.JSON(500, gin.H{"status": "error", "error": err})
+		c.JSON(500, gin.H{"status": "error", "error": err.Error()})
 		c.Abort()
 		return
 	}

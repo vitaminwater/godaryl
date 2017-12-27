@@ -57,33 +57,33 @@ func newTokenFromToken(hash string) (*token, error) {
 func handleCreateDarylToken(c *gin.Context) {
 	d := &protodef.Daryl{}
 	if err := c.Bind(d); err != nil {
-		c.JSON(500, gin.H{"status": "error", "error": err})
+		c.JSON(500, gin.H{"status": "error", "error": err.Error()})
 		c.Abort()
 		return
 	}
 
 	da, err := model.NewDarylFromProtodef(d)
 	if err != nil {
-		c.JSON(500, gin.H{"status": "error", "error": err})
+		c.JSON(500, gin.H{"status": "error", "error": err.Error()})
 		c.Abort()
 		return
 	}
 
 	if err := da.GetFromEmailAndPassword(); err != nil {
-		c.JSON(500, gin.H{"status": "error", "error": err})
+		c.JSON(500, gin.H{"status": "error", "error": err.Error()})
 		c.Abort()
 		return
 	}
 
 	d, err = da.ToProtodef()
 	if err != nil {
-		c.JSON(500, gin.H{"status": "error", "error": err})
+		c.JSON(500, gin.H{"status": "error", "error": err.Error()})
 		c.Abort()
 		return
 	}
 	t, err := newTokenForDaryl(d)
 	if err != nil {
-		c.JSON(500, gin.H{"status": "error", "error": err})
+		c.JSON(500, gin.H{"status": "error", "error": err.Error()})
 		c.Abort()
 		return
 	}

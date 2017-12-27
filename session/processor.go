@@ -43,7 +43,7 @@ func (sp *sessionProcessor) GetWorkSession(r *protodef.GetWorkSessionRequest) (*
 	if err != nil {
 		return nil, err
 	}
-	return &protodef.GetWorkSessionResponse{spp}, nil
+	return &protodef.GetWorkSessionResponse{Session: spp}, nil
 }
 
 func (sp *sessionProcessor) CancelWorkSession(r *protodef.CancelWorkSessionRequest) (*protodef.CancelWorkSessionResponse, error) {

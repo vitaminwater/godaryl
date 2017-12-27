@@ -104,7 +104,7 @@ func (mp *messageProcessor) GetUserMessages(r *protodef.GetUserMessagesRequest) 
 		}
 	}
 
-	return &protodef.GetUserMessagesResponse{r.Pagination, m}, nil
+	return &protodef.GetUserMessagesResponse{Pagination: r.Pagination, Messages: m}, nil
 }
 
 func NewMessageProcessor() *messageProcessor {
