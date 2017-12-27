@@ -97,7 +97,7 @@ func NewSessionSliceFromProtodef(d Daryl, ss *protodef.SessionSlice) (SessionSli
 	if err != nil {
 		return SessionSlice{}, err
 	}
-	h, err := NewHabitFromProtodef(d, ss.Habit)
+	h, err := NewHabitFromProtodef(d.Id, ss.Habit)
 	if err != nil {
 		return SessionSlice{}, err
 	}

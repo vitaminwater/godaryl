@@ -46,6 +46,26 @@ func (m Message) ToProtodef() (*protodef.Message, error) {
 	}, nil
 }
 
+func MessagesForDaryl(darylId string, from, to int32) ([]Message, error) {
+	result := []Message{}
+	err := daryl_db.SelectPaginated("message", "daryl_id", &result, Message{DarylId: darylId}, from, to)
+	if err != nil {
+		return result, err
+	}
+
+	return result, nil
+}
+
+func MessagesForHabit(habitId string, from, to int32) ([]Message, error) {
+	result := []Message{}
+	err := daryl_db.SelectPaginated("message", "habit_id", &result, Message{HabitId: sql.NullString{String: habitId, Valid: true}}, from, to)
+	if err != nil {
+		return result, err
+	}
+
+	return result, nil
+}
+
 func NewMessageFromProtodef(d Daryl, msg *protodef.Message) (Message, error) {
 	attrs := map[string]interface{}{}
 	err := json.Unmarshal(msg.Attrs, &attrs)

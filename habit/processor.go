@@ -18,7 +18,7 @@ func (hp *habitProcessor) SetDaryl(d *daryl.Daryl) {
 }
 
 func (hp *habitProcessor) AddHabit(r *protodef.AddHabitRequest) (*protodef.AddHabitResponse, error) {
-	h, err := model.NewHabitFromProtodef(hp.d.D, r.Habit)
+	h, err := model.NewHabitFromProtodef(hp.d.D.Id, r.Habit)
 	if err != nil {
 		return nil, err
 	}

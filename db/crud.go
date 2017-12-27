@@ -30,6 +30,21 @@ func Select(t, match string, dest, src interface{}) error {
 	}
 }
 
+func SelectPaginated(t, match string, dest, src interface{}, from, to int32) error {
+	q, err := GettPaginatedQuery(t, match, src, from, to)
+	if err != nil {
+		return err
+	}
+	if stmt, err := db.PrepareNamed(q); err != nil {
+		return err
+	} else {
+		if err := stmt.Select(dest, src); err != nil {
+			return err
+		}
+		return nil
+	}
+}
+
 func Insert(t string, s interface{}) error {
 	q, err := InsertQuery(t, s)
 	if err != nil {

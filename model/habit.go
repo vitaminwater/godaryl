@@ -30,9 +30,9 @@ func (h Habit) ToProtodef() (*protodef.Habit, error) {
 	}, nil
 }
 
-func HabitsForDaryl(d Daryl) ([]Habit, error) {
+func HabitsForDaryl(darylId string) ([]Habit, error) {
 	result := []Habit{}
-	err := daryl_db.Select("habit", "daryl_id", &result, Habit{DarylId: d.Id})
+	err := daryl_db.Select("habit", "daryl_id", &result, Habit{DarylId: darylId})
 	if err != nil {
 		return result, err
 	}
@@ -40,7 +40,7 @@ func HabitsForDaryl(d Daryl) ([]Habit, error) {
 	return result, nil
 }
 
-func NewHabitFromProtodef(d Daryl, h *protodef.Habit) (Habit, error) {
+func NewHabitFromProtodef(darylId string, h *protodef.Habit) (Habit, error) {
 	duration, err := time.ParseDuration(h.Duration)
 	if err != nil {
 		return Habit{}, err
@@ -48,7 +48,7 @@ func NewHabitFromProtodef(d Daryl, h *protodef.Habit) (Habit, error) {
 	return Habit{
 		Id:       h.Id,
 		Title:    h.Title,
-		DarylId:  d.Id,
+		DarylId:  darylId,
 		Duration: duration,
 	}, nil
 }

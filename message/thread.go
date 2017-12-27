@@ -9,6 +9,7 @@ import (
 type thread struct {
 	id string
 	d  *daryl.Daryl
+	h  daryl.Habit
 	cs []conversation
 	c  conversation
 
@@ -63,8 +64,8 @@ func threadProcess(t thread) {
 	}
 }
 
-func newThread(id string, d *daryl.Daryl, cs []conversation) (thread, error) {
-	t := thread{id: id, d: d, cs: cs, c: nil, cmd: make(chan threadCommand, 10)}
+func newThread(id string, d *daryl.Daryl, h daryl.Habit, cs []conversation) (thread, error) {
+	t := thread{id: id, d: d, h: h, cs: cs, c: nil, cmd: make(chan threadCommand, 10)}
 
 	t.updateCurrentConversation()
 	go threadProcess(t)

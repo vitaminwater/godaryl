@@ -74,7 +74,7 @@ func habitStoreProcess(hs *habitStore) {
 }
 
 func (hs *habitStore) loadHabits() error {
-	habits, err := model.HabitsForDaryl(hs.d.D)
+	habits, err := model.HabitsForDaryl(hs.d.D.Id)
 	if err != nil {
 		return err
 	}

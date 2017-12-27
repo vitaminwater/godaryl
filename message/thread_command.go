@@ -69,6 +69,17 @@ type getUserMessagesCommand struct {
 }
 
 func (c getUserMessagesCommand) execute(t *thread) error {
-	c.r <- []model.Message{}
+	var res []model.Message
+	var err error
+	if t.h != nil {
+		res, err = model.MessagesForHabit(t.h.GetHabit().Id, c.from, c.to)
+	} else {
+		res, err = model.MessagesForDaryl(t.d.D.Id, c.from, c.to)
+	}
+	if err != nil {
+		return err
+	}
+
+	c.r <- res
 	return nil
 }

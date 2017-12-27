@@ -29,7 +29,7 @@ func (mp *messageProcessor) SetDaryl(d *daryl.Daryl) {
 	}
 	for _, h := range hs {
 		id := fmt.Sprintf("habit_%s", h.GetHabit().Id)
-		t, err := newThread(id, mp.d, []conversation{habitConversation{h: h}})
+		t, err := newThread(id, mp.d, h, []conversation{habitConversation{h: h}})
 		if err != nil {
 			log.Warning(err)
 		}
@@ -37,7 +37,7 @@ func (mp *messageProcessor) SetDaryl(d *daryl.Daryl) {
 	}
 
 	id := fmt.Sprintf("daryl_%s", d.D.Id)
-	t, err := newThread(id, mp.d, []conversation{darylConversation{d: d}})
+	t, err := newThread(id, mp.d, nil, []conversation{darylConversation{d: d}})
 	if err != nil {
 		log.Warning(err)
 	}
